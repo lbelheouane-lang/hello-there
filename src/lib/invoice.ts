@@ -215,15 +215,20 @@ export function buildInvoiceHtml(inv: InvoiceRecord): string {
 
     ${inv.notes ? `<div class="notes">${esc(inv.notes)}</div>` : ""}
 
+    ${s.thank_you_message ? `<div class="notes">${esc(s.thank_you_message)}</div>` : ""}
+
     <div class="sign">
-      <div>Signature du client</div>
-      <div>Cachet & signature du représentant</div>
+      <div>${esc(s.signature_left || "Signature du client")}</div>
+      <div>${esc(s.signature_right || "Cachet & signature du représentant")}</div>
     </div>
 
-    <div class="foot">Merci de votre confiance — ${esc(STORE_INFO.name)} · ${esc(STORE_INFO.phone)}</div>
+    ${s.terms ? `<div class="terms">${esc(s.terms)}</div>` : ""}
+
+    <div class="foot">${esc(s.invoice_footer || `Merci de votre confiance — ${store.name}`)}${store.phone ? ` · ${esc(store.phone)}` : ""}</div>
   </div>
 </body></html>`;
 }
+
 
 /** Open the invoice in a new window and trigger the print / save-as-PDF dialog. */
 export function printInvoice(inv: InvoiceRecord): void {
