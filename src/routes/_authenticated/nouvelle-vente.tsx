@@ -51,6 +51,8 @@ function NewSalePage() {
   const [amountPaid, setAmountPaid] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<string>(PAYMENT_METHODS[0].value);
   const [notes, setNotes] = useState("");
+  const [saleType, setSaleType] = useState<"full" | "installment">("full");
+  const [dueDate, setDueDate] = useState("");
 
   // Quick add customer
   const [newCustomerName, setNewCustomerName] = useState("");
@@ -128,6 +130,10 @@ function NewSalePage() {
       if (!selectedProduct) throw new Error("Sélectionnez un bijou à vendre.");
       const total = Number(totalAmount);
       if (!total || total <= 0) throw new Error("Indiquez le montant total de la vente.");
+      const isInstallment = saleType === "installment";
+      const paid = isInstallment ? Number(amountPaid) || 0 : Number(amountPaid) || total;
+      if (isInstallment && paid >= total)
+        throw new Error("Pour un paiement échelonné, l'acompte doit être inférieur au total.");
       const { data: u } = await supabase.auth.getUser();
       const saleNumber = `V-${Date.now().toString(36).toUpperCase().slice(-6)}`;
       const { error } = await supabase.from("sales").insert({
@@ -137,8 +143,10 @@ function NewSalePage() {
         product_name: selectedProduct.name,
         weight_grams: Number(selectedProduct.weight_grams),
         total_amount: total,
-        amount_paid: Number(amountPaid) || total,
+        amount_paid: paid,
         payment_method: paymentMethod,
+        sale_type: saleType,
+        due_date: isInstallment && dueDate ? dueDate : null,
         notes: notes.trim() || null,
         sold_by: u.user?.id,
       });
@@ -154,8 +162,11 @@ function NewSalePage() {
       setTotalAmount("");
       setAmountPaid("");
       setNotes("");
+      setSaleType("full");
+      setDueDate("");
       qc.invalidateQueries({ queryKey: ["products"] });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
+      qc.invalidateQueries({ queryKey: ["sales"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -245,9 +256,39 @@ function NewSalePage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Montant payé (DZD)</Label>
-                <Input type="number" min={0} step="1" placeholder="= total si vide" value={amountPaid} onChange={(e) => setAmountPaid(e.target.value)} />
+                <Label>Type de paiement</Label>
+                <Select value={saleType} onValueChange={(v) => setSaleType(v as "full" | "installment")}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="full">Paiement intégral</SelectItem>
+                    <SelectItem value="installment">Paiement échelonné</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+
+              <div className="space-y-2">
+                <Label>{saleType === "installment" ? "Acompte initial (DZD)" : "Montant payé (DZD)"}</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  step="1"
+                  placeholder={saleType === "installment" ? "Acompte versé" : "= total si vide"}
+                  value={amountPaid}
+                  onChange={(e) => setAmountPaid(e.target.value)}
+                />
+                {saleType === "installment" && Number(totalAmount) > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    Reste à payer : {formatDZD(Math.max(Number(totalAmount) - (Number(amountPaid) || 0), 0))}
+                  </p>
+                )}
+              </div>
+
+              {saleType === "installment" && (
+                <div className="space-y-2">
+                  <Label>Date d'échéance</Label>
+                  <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label>Mode de paiement</Label>

@@ -116,6 +116,56 @@ export type Database = {
         }
         Relationships: []
       }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          is_demo: boolean
+          notes: string | null
+          paid_at: string
+          payment_method: string
+          receipt_number: string
+          recorded_by: string | null
+          sale_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          is_demo?: boolean
+          notes?: string | null
+          paid_at?: string
+          payment_method?: string
+          receipt_number: string
+          recorded_by?: string | null
+          sale_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          is_demo?: boolean
+          notes?: string | null
+          paid_at?: string
+          payment_method?: string
+          receipt_number?: string
+          recorded_by?: string | null
+          sale_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           category: string
@@ -219,6 +269,7 @@ export type Database = {
           amount_paid: number
           created_at: string
           customer_id: string | null
+          due_date: string | null
           id: string
           is_demo: boolean
           notes: string | null
@@ -226,6 +277,7 @@ export type Database = {
           product_id: string | null
           product_name: string | null
           sale_number: string
+          sale_type: string
           sold_by: string | null
           total_amount: number
           updated_at: string
@@ -235,6 +287,7 @@ export type Database = {
           amount_paid?: number
           created_at?: string
           customer_id?: string | null
+          due_date?: string | null
           id?: string
           is_demo?: boolean
           notes?: string | null
@@ -242,6 +295,7 @@ export type Database = {
           product_id?: string | null
           product_name?: string | null
           sale_number: string
+          sale_type?: string
           sold_by?: string | null
           total_amount?: number
           updated_at?: string
@@ -251,6 +305,7 @@ export type Database = {
           amount_paid?: number
           created_at?: string
           customer_id?: string | null
+          due_date?: string | null
           id?: string
           is_demo?: boolean
           notes?: string | null
@@ -258,6 +313,7 @@ export type Database = {
           product_id?: string | null
           product_name?: string | null
           sale_number?: string
+          sale_type?: string
           sold_by?: string | null
           total_amount?: number
           updated_at?: string

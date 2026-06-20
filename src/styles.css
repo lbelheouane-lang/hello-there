@@ -242,8 +242,20 @@
     visibility: hidden;
   }
   #label-print-area,
-  #label-print-area * {
+  #label-print-area *,
+  #receipt-print-area,
+  #receipt-print-area * {
     visibility: visible;
+  }
+  #receipt-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #ffffff !important;
+    color: #000 !important;
+    padding: 8mm !important;
+    margin: 0 !important;
   }
   #label-print-area {
     position: absolute;
