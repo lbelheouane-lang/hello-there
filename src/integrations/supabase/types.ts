@@ -116,6 +116,129 @@ export type Database = {
         }
         Relationships: []
       }
+      invoices: {
+        Row: {
+          amount_this_tx: number
+          balance: number
+          created_at: string
+          customer_address: string | null
+          customer_id: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          discount: number
+          employee_id: string | null
+          employee_name: string | null
+          gold_karat: number | null
+          id: string
+          invoice_number: string
+          invoice_type: string
+          is_demo: boolean
+          issued_at: string
+          metal_type: string | null
+          notes: string | null
+          payment_id: string | null
+          payment_method: string | null
+          payment_status: string
+          product_id: string | null
+          product_name: string | null
+          product_sku: string | null
+          quantity: number
+          sale_id: string | null
+          sale_number: string | null
+          sale_type: string | null
+          total_amount: number
+          total_paid: number
+          unit_price: number
+          updated_at: string
+          weight_grams: number | null
+        }
+        Insert: {
+          amount_this_tx?: number
+          balance?: number
+          created_at?: string
+          customer_address?: string | null
+          customer_id?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          discount?: number
+          employee_id?: string | null
+          employee_name?: string | null
+          gold_karat?: number | null
+          id?: string
+          invoice_number: string
+          invoice_type?: string
+          is_demo?: boolean
+          issued_at?: string
+          metal_type?: string | null
+          notes?: string | null
+          payment_id?: string | null
+          payment_method?: string | null
+          payment_status?: string
+          product_id?: string | null
+          product_name?: string | null
+          product_sku?: string | null
+          quantity?: number
+          sale_id?: string | null
+          sale_number?: string | null
+          sale_type?: string | null
+          total_amount?: number
+          total_paid?: number
+          unit_price?: number
+          updated_at?: string
+          weight_grams?: number | null
+        }
+        Update: {
+          amount_this_tx?: number
+          balance?: number
+          created_at?: string
+          customer_address?: string | null
+          customer_id?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          discount?: number
+          employee_id?: string | null
+          employee_name?: string | null
+          gold_karat?: number | null
+          id?: string
+          invoice_number?: string
+          invoice_type?: string
+          is_demo?: boolean
+          issued_at?: string
+          metal_type?: string | null
+          notes?: string | null
+          payment_id?: string | null
+          payment_method?: string | null
+          payment_status?: string
+          product_id?: string | null
+          product_name?: string | null
+          product_sku?: string | null
+          quantity?: number
+          sale_id?: string | null
+          sale_number?: string | null
+          sale_type?: string | null
+          total_amount?: number
+          total_paid?: number
+          unit_price?: number
+          updated_at?: string
+          weight_grams?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -441,6 +564,11 @@ export type Database = {
         }
         Returns: boolean
       }
+      invoice_status: {
+        Args: { _due: string; _paid: number; _total: number }
+        Returns: string
+      }
+      next_invoice_number: { Args: { _prefix?: string }; Returns: string }
       seed_demo_data: { Args: never; Returns: undefined }
     }
     Enums: {
