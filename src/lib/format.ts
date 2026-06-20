@@ -22,6 +22,17 @@ export const METAL_TYPES = [
   { value: "platine", label: "Platine" },
 ] as const;
 
+export const PAYMENT_METHODS = [
+  { value: "especes", label: "Espèces" },
+  { value: "cheque", label: "Chèque" },
+  { value: "carte", label: "Carte" },
+  { value: "virement", label: "Virement" },
+] as const;
+
+export function paymentLabel(value: string): string {
+  return PAYMENT_METHODS.find((p) => p.value === value)?.label ?? value;
+}
+
 export const CATEGORIES = [
   "Bague",
   "Collier",
