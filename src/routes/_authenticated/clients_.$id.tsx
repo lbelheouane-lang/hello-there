@@ -32,7 +32,7 @@ import {
 } from "@/lib/installments";
 import { printReceipt, type ReceiptData } from "@/lib/receipt";
 
-export const Route = createFileRoute("/_authenticated/clients/$id")({
+export const Route = createFileRoute("/_authenticated/clients_/$id")({
   component: CustomerProfilePage,
 });
 
