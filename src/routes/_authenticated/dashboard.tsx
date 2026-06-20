@@ -97,7 +97,7 @@ function DashboardPage() {
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Coins className="h-5 w-5 text-primary" /> Cours de l'or au gramme
+              <Coins className="h-5 w-5 text-primary" /> Cours de l'or au gramme (USD)
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -105,7 +105,8 @@ function DashboardPage() {
               {KARATS.map((k) => (
                 <div key={k} className="rounded-xl border bg-card p-4">
                   <p className="text-sm text-muted-foreground">{k}K</p>
-                  <p className="mt-1 text-xl font-semibold">{prices?.[k] ? formatDZD(prices[k].price_per_gram) : "—"}</p>
+                  <p className="mt-1 text-xl font-semibold">{prices?.[k] ? formatUSD(prices[k].price_per_gram) : "—"}</p>
+                  <p className="text-xs text-muted-foreground">{prices?.[k] ? `≈ ${formatFromUSD(prices[k].price_per_gram, "DZD")}` : ""}</p>
                 </div>
               ))}
             </div>
