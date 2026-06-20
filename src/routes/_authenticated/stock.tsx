@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/table";
 import {
   KARATS, CATEGORIES, METAL_TYPES, PRODUCT_STATUSES,
-  formatGrams, statusLabel, metalValue, formatDZD,
+  formatGrams, statusLabel, metalValue,
 } from "@/lib/format";
 import { formatFromEUR } from "@/lib/currency";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
