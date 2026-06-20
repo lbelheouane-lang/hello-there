@@ -95,6 +95,8 @@ function StockPage() {
   const [metalFilter, setMetalFilter] = useState("all");
   const [karatFilter, setKaratFilter] = useState("all");
   const [supplierFilter, setSupplierFilter] = useState("all");
+  const [originFilter, setOriginFilter] = useState("all");
+  const [countryFilter, setCountryFilter] = useState("all");
   const [minWeight, setMinWeight] = useState("");
   const [maxWeight, setMaxWeight] = useState("");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
