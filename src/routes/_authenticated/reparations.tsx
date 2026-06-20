@@ -562,7 +562,7 @@ function RepairDetailDialog({ repair, onClose, onPrint }: { repair: Repair | nul
 
   const url = repair ? trackingUrl(repair.tracking_token) : "";
 
-  useMemo(() => {
+  useEffect(() => {
     if (repair) generateQrDataUrl(trackingUrl(repair.tracking_token)).then(setQr).catch(() => setQr(""));
     else setQr("");
   }, [repair]);
