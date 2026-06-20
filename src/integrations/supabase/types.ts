@@ -658,6 +658,47 @@ export type Database = {
         }
         Relationships: []
       }
+      product_origin_events: {
+        Row: {
+          changed_by: string | null
+          country_of_origin: string | null
+          created_at: string
+          detail: string | null
+          event_type: string
+          id: string
+          metal_origin: string | null
+          product_id: string
+        }
+        Insert: {
+          changed_by?: string | null
+          country_of_origin?: string | null
+          created_at?: string
+          detail?: string | null
+          event_type: string
+          id?: string
+          metal_origin?: string | null
+          product_id: string
+        }
+        Update: {
+          changed_by?: string | null
+          country_of_origin?: string | null
+          created_at?: string
+          detail?: string | null
+          event_type?: string
+          id?: string
+          metal_origin?: string | null
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_origin_events_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_subcategories: {
         Row: {
           category_id: string
@@ -693,6 +734,7 @@ export type Database = {
       products: {
         Row: {
           category: string
+          country_of_origin: string | null
           created_at: string
           created_by: string | null
           gold_karat: number | null
@@ -701,6 +743,7 @@ export type Database = {
           is_demo: boolean
           labor_cost: number
           making_charge: number
+          metal_origin: string | null
           metal_purchase_price: number
           metal_type: string
           name: string
@@ -716,6 +759,7 @@ export type Database = {
         }
         Insert: {
           category: string
+          country_of_origin?: string | null
           created_at?: string
           created_by?: string | null
           gold_karat?: number | null
@@ -724,6 +768,7 @@ export type Database = {
           is_demo?: boolean
           labor_cost?: number
           making_charge?: number
+          metal_origin?: string | null
           metal_purchase_price?: number
           metal_type?: string
           name: string
@@ -739,6 +784,7 @@ export type Database = {
         }
         Update: {
           category?: string
+          country_of_origin?: string | null
           created_at?: string
           created_by?: string | null
           gold_karat?: number | null
@@ -747,6 +793,7 @@ export type Database = {
           is_demo?: boolean
           labor_cost?: number
           making_charge?: number
+          metal_origin?: string | null
           metal_purchase_price?: number
           metal_type?: string
           name?: string
