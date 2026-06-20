@@ -29,6 +29,7 @@ interface Customer {
   email: string | null;
   address: string | null;
   notes: string | null;
+  is_demo: boolean;
 }
 
 const empty: Record<string, string> = { full_name: "", phone: "", email: "", address: "", notes: "" };
