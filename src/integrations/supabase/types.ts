@@ -284,6 +284,7 @@ export type Database = {
           employee_id: string | null
           employee_name: string | null
           gold_karat: number | null
+          gold_value: number | null
           id: string
           invoice_number: string
           invoice_type: string
@@ -297,6 +298,7 @@ export type Database = {
           product_id: string | null
           product_name: string | null
           product_sku: string | null
+          purchase_price_per_gram: number | null
           quantity: number
           sale_id: string | null
           sale_number: string | null
@@ -319,6 +321,7 @@ export type Database = {
           employee_id?: string | null
           employee_name?: string | null
           gold_karat?: number | null
+          gold_value?: number | null
           id?: string
           invoice_number: string
           invoice_type?: string
@@ -332,6 +335,7 @@ export type Database = {
           product_id?: string | null
           product_name?: string | null
           product_sku?: string | null
+          purchase_price_per_gram?: number | null
           quantity?: number
           sale_id?: string | null
           sale_number?: string | null
@@ -354,6 +358,7 @@ export type Database = {
           employee_id?: string | null
           employee_name?: string | null
           gold_karat?: number | null
+          gold_value?: number | null
           id?: string
           invoice_number?: string
           invoice_type?: string
@@ -367,6 +372,7 @@ export type Database = {
           product_id?: string | null
           product_name?: string | null
           product_sku?: string | null
+          purchase_price_per_gram?: number | null
           quantity?: number
           sale_id?: string | null
           sale_number?: string | null
@@ -905,6 +911,7 @@ export type Database = {
           payment_method: string
           product_id: string | null
           product_name: string | null
+          purchase_price_per_gram: number | null
           sale_number: string
           sale_type: string
           sold_by: string | null
@@ -923,6 +930,7 @@ export type Database = {
           payment_method?: string
           product_id?: string | null
           product_name?: string | null
+          purchase_price_per_gram?: number | null
           sale_number: string
           sale_type?: string
           sold_by?: string | null
@@ -941,6 +949,7 @@ export type Database = {
           payment_method?: string
           product_id?: string | null
           product_name?: string | null
+          purchase_price_per_gram?: number | null
           sale_number?: string
           sale_type?: string
           sold_by?: string | null
