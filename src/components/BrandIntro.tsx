@@ -80,7 +80,11 @@ export function BrandIntro() {
               animation: "brand-logo-reveal 1s cubic-bezier(0.22,1,0.36,1) forwards",
             }}
           >
-            <Gem className="h-10 w-10" />
+            {settings?.logo_url ? (
+              <img src={settings.logo_url} alt={storeName} className="h-14 w-14 object-contain" />
+            ) : (
+              <Gem className="h-10 w-10" />
+            )}
           </div>
         </div>
 
