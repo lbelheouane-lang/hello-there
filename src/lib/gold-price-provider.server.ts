@@ -15,14 +15,14 @@ const PURITY: Record<number, number> = {
 };
 const KARATS = [24, 22, 21, 18, 14] as const;
 
-/** Taux de conversion USD -> DZD (configurable via secret, fallback raisonnable). */
+/** Taux de conversion USD -> DZD (configurable via secret) pour la valorisation produit. */
 function usdToDzd(): number {
   const raw = Number(process.env.GOLD_USD_TO_DZD);
   return Number.isFinite(raw) && raw > 0 ? raw : 268;
 }
 
 export interface SpotPrice {
-  /** Prix de l'once d'or pur (24K) dans la devise indiquée. */
+  /** Prix de l'once d'or pur (24K) en USD. */
   pricePerOunce: number;
   currency: string;
   source: string;
@@ -54,7 +54,7 @@ async function fetchJson(url: string, timeoutMs = 8000): Promise<any | null> {
 /**
  * Fournisseur GoldRepublic. GoldRepublic n'expose pas d'API publique documentée
  * de cotation en temps réel ; on tente un endpoint connu, sinon on renvoie null
- * et la chaîne de fournisseurs bascule sur le suivant.
+ * et la chaîne de fournisseurs bascule sur le suivant. Cotation en USD.
  */
 const goldRepublicSource: GoldPriceSource = {
   name: "goldrepublic",
@@ -63,8 +63,8 @@ const goldRepublicSource: GoldPriceSource = {
     const usdPerGram = Number(data?.ask ?? data?.price ?? data?.bid);
     if (!Number.isFinite(usdPerGram) || usdPerGram <= 0) return null;
     return {
-      pricePerOunce: usdPerGram * OUNCE_TO_GRAM * usdToDzd(),
-      currency: "DZD",
+      pricePerOunce: usdPerGram * OUNCE_TO_GRAM,
+      currency: "USD",
       source: this.name,
     };
   },
@@ -78,8 +78,8 @@ const goldApiSource: GoldPriceSource = {
     const usdPerOunce = Number(data?.price);
     if (!Number.isFinite(usdPerOunce) || usdPerOunce <= 0) return null;
     return {
-      pricePerOunce: usdPerOunce * usdToDzd(),
-      currency: "DZD",
+      pricePerOunce: usdPerOunce,
+      currency: "USD",
       source: this.name,
     };
   },
