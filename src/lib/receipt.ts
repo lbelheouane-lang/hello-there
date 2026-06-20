@@ -54,10 +54,12 @@ export function buildReceiptHtml(d: ReceiptData): string {
   .foot { text-align: center; font-size: 10px; color: #999; margin-top: 16px; }
 </style></head><body>
   <div class="head">
-    <div class="store">${esc(d.storeName)}</div>
-    <div class="sub">Bijouterie · Or & Joaillerie</div>
+    ${logoHtml}
+    <div class="store">${esc(name)}</div>
+    <div class="sub">${esc(store.tagline || "Bijouterie · Or & Joaillerie")}</div>
   </div>
   <div class="title">REÇU DE PAIEMENT — VERSEMENT</div>
+
   ${row("Reçu n°", d.receiptNumber)}
   ${row("Date & heure", formatDateTime(d.paidAt))}
   ${row("Facture n°", d.invoiceNumber)}
