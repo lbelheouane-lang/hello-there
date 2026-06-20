@@ -9,6 +9,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { BrandIntro } from "@/components/BrandIntro";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import {
@@ -94,13 +95,19 @@ function AppSidebar() {
 export function AppShell({ title, children }: { title: string; children: ReactNode }) {
   return (
     <SidebarProvider>
+      <BrandIntro />
       <AppSidebar />
       <SidebarInset>
         <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur">
           <SidebarTrigger />
           <h1 className="font-serif text-xl font-semibold">{title}</h1>
         </header>
-        <main className="flex-1 p-4 md:p-6">{children}</main>
+        <main
+          className="flex-1 p-4 md:p-6"
+          style={{ animation: "brand-content-in 0.6s ease-out both" }}
+        >
+          {children}
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );
