@@ -542,6 +542,102 @@ export type Database = {
         }
         Relationships: []
       }
+      purchases: {
+        Row: {
+          created_at: string
+          employee_name: string | null
+          gold_karat: number | null
+          id: string
+          is_demo: boolean
+          labor_cost: number
+          making_charge: number
+          metal_purchase_price: number
+          metal_type: string | null
+          notes: string | null
+          product_id: string | null
+          product_name: string | null
+          purchased_at: string
+          quantity: number
+          recorded_by: string | null
+          reference: string
+          sku: string | null
+          stone_cost: number
+          supplier_id: string | null
+          supplier_name: string | null
+          total_cost: number
+          unit_cost: number
+          updated_at: string
+          weight_grams: number
+        }
+        Insert: {
+          created_at?: string
+          employee_name?: string | null
+          gold_karat?: number | null
+          id?: string
+          is_demo?: boolean
+          labor_cost?: number
+          making_charge?: number
+          metal_purchase_price?: number
+          metal_type?: string | null
+          notes?: string | null
+          product_id?: string | null
+          product_name?: string | null
+          purchased_at?: string
+          quantity?: number
+          recorded_by?: string | null
+          reference: string
+          sku?: string | null
+          stone_cost?: number
+          supplier_id?: string | null
+          supplier_name?: string | null
+          total_cost?: number
+          unit_cost?: number
+          updated_at?: string
+          weight_grams?: number
+        }
+        Update: {
+          created_at?: string
+          employee_name?: string | null
+          gold_karat?: number | null
+          id?: string
+          is_demo?: boolean
+          labor_cost?: number
+          making_charge?: number
+          metal_purchase_price?: number
+          metal_type?: string | null
+          notes?: string | null
+          product_id?: string | null
+          product_name?: string | null
+          purchased_at?: string
+          quantity?: number
+          recorded_by?: string | null
+          reference?: string
+          sku?: string | null
+          stone_cost?: number
+          supplier_id?: string | null
+          supplier_name?: string | null
+          total_cost?: number
+          unit_cost?: number
+          updated_at?: string
+          weight_grams?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchases_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchases_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       repair_status_history: {
         Row: {
           changed_by: string | null
@@ -958,6 +1054,7 @@ export type Database = {
       }
       next_expense_number: { Args: never; Returns: string }
       next_invoice_number: { Args: { _prefix?: string }; Returns: string }
+      next_purchase_number: { Args: never; Returns: string }
       next_repair_number: { Args: never; Returns: string }
       seed_demo_data: { Args: never; Returns: undefined }
     }
