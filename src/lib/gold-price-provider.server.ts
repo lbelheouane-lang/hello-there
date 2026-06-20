@@ -261,8 +261,9 @@ export async function runGoldPriceUpdate(): Promise<UpdateResult> {
   }));
   await supabaseAdmin.from("gold_prices").upsert(rows, { onConflict: "karat,price_date" });
 
-  // 6) Recalcul des produits (en EUR).
-  const productsRecalculated = await recalcProducts(basePerGram);
+  // 6) Recalcul des produits : le métal (calculé en EUR) est converti en DZD,
+  //    puis additionné aux coûts (déjà en DZD). Le prix de vente est stocké en DZD.
+  const productsRecalculated = await recalcProducts(basePerGram, cfg.eurToDzd);
 
   // 7) Journalisation.
   await logSync({
@@ -322,10 +323,12 @@ export async function runGoldPriceUpdate(): Promise<UpdateResult> {
 }
 
 /**
- * Recalcule le prix de vente de chaque produit en or, en EUR (devise de base).
- * Prix EUR = (Poids × Cours EUR/g × Pureté) + Façon + Pierres + Main d'œuvre
+ * Recalcule le prix de vente de chaque produit en or. La valeur du métal est
+ * calculée à partir du cours EUR puis convertie en DZD via le taux configuré.
+ * Prix DZD = (Poids × Cours EUR/g × Pureté × Taux EUR→DZD) + Façon + Pierres + Main d'œuvre
+ * (les coûts façon/pierres/main d'œuvre sont déjà stockés en DZD).
  */
-async function recalcProducts(baseEurPerGram: number): Promise<number> {
+async function recalcProducts(baseEurPerGram: number, eurToDzd: number): Promise<number> {
   const { data: products } = await supabaseAdmin
     .from("products")
     .select("id, metal_type, gold_karat, weight_grams, making_charge, stone_cost, labor_cost, selling_price")
@@ -341,14 +344,14 @@ async function recalcProducts(baseEurPerGram: number): Promise<number> {
   for (const p of products as any[]) {
     const purity = PURITY[p.gold_karat as number] ?? 0;
     if (!purity) continue;
-    const metalValueEur = Number(p.weight_grams) * baseEurPerGram * purity;
+    const metalValueDzd = Number(p.weight_grams) * baseEurPerGram * purity * eurToDzd;
     const selling =
       Math.round(
-        (metalValueEur +
+        metalValueDzd +
           Number(p.making_charge ?? 0) +
           Number(p.stone_cost ?? 0) +
-          Number(p.labor_cost ?? 0)) * 100,
-      ) / 100;
+          Number(p.labor_cost ?? 0),
+      );
 
     valuationBefore += Number(p.selling_price ?? 0);
     valuationAfter += selling;
@@ -364,16 +367,17 @@ async function recalcProducts(baseEurPerGram: number): Promise<number> {
           oldSellingPrice: Number(p.selling_price ?? 0),
           newSellingPrice: selling,
           baseEurPerGram,
-          currency: "EUR",
+          eurToDzd,
+          currency: "DZD",
         });
       }
     }
   }
 
   await logAudit("inventory_valuation", null, {
-    currency: "EUR",
-    valuationBefore: Math.round(valuationBefore * 100) / 100,
-    valuationAfter: Math.round(valuationAfter * 100) / 100,
+    currency: "DZD",
+    valuationBefore: Math.round(valuationBefore),
+    valuationAfter: Math.round(valuationAfter),
     productsRecalculated: count,
   });
 

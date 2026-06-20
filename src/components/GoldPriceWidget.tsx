@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { formatRelativeTime, KARATS } from "@/lib/format";
-import { formatEUR, formatFromEUR } from "@/lib/currency";
+import { formatRelativeTime, formatDateTime, KARATS } from "@/lib/format";
+import { formatEUR, formatFromEUR, eurToDzdRate } from "@/lib/currency";
 import { useLatestGoldPrices, useGoldPriceChange } from "@/hooks/use-gold-prices";
 import { refreshGoldPrices } from "@/lib/gold-prices.functions";
 
@@ -70,23 +70,17 @@ export function GoldPriceWidget({ canRefresh = false }: { canRefresh?: boolean }
           )}
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-3">
         <div className="flex items-end justify-between">
           <div>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">Cours de l'or en direct</p>
             <p className="text-3xl font-semibold">
               {latest ? formatEUR(latest.price_per_gram) : "—"}
-              <span className="ml-1 text-sm font-normal text-muted-foreground">/ g (EUR)</span>
+              <span className="ml-1 text-sm font-normal text-muted-foreground">/ g</span>
             </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {latest?.price_per_ounce ? formatEUR(latest.price_per_ounce) : "—"}
-              <span className="ml-1 text-xs">/ once</span>
-              {latest && (
-                <span className="ml-2">≈ {formatFromEUR(latest.price_per_gram, "DZD")} / g</span>
-              )}
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Maj {formatRelativeTime(latest?.fetched_at)} · {latest?.source ?? "—"}
-            </p>
+            {latest?.price_per_ounce ? (
+              <p className="text-sm text-muted-foreground">{formatEUR(latest.price_per_ounce)} / once</p>
+            ) : null}
           </div>
           <div className={`flex items-center gap-1 text-sm font-medium ${tone}`}>
             <Indicator className="h-4 w-4" />
@@ -101,6 +95,22 @@ export function GoldPriceWidget({ canRefresh = false }: { canRefresh?: boolean }
             )}
           </div>
         </div>
+
+        <div className="rounded-lg border bg-muted/40 p-3">
+          <p className="text-xs font-medium text-muted-foreground">Conversion estimée en DZD</p>
+          <p className="text-xl font-semibold">
+            {latest ? formatFromEUR(latest.price_per_gram, "DZD") : "—"}
+            <span className="ml-1 text-sm font-normal text-muted-foreground">/ g</span>
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Taux appliqué : 1 EUR = {eurToDzdRate()} DZD
+          </p>
+        </div>
+
+        <p className="text-xs text-muted-foreground">
+          Dernière mise à jour : {latest?.fetched_at ? formatDateTime(latest.fetched_at) : "—"}
+          {" · "}{formatRelativeTime(latest?.fetched_at)} · {latest?.source ?? "—"}
+        </p>
       </CardContent>
     </Card>
   );

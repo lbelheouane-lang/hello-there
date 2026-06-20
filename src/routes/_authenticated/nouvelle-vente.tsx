@@ -16,7 +16,7 @@ import {
 import {
   PAYMENT_METHODS, METAL_TYPES, formatDZD, formatGrams, metalValue,
 } from "@/lib/format";
-import { formatFromEUR } from "@/lib/currency";
+import { dzdFromEur } from "@/lib/currency";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
 
 export const Route = createFileRoute("/_authenticated/nouvelle-vente")({
@@ -90,12 +90,13 @@ function NewSalePage() {
   }, [products, productSearch]);
 
   const selectedProduct = products?.find((p) => p.id === productId) ?? null;
-  // Le cours de l'or est en EUR (devise de base) ; le prix de vente est facturé en EUR.
+  // Le cours de l'or est en EUR (devise de base) ; la valeur métal est convertie
+  // en DZD pour toutes les ventes et documents.
   const suggestedValue = selectedProduct
-    ? metalValue(
+    ? dzdFromEur(metalValue(
         Number(selectedProduct.weight_grams),
         selectedProduct.metal_type === "or" ? priceForKarat(prices, selectedProduct.gold_karat) : null,
-      )
+      ))
     : 0;
 
   const addCustomer = useMutation({
@@ -188,7 +189,7 @@ function NewSalePage() {
             <div className="max-h-80 space-y-2 overflow-y-auto">
               {filteredProducts.map((p) => {
                 const ppg = p.metal_type === "or" ? priceForKarat(prices, p.gold_karat) : null;
-                const valueEur = metalValue(Number(p.weight_grams), ppg);
+                const valueDzd = dzdFromEur(metalValue(Number(p.weight_grams), ppg));
                 const active = p.id === productId;
                 return (
                   <button
@@ -196,7 +197,7 @@ function NewSalePage() {
                     type="button"
                     onClick={() => {
                       setProductId(p.id);
-                      if (valueEur) setTotalAmount(String(Math.round(valueEur * 100) / 100));
+                      if (valueDzd) setTotalAmount(String(Math.round(valueDzd)));
                     }}
                     className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-colors ${active ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`}
                   >
@@ -209,8 +210,7 @@ function NewSalePage() {
                       </p>
                     </div>
                     <div className="flex flex-col items-end gap-0.5">
-                      <span className="text-sm font-medium">{ppg ? formatDZD(valueEur) : "—"}</span>
-                      {ppg ? <span className="text-xs text-muted-foreground">≈ {formatFromEUR(valueEur, "DZD")}</span> : null}
+                      <span className="text-sm font-medium">{ppg ? formatDZD(valueDzd) : "—"}</span>
                       {active && <Check className="h-4 w-4 text-primary" />}
                     </div>
                   </button>

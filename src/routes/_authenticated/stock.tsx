@@ -24,7 +24,7 @@ import {
   KARATS, CATEGORIES, METAL_TYPES, PRODUCT_STATUSES,
   formatGrams, statusLabel, metalValue,
 } from "@/lib/format";
-import { formatEUR, formatFromEUR } from "@/lib/currency";
+import { formatFromEUR } from "@/lib/currency";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
 import { LabelDialog, type LabelProduct } from "@/components/LabelDialog";
 import { productImage } from "@/lib/product-image";
@@ -334,7 +334,7 @@ function StockPage() {
                 <TableHead>Bijou</TableHead>
                 <TableHead>Titre</TableHead>
                 <TableHead>Poids</TableHead>
-                <TableHead>Valeur métal (USD)</TableHead>
+                <TableHead>Valeur métal (DZD)</TableHead>
                 <TableHead>Statut</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -374,10 +374,7 @@ function StockPage() {
                     <TableCell>{formatGrams(Number(p.weight_grams))}</TableCell>
                     <TableCell>
                       {ppg ? (
-                        <div>
-                          <div>{formatEUR(value)}</div>
-                          <div className="text-xs text-muted-foreground">≈ {formatFromEUR(value, "DZD")}</div>
-                        </div>
+                        <div className="font-medium">{formatFromEUR(value, "DZD")}</div>
                       ) : (
                         <span className="text-muted-foreground">cours manquant</span>
                       )}
