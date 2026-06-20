@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import {
-  METAL_TYPES, formatGrams, formatDZD, statusLabel,
+  METAL_TYPES, formatGrams, formatDZD, statusLabel, metalOriginLabel, formatDateTime,
 } from "@/lib/format";
 import { LabelDialog, type LabelProduct } from "@/components/LabelDialog";
 import { productImage } from "@/lib/product-image";
@@ -29,11 +29,21 @@ interface ProductRow {
   metal_purchase_price: number;
   labor_cost: number;
   origin: string | null;
+  metal_origin: string | null;
+  country_of_origin: string | null;
   status: string;
   created_at: string;
   supplier_id: string | null;
   is_demo: boolean;
   suppliers: { name: string } | null;
+}
+
+interface OriginEvent {
+  id: string;
+  event_type: string;
+  detail: string | null;
+  created_at: string;
+  changed_by: string | null;
 }
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
