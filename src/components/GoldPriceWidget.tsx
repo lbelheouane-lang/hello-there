@@ -74,8 +74,15 @@ export function GoldPriceWidget({ canRefresh = false }: { canRefresh?: boolean }
         <div className="flex items-end justify-between">
           <div>
             <p className="text-3xl font-semibold">
-              {latest ? formatDZD(latest.price_per_gram) : "—"}
-              <span className="ml-1 text-sm font-normal text-muted-foreground">/ g</span>
+              {latest ? formatUSD(latest.price_per_gram) : "—"}
+              <span className="ml-1 text-sm font-normal text-muted-foreground">/ g (USD)</span>
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {latest?.price_per_ounce ? formatUSD(latest.price_per_ounce) : "—"}
+              <span className="ml-1 text-xs">/ once</span>
+              {latest && (
+                <span className="ml-2">≈ {formatFromUSD(latest.price_per_gram, "DZD")} / g</span>
+              )}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
               Maj {formatRelativeTime(latest?.fetched_at)} · {latest?.source ?? "—"}
@@ -86,7 +93,7 @@ export function GoldPriceWidget({ canRefresh = false }: { canRefresh?: boolean }
             {change && change.previous != null ? (
               <span>
                 {change.diff > 0 ? "+" : ""}
-                {formatDZD(change.diff)} ({change.percent > 0 ? "+" : ""}
+                {formatUSD(change.diff)} ({change.percent > 0 ? "+" : ""}
                 {change.percent.toFixed(2)}%)
               </span>
             ) : (
