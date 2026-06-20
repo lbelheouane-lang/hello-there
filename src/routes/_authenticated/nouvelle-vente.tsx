@@ -88,12 +88,14 @@ function NewSalePage() {
   }, [products, productSearch]);
 
   const selectedProduct = products?.find((p) => p.id === productId) ?? null;
-  const suggestedValue = selectedProduct
+  const suggestedUsd = selectedProduct
     ? metalValue(
         Number(selectedProduct.weight_grams),
         selectedProduct.metal_type === "or" ? priceForKarat(prices, selectedProduct.gold_karat) : null,
       )
     : 0;
+  // Le cours est en USD ; le prix de vente est facturé en DZD.
+  const suggestedValue = dzdFromUsd(suggestedUsd);
 
   const addCustomer = useMutation({
     mutationFn: async () => {
