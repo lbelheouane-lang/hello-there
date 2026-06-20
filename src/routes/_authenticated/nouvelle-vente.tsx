@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -48,7 +48,7 @@ function NewSalePage() {
   const [customerId, setCustomerId] = useState<string>("");
   const [totalAmount, setTotalAmount] = useState("");
   const [amountPaid, setAmountPaid] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState(PAYMENT_METHODS[0].value);
+  const [paymentMethod, setPaymentMethod] = useState<string>(PAYMENT_METHODS[0].value);
   const [notes, setNotes] = useState("");
 
   // Quick add customer

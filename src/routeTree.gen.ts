@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedStockRouteImport } from './routes/_authenticated/stock'
+import { Route as AuthenticatedNouvelleVenteRouteImport } from './routes/_authenticated/nouvelle-vente'
 import { Route as AuthenticatedFournisseursRouteImport } from './routes/_authenticated/fournisseurs'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCoursOrRouteImport } from './routes/_authenticated/cours-or'
@@ -38,6 +39,12 @@ const AuthenticatedStockRoute = AuthenticatedStockRouteImport.update({
   path: '/stock',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedNouvelleVenteRoute =
+  AuthenticatedNouvelleVenteRouteImport.update({
+    id: '/nouvelle-vente',
+    path: '/nouvelle-vente',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFournisseursRoute =
   AuthenticatedFournisseursRouteImport.update({
     id: '/fournisseurs',
@@ -73,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/cours-or': typeof AuthenticatedCoursOrRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fournisseurs': typeof AuthenticatedFournisseursRoute
+  '/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
   '/stock': typeof AuthenticatedStockRoute
   '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
 }
@@ -83,6 +91,7 @@ export interface FileRoutesByTo {
   '/cours-or': typeof AuthenticatedCoursOrRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fournisseurs': typeof AuthenticatedFournisseursRoute
+  '/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
   '/stock': typeof AuthenticatedStockRoute
   '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
 }
@@ -95,6 +104,7 @@ export interface FileRoutesById {
   '/_authenticated/cours-or': typeof AuthenticatedCoursOrRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/fournisseurs': typeof AuthenticatedFournisseursRoute
+  '/_authenticated/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
   '/_authenticated/stock': typeof AuthenticatedStockRoute
   '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
 }
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/cours-or'
     | '/dashboard'
     | '/fournisseurs'
+    | '/nouvelle-vente'
     | '/stock'
     | '/api/public/hooks/update-gold-prices'
   fileRoutesByTo: FileRoutesByTo
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/cours-or'
     | '/dashboard'
     | '/fournisseurs'
+    | '/nouvelle-vente'
     | '/stock'
     | '/api/public/hooks/update-gold-prices'
   id:
@@ -128,6 +140,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cours-or'
     | '/_authenticated/dashboard'
     | '/_authenticated/fournisseurs'
+    | '/_authenticated/nouvelle-vente'
     | '/_authenticated/stock'
     | '/api/public/hooks/update-gold-prices'
   fileRoutesById: FileRoutesById
@@ -167,6 +180,13 @@ declare module '@tanstack/react-router' {
       path: '/stock'
       fullPath: '/stock'
       preLoaderRoute: typeof AuthenticatedStockRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/nouvelle-vente': {
+      id: '/_authenticated/nouvelle-vente'
+      path: '/nouvelle-vente'
+      fullPath: '/nouvelle-vente'
+      preLoaderRoute: typeof AuthenticatedNouvelleVenteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/fournisseurs': {
@@ -212,6 +232,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCoursOrRoute: typeof AuthenticatedCoursOrRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFournisseursRoute: typeof AuthenticatedFournisseursRoute
+  AuthenticatedNouvelleVenteRoute: typeof AuthenticatedNouvelleVenteRoute
   AuthenticatedStockRoute: typeof AuthenticatedStockRoute
 }
 
@@ -220,6 +241,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCoursOrRoute: AuthenticatedCoursOrRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFournisseursRoute: AuthenticatedFournisseursRoute,
+  AuthenticatedNouvelleVenteRoute: AuthenticatedNouvelleVenteRoute,
   AuthenticatedStockRoute: AuthenticatedStockRoute,
 }
 
