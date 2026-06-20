@@ -123,6 +123,7 @@ export type Database = {
           metal_purchase_price: number
           metal_type: string
           name: string
+          origin: string | null
           selling_price: number
           status: string
           stone_cost: number
@@ -142,6 +143,7 @@ export type Database = {
           metal_purchase_price?: number
           metal_type?: string
           name: string
+          origin?: string | null
           selling_price?: number
           status?: string
           stone_cost?: number
@@ -161,6 +163,7 @@ export type Database = {
           metal_purchase_price?: number
           metal_type?: string
           name?: string
+          origin?: string | null
           selling_price?: number
           status?: string
           stone_cost?: number
