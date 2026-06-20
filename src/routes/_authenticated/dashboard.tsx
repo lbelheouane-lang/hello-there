@@ -8,7 +8,7 @@ import { useLatestGoldPrices } from "@/hooks/use-gold-prices";
 import { useAuth } from "@/hooks/use-auth";
 import { GoldPriceWidget } from "@/components/GoldPriceWidget";
 import { formatGrams, KARATS } from "@/lib/format";
-import { formatUSD, formatFromUSD } from "@/lib/currency";
+import { formatEUR, formatFromEUR } from "@/lib/currency";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
@@ -85,7 +85,7 @@ function DashboardPage() {
         <StatCard icon={Scale} label="Poids vendu (mois)" value={formatGrams(stats?.soldGramsMonth ?? 0)} hint={`Aujourd'hui : ${formatGrams(stats?.soldGramsDay ?? 0)}`} />
         <StatCard icon={ShoppingBag} label="Ventes du mois" value={String(stats?.salesMonth ?? 0)} hint={`Total : ${stats?.salesTotal ?? 0}`} />
         <StatCard icon={Package} label="Stock total" value={formatGrams(stats?.stockGrams ?? 0)} hint={`${stats?.stockCount ?? 0} pièces en stock`} />
-        <StatCard icon={Coins} label="Cours 18K (gramme)" value={prices?.[18] ? formatUSD(prices[18].price_per_gram) : "—"} hint={prices?.[18] ? `≈ ${formatFromUSD(prices[18].price_per_gram, "DZD")}` : "Dernier cours connu"} />
+        <StatCard icon={Coins} label="Cours 18K (gramme)" value={prices?.[18] ? formatEUR(prices[18].price_per_gram) : "—"} hint={prices?.[18] ? `≈ ${formatFromEUR(prices[18].price_per_gram, "DZD")}` : "Dernier cours connu"} />
       </div>
 
       <div className="mt-6">
@@ -105,8 +105,8 @@ function DashboardPage() {
               {KARATS.map((k) => (
                 <div key={k} className="rounded-xl border bg-card p-4">
                   <p className="text-sm text-muted-foreground">{k}K</p>
-                  <p className="mt-1 text-xl font-semibold">{prices?.[k] ? formatUSD(prices[k].price_per_gram) : "—"}</p>
-                  <p className="text-xs text-muted-foreground">{prices?.[k] ? `≈ ${formatFromUSD(prices[k].price_per_gram, "DZD")}` : ""}</p>
+                  <p className="mt-1 text-xl font-semibold">{prices?.[k] ? formatEUR(prices[k].price_per_gram) : "—"}</p>
+                  <p className="text-xs text-muted-foreground">{prices?.[k] ? `≈ ${formatFromEUR(prices[k].price_per_gram, "DZD")}` : ""}</p>
                 </div>
               ))}
             </div>

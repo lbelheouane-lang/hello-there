@@ -16,7 +16,7 @@ import {
 import {
   PAYMENT_METHODS, METAL_TYPES, formatDZD, formatGrams, metalValue,
 } from "@/lib/format";
-import { dzdFromUsd, formatUSD } from "@/lib/currency";
+import { dzdFromEur, formatEUR } from "@/lib/currency";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
 
 export const Route = createFileRoute("/_authenticated/nouvelle-vente")({
@@ -97,7 +97,7 @@ function NewSalePage() {
       )
     : 0;
   // Le cours est en USD ; le prix de vente est facturé en DZD.
-  const suggestedValue = dzdFromUsd(suggestedUsd);
+  const suggestedValue = dzdFromEur(suggestedUsd);
 
   const addCustomer = useMutation({
     mutationFn: async () => {
@@ -190,7 +190,7 @@ function NewSalePage() {
               {filteredProducts.map((p) => {
                 const ppg = p.metal_type === "or" ? priceForKarat(prices, p.gold_karat) : null;
                 const valueUsd = metalValue(Number(p.weight_grams), ppg);
-                const valueDzd = dzdFromUsd(valueUsd);
+                const valueDzd = dzdFromEur(valueUsd);
                 const active = p.id === productId;
                 return (
                   <button
@@ -212,7 +212,7 @@ function NewSalePage() {
                     </div>
                     <div className="flex flex-col items-end gap-0.5">
                       <span className="text-sm font-medium">{ppg ? formatDZD(valueDzd) : "—"}</span>
-                      {ppg ? <span className="text-xs text-muted-foreground">{formatUSD(valueUsd)}</span> : null}
+                      {ppg ? <span className="text-xs text-muted-foreground">{formatEUR(valueUsd)}</span> : null}
                       {active && <Check className="h-4 w-4 text-primary" />}
                     </div>
                   </button>
