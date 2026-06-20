@@ -93,6 +93,40 @@ function SettingsPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  // Subcategories
+  const subs = useSubcategories();
+  const [subCatId, setSubCatId] = useState("");
+  const [newSub, setNewSub] = useState("");
+  const catName = (id: string) => cats.data?.find((c) => c.id === id)?.name ?? "";
+  const addSub = useMutation({
+    mutationFn: async () => {
+      if (!subCatId) throw new Error("Choisissez d'abord une catégorie.");
+      const name = newSub.trim();
+      if (!name) throw new Error("Nom de sous-catégorie requis.");
+      const { error } = await supabase.from("product_subcategories").insert({ category_id: subCatId, name });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Sous-catégorie ajoutée.");
+      setNewSub("");
+      qc.invalidateQueries({ queryKey: ["product_subcategories"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const delSub = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("product_subcategories").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Sous-catégorie supprimée.");
+      qc.invalidateQueries({ queryKey: ["product_subcategories"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+
+
   return (
     <AppShell title="Paramètres" allow={["admin"]}>
       <div className="mx-auto max-w-2xl space-y-6">
