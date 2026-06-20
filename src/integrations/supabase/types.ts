@@ -542,6 +542,124 @@ export type Database = {
         }
         Relationships: []
       }
+      repair_status_history: {
+        Row: {
+          changed_by: string | null
+          created_at: string
+          id: string
+          note: string | null
+          repair_id: string
+          status: string
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          repair_id: string
+          status: string
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          repair_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repair_status_history_repair_id_fkey"
+            columns: ["repair_id"]
+            isOneToOne: false
+            referencedRelation: "repairs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      repairs: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          customer_name: string
+          customer_phone: string | null
+          estimated_completion: string | null
+          estimated_cost: number | null
+          id: string
+          intake_at: string
+          is_demo: boolean
+          jewelry_description: string | null
+          jewelry_type: string
+          metal_type: string | null
+          notes: string | null
+          photos: string[]
+          purity: string | null
+          reference: string
+          repair_description: string
+          status: string
+          tracking_token: string
+          updated_at: string
+          weight_grams: number | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          customer_name: string
+          customer_phone?: string | null
+          estimated_completion?: string | null
+          estimated_cost?: number | null
+          id?: string
+          intake_at?: string
+          is_demo?: boolean
+          jewelry_description?: string | null
+          jewelry_type: string
+          metal_type?: string | null
+          notes?: string | null
+          photos?: string[]
+          purity?: string | null
+          reference?: string
+          repair_description: string
+          status?: string
+          tracking_token?: string
+          updated_at?: string
+          weight_grams?: number | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          customer_name?: string
+          customer_phone?: string | null
+          estimated_completion?: string | null
+          estimated_cost?: number | null
+          id?: string
+          intake_at?: string
+          is_demo?: boolean
+          jewelry_description?: string | null
+          jewelry_type?: string
+          metal_type?: string | null
+          notes?: string | null
+          photos?: string[]
+          purity?: string | null
+          reference?: string
+          repair_description?: string
+          status?: string
+          tracking_token?: string
+          updated_at?: string
+          weight_grams?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repairs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sales: {
         Row: {
           amount_paid: number
@@ -808,6 +926,25 @@ export type Database = {
     }
     Functions: {
       delete_demo_data: { Args: never; Returns: undefined }
+      get_repair_tracking: {
+        Args: { _token: string }
+        Returns: {
+          estimated_completion: string
+          intake_at: string
+          jewelry_type: string
+          reference: string
+          status: string
+          updated_at: string
+        }[]
+      }
+      get_repair_tracking_history: {
+        Args: { _token: string }
+        Returns: {
+          created_at: string
+          note: string
+          status: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -821,6 +958,7 @@ export type Database = {
       }
       next_expense_number: { Args: never; Returns: string }
       next_invoice_number: { Args: { _prefix?: string }; Returns: string }
+      next_repair_number: { Args: never; Returns: string }
       seed_demo_data: { Args: never; Returns: undefined }
     }
     Enums: {
