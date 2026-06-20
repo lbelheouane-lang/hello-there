@@ -152,6 +152,27 @@ function ProductDetailPage() {
             </CardContent>
           </Card>
 
+          {originEvents && originEvents.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Historique de l'origine</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {originEvents.map((e) => (
+                  <div key={e.id} className="flex items-start gap-3 border-b border-border/60 pb-3 last:border-0 last:pb-0">
+                    <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
+                    <div className="min-w-0">
+                      <p className="text-sm">{e.detail ?? e.event_type}</p>
+                      <p className="text-xs text-muted-foreground">{formatDateTime(e.created_at)}</p>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+
+
           {isAdmin && (
             <Button className="w-full" onClick={() => setLabelOpen(true)}>
               <Tag className="mr-2 h-4 w-4" /> Étiquette & QR code
