@@ -193,10 +193,12 @@ export async function runGoldPriceUpdate(): Promise<UpdateResult> {
 }
 
 /**
- * Recalcule le prix de vente de chaque produit en or :
- * Prix = (Poids × Cours or pur × Facteur pureté) + Façon + Pierres + Main d'œuvre
+ * Recalcule le prix de vente de chaque produit en or.
+ * Le cours est désormais stocké en USD ; les frais (façon, pierres, main
+ * d'œuvre) et le prix de vente restent en DZD (devise d'exploitation).
+ * Prix DZD = (Poids × Cours USD/g × Pureté × taux USD→DZD) + Façon + Pierres + Main d'œuvre
  */
-async function recalcProducts(basePricePerGram: number, currency: string): Promise<number> {
+async function recalcProducts(baseUsdPerGram: number, currency: string): Promise<number> {
   const { data: products } = await supabaseAdmin
     .from("products")
     .select("id, metal_type, gold_karat, weight_grams, making_charge, stone_cost, labor_cost, selling_price")
@@ -205,6 +207,7 @@ async function recalcProducts(basePricePerGram: number, currency: string): Promi
 
   if (!products?.length) return 0;
 
+  const rate = usdToDzd();
   let count = 0;
   let valuationBefore = 0;
   let valuationAfter = 0;
@@ -212,10 +215,10 @@ async function recalcProducts(basePricePerGram: number, currency: string): Promi
   for (const p of products as any[]) {
     const purity = PURITY[p.gold_karat as number] ?? 0;
     if (!purity) continue;
-    const metalValue = Number(p.weight_grams) * basePricePerGram * purity;
+    const metalValueDzd = Number(p.weight_grams) * baseUsdPerGram * purity * rate;
     const selling =
       Math.round(
-        (metalValue +
+        (metalValueDzd +
           Number(p.making_charge ?? 0) +
           Number(p.stone_cost ?? 0) +
           Number(p.labor_cost ?? 0)) * 100,
@@ -234,15 +237,18 @@ async function recalcProducts(basePricePerGram: number, currency: string): Promi
         await logAudit("product_recalc", p.id, {
           oldSellingPrice: Number(p.selling_price ?? 0),
           newSellingPrice: selling,
-          basePricePerGram,
-          currency,
+          baseUsdPerGram,
+          usdToDzd: rate,
+          priceCurrency: currency,
+          sellingCurrency: "DZD",
         });
       }
     }
   }
 
   await logAudit("inventory_valuation", null, {
-    currency,
+    priceCurrency: currency,
+    sellingCurrency: "DZD",
     valuationBefore: Math.round(valuationBefore * 100) / 100,
     valuationAfter: Math.round(valuationAfter * 100) / 100,
     productsRecalculated: count,
