@@ -97,6 +97,13 @@ function purityLabel(inv: InvoiceRecord): string {
 export function buildInvoiceHtml(inv: InvoiceRecord): string {
   const isPayment = inv.invoice_type === "payment";
   const statusColor = STATUS_COLOR[inv.payment_status] ?? "#6b7280";
+  const store = getStoreInfo();
+  const s = getStoreSettings();
+  const logoHtml = store.logo
+    ? `<img class="logo-img" src="${esc(store.logo)}" alt="${esc(store.name)}" />`
+    : `<div class="logo">${esc(store.name.charAt(0).toUpperCase() || "M")}</div>`;
+  const contactLine = [store.phone, store.email].filter(Boolean).map(esc).join(" · ");
+
 
   const productRows = inv.product_name
     ? `<tr>
