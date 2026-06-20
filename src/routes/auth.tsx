@@ -178,6 +178,9 @@ function Brand({ subtitle }: { subtitle?: string }) {
 }
 
 function Intro() {
+  const { data: settings } = useStoreSettings();
+  const storeName = settings?.store_name || "Maison d'Or";
+  const storeTag = settings?.slogan || settings?.tagline || "Gestion de bijouterie d'exception";
   return (
     <div className="brand-intro relative flex flex-col items-center text-center">
       {/* expanding rings */}
