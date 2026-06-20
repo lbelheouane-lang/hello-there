@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLatestGoldPrices } from "@/hooks/use-gold-prices";
+import { useAuth } from "@/hooks/use-auth";
+import { GoldPriceWidget } from "@/components/GoldPriceWidget";
 import { formatDZD, formatGrams, KARATS } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
