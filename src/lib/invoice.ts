@@ -204,14 +204,6 @@ export function buildInvoiceHtml(inv: InvoiceRecord): string {
       <tbody>${productRows}</tbody>
     </table>` : ""}
 
-    ${inv.weight_grams != null || inv.purchase_price_per_gram != null ? `<div class="totals">
-      <table>
-        <tr><td class="lbl">Poids (grammes)</td><td class="val">${esc(formatGrams(inv.weight_grams))}</td></tr>
-        <tr><td class="lbl">Prix d'achat par gramme</td><td class="val">${esc(inv.purchase_price_per_gram != null ? `${formatDZD(inv.purchase_price_per_gram)}/g` : "—")}</td></tr>
-        <tr><td class="lbl">Valeur or calculée</td><td class="val">${esc(inv.gold_value != null ? formatDZD(inv.gold_value) : "—")}</td></tr>
-      </table>
-    </div>` : ""}
-
     <div class="totals">
       <table>
         <tr><td class="lbl">Sous-total</td><td class="val">${esc(formatDZD(inv.total_amount + inv.discount))}</td></tr>
