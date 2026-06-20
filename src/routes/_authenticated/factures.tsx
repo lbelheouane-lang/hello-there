@@ -55,6 +55,19 @@ function InvoicesPage() {
 
   const filtered = useMemo(() => {
     let list = invoices ?? [];
+    // Tab scope
+    if (tab === "documents") {
+      // all documents: sale invoices + payment vouchers
+    } else if (tab === "full") {
+      list = list.filter((i) => i.invoice_type === "sale" && i.sale_type !== "installment");
+    } else if (tab === "installment") {
+      list = list.filter((i) => i.invoice_type === "sale" && i.sale_type === "installment");
+    } else if (tab === "pending") {
+      list = list.filter((i) => i.invoice_type === "sale" && Number(i.balance) > 0);
+    } else {
+      // all sales
+      list = list.filter((i) => i.invoice_type === "sale");
+    }
     const q = search.toLowerCase().trim();
     if (q) {
       list = list.filter((i) =>
@@ -70,7 +83,8 @@ function InvoicesPage() {
     if (fromDate) list = list.filter((i) => i.issued_at >= fromDate);
     if (toDate) list = list.filter((i) => i.issued_at <= `${toDate}T23:59:59`);
     return list;
-  }, [invoices, search, typeFilter, statusFilter, fromDate, toDate]);
+  }, [invoices, tab, search, typeFilter, statusFilter, fromDate, toDate]);
+
 
   const totalBilled = filtered.reduce((s, i) => s + (i.invoice_type === "sale" ? Number(i.total_amount) : 0), 0);
   const totalCollected = filtered.reduce((s, i) => s + Number(i.amount_this_tx), 0);
