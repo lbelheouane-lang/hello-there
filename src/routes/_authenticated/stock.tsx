@@ -778,6 +778,20 @@ function StockPage() {
                             <span className="text-muted-foreground">cours manquant</span>
                           )}
                         </TableCell>
+                        <TableCell>
+                          {p.metal_origin ? (
+                            <div className="text-xs">
+                              <Badge variant={p.metal_origin === "imported" ? "default" : "secondary"} className="text-[10px]">
+                                {metalOriginLabel(p.metal_origin)}
+                              </Badge>
+                              {p.metal_origin === "imported" && p.country_of_origin && (
+                                <div className="mt-0.5 text-muted-foreground">{p.country_of_origin}</div>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
                         <TableCell><Badge variant={statusVariant(p.status)}>{statusLabel(p.status)}</Badge></TableCell>
                         <TableCell className="text-right">
                           <Button variant="ghost" size="icon" title="Étiquette & QR" onClick={() => setLabelProducts([toLabel(p)])}>
