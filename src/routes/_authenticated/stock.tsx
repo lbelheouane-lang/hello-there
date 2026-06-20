@@ -279,6 +279,12 @@ function StockPage() {
     mutationFn: async () => {
       if (!form.name.trim()) throw new Error("Le nom du bijou est obligatoire.");
       if (!form.category) throw new Error("La catégorie est obligatoire.");
+      let countryOfOrigin: string | null = null;
+      if (form.metal_origin === "imported") {
+        const c = form.country_select === "Autre" ? form.country_custom.trim() : form.country_select;
+        if (!c) throw new Error("Le pays d'origine est obligatoire pour un métal importé.");
+        countryOfOrigin = c;
+      }
       const payload = {
         name: form.name.trim(),
         category: form.category,
@@ -290,6 +296,8 @@ function StockPage() {
         labor_cost: Number(form.labor_cost) || 0,
         supplier_id: form.supplier_id || null,
         origin: form.origin.trim() || null,
+        metal_origin: form.metal_origin || null,
+        country_of_origin: countryOfOrigin,
         status: form.status,
       };
       if (editing) {
