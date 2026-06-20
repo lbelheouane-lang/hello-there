@@ -52,6 +52,7 @@ export function buildReceiptHtml(d: ReceiptData): string {
   .sign { display: flex; justify-content: space-between; gap: 16px; margin-top: 36px; }
   .sign div { flex: 1; text-align: center; font-size: 10px; color: #666; border-top: 1px solid #999; padding-top: 4px; }
   .foot { text-align: center; font-size: 10px; color: #999; margin-top: 16px; }
+  .logo-img { width: 52px; height: 52px; object-fit: contain; margin: 0 auto 6px; display: block; }
 </style></head><body>
   <div class="head">
     ${logoHtml}
