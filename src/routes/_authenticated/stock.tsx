@@ -43,7 +43,7 @@ interface Product {
   status: string;
 }
 
-const empty = {
+const empty: Record<string, string> = {
   name: "", category: CATEGORIES[0], metal_type: "or", gold_karat: "21",
   weight_grams: "", metal_purchase_price: "", labor_cost: "", supplier_id: "",
   status: "en_stock",
