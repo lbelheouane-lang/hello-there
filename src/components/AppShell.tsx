@@ -112,7 +112,7 @@ function AppSidebar() {
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {NAV.filter((item) => role != null && item.roles.includes(role)).map((item) => (
+              {NAV.filter((item) => canAccess(item, role, permissions)).map((item) => (
                 <SidebarMenuItem key={item.to}>
                   <SidebarMenuButton asChild isActive={pathname === item.to}>
                     <Link to={item.to}>
