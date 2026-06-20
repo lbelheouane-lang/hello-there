@@ -47,6 +47,7 @@ function GoldPricePage() {
       const rows = KARATS.filter((k) => draft[k] && Number(draft[k]) > 0).map((k) => ({
         karat: k,
         price_per_gram: Number(draft[k]),
+        currency: "USD",
         price_date: today,
         source: "manuel",
       }));
