@@ -77,6 +77,86 @@ export type Database = {
         }
         Relationships: []
       }
+      expense_categories: {
+        Row: {
+          created_at: string
+          id: string
+          is_custom: boolean
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_custom?: boolean
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_custom?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
+      expenses: {
+        Row: {
+          amount: number
+          attachment_path: string | null
+          category: string
+          created_at: string
+          description: string
+          id: string
+          is_demo: boolean
+          notes: string | null
+          payment_method: string
+          recorded_by: string | null
+          reference: string
+          spent_at: string
+          supplier_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          attachment_path?: string | null
+          category: string
+          created_at?: string
+          description: string
+          id?: string
+          is_demo?: boolean
+          notes?: string | null
+          payment_method?: string
+          recorded_by?: string | null
+          reference?: string
+          spent_at?: string
+          supplier_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          attachment_path?: string | null
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          is_demo?: boolean
+          notes?: string | null
+          payment_method?: string
+          recorded_by?: string | null
+          reference?: string
+          spent_at?: string
+          supplier_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gold_prices: {
         Row: {
           created_at: string
@@ -568,6 +648,7 @@ export type Database = {
         Args: { _due: string; _paid: number; _total: number }
         Returns: string
       }
+      next_expense_number: { Args: never; Returns: string }
       next_invoice_number: { Args: { _prefix?: string }; Returns: string }
       seed_demo_data: { Args: never; Returns: undefined }
     }
