@@ -49,7 +49,7 @@ function AuthPage() {
       password,
       options: {
         emailRedirectTo: window.location.origin,
-        data: { full_name: fullName, phone },
+        data: { full_name: fullName },
       },
     });
     setLoading(false);
