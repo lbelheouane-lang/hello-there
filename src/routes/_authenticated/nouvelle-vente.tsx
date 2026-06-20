@@ -40,7 +40,7 @@ interface CustomerOption {
 
 function NewSalePage() {
   const qc = useQueryClient();
-  const navigate = useNavigate();
+  
   const { data: prices } = useLatestGoldPrices();
 
   const [productSearch, setProductSearch] = useState("");
