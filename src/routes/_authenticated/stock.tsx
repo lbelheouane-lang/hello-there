@@ -57,6 +57,8 @@ interface Product {
   labor_cost: number;
   supplier_id: string | null;
   origin: string | null;
+  metal_origin: string | null;
+  country_of_origin: string | null;
   created_at: string;
   status: string;
   is_demo: boolean;
@@ -66,6 +68,7 @@ const empty: Record<string, string> = {
   name: "", category: CATEGORIES[0], subcategory: "", metal_type: "or", gold_karat: "21",
   weight_grams: "", metal_purchase_price: "", labor_cost: "", supplier_id: "",
   origin: "", status: "en_stock",
+  metal_origin: "", country_select: "", country_custom: "",
 };
 
 function statusVariant(s: string): "default" | "secondary" | "destructive" {
