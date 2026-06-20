@@ -307,7 +307,7 @@ function StockPage() {
           {categoryNames.map((cat) => {
             const Icon = categoryIcon(cat);
             const st = stats.get(cat);
-            const subs = subcatNames(subcategories, cat);
+            const subs = subsForCat(cat);
             const isOpen = expanded.has(cat);
             const low = st && st.count > 0 && st.count <= LOW_STOCK_THRESHOLD;
             return (
@@ -324,7 +324,7 @@ function StockPage() {
                   >
                     <Icon className={cn("h-4 w-4", catFilter === cat ? "text-primary" : "text-muted-foreground")} />
                     <span className="truncate">{cat}</span>
-                    {low && <AlertTriangle className="h-3.5 w-3.5 text-destructive" title="Stock faible" />}
+                    {low && <AlertTriangle className="h-3.5 w-3.5 text-destructive" aria-label="Stock faible" />}
                   </button>
                   <Badge variant="secondary" className="mr-1">{st?.count ?? 0}</Badge>
                   {subs.length > 0 && (
@@ -335,7 +335,7 @@ function StockPage() {
                 </div>
                 {subs.length > 0 && (
                   <CollapsibleContent className="ml-4 mt-1 space-y-1 border-l pl-2">
-                    {subs.map((sub) => {
+                    {subs.map((sub: string) => {
                       const cnt = products?.filter((p) => p.status === "en_stock" && p.category === cat && p.subcategory === sub).length ?? 0;
                       return (
                         <button
