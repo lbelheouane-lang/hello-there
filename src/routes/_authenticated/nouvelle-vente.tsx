@@ -130,6 +130,10 @@ function NewSalePage() {
       if (!selectedProduct) throw new Error("Sélectionnez un bijou à vendre.");
       const total = Number(totalAmount);
       if (!total || total <= 0) throw new Error("Indiquez le montant total de la vente.");
+      const isInstallment = saleType === "installment";
+      const paid = isInstallment ? Number(amountPaid) || 0 : Number(amountPaid) || total;
+      if (isInstallment && paid >= total)
+        throw new Error("Pour un paiement échelonné, l'acompte doit être inférieur au total.");
       const { data: u } = await supabase.auth.getUser();
       const saleNumber = `V-${Date.now().toString(36).toUpperCase().slice(-6)}`;
       const { error } = await supabase.from("sales").insert({
@@ -139,8 +143,10 @@ function NewSalePage() {
         product_name: selectedProduct.name,
         weight_grams: Number(selectedProduct.weight_grams),
         total_amount: total,
-        amount_paid: Number(amountPaid) || total,
+        amount_paid: paid,
         payment_method: paymentMethod,
+        sale_type: saleType,
+        due_date: isInstallment && dueDate ? dueDate : null,
         notes: notes.trim() || null,
         sold_by: u.user?.id,
       });
@@ -156,8 +162,11 @@ function NewSalePage() {
       setTotalAmount("");
       setAmountPaid("");
       setNotes("");
+      setSaleType("full");
+      setDueDate("");
       qc.invalidateQueries({ queryKey: ["products"] });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
+      qc.invalidateQueries({ queryKey: ["sales"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
