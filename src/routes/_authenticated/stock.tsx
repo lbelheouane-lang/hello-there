@@ -286,19 +286,7 @@ function StockPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  // Subcategories for current form category (by category name -> need ids)
-  const catId = useMemo(() => {
-    // subcategories store category_id; we look up by matching id via products? simpler: match by name not available.
-    return null;
-  }, []);
 
-  function subsForCategoryName(name: string): string[] {
-    // subcategories reference category_id; resolve through categories query is omitted,
-    // so we match using the subcategories list joined client-side via category id lookup.
-    return (subcategories ?? [])
-      .filter((s) => s._categoryName === name)
-      .map((s) => s.name);
-  }
 
   return (
     <AppShell title="Stock" allow={["admin"]}>
