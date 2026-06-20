@@ -36,7 +36,7 @@ import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
 import { LabelDialog, type LabelProduct } from "@/components/LabelDialog";
 import { productImage } from "@/lib/product-image";
 import { categoryIcon } from "@/lib/category-meta";
-import { useCategoryNames, useSubcategories } from "@/hooks/use-categories";
+import { useCategories, useCategoryNames, useSubcategories } from "@/hooks/use-categories";
 
 export const Route = createFileRoute("/_authenticated/stock")({
   component: StockPage,
