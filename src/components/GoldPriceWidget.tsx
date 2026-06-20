@@ -9,7 +9,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { formatRelativeTime, KARATS } from "@/lib/format";
-import { formatUSD, formatFromUSD } from "@/lib/currency";
+import { formatEUR, formatFromEUR } from "@/lib/currency";
 import { useLatestGoldPrices, useGoldPriceChange } from "@/hooks/use-gold-prices";
 import { refreshGoldPrices } from "@/lib/gold-prices.functions";
 
@@ -74,14 +74,14 @@ export function GoldPriceWidget({ canRefresh = false }: { canRefresh?: boolean }
         <div className="flex items-end justify-between">
           <div>
             <p className="text-3xl font-semibold">
-              {latest ? formatUSD(latest.price_per_gram) : "—"}
-              <span className="ml-1 text-sm font-normal text-muted-foreground">/ g (USD)</span>
+              {latest ? formatEUR(latest.price_per_gram) : "—"}
+              <span className="ml-1 text-sm font-normal text-muted-foreground">/ g (EUR)</span>
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              {latest?.price_per_ounce ? formatUSD(latest.price_per_ounce) : "—"}
+              {latest?.price_per_ounce ? formatEUR(latest.price_per_ounce) : "—"}
               <span className="ml-1 text-xs">/ once</span>
               {latest && (
-                <span className="ml-2">≈ {formatFromUSD(latest.price_per_gram, "DZD")} / g</span>
+                <span className="ml-2">≈ {formatFromEUR(latest.price_per_gram, "DZD")} / g</span>
               )}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
@@ -93,7 +93,7 @@ export function GoldPriceWidget({ canRefresh = false }: { canRefresh?: boolean }
             {change && change.previous != null ? (
               <span>
                 {change.diff > 0 ? "+" : ""}
-                {formatUSD(change.diff)} ({change.percent > 0 ? "+" : ""}
+                {formatEUR(change.diff)} ({change.percent > 0 ? "+" : ""}
                 {change.percent.toFixed(2)}%)
               </span>
             ) : (

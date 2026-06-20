@@ -24,7 +24,7 @@ import {
   KARATS, CATEGORIES, METAL_TYPES, PRODUCT_STATUSES,
   formatGrams, statusLabel, metalValue,
 } from "@/lib/format";
-import { formatUSD, formatFromUSD } from "@/lib/currency";
+import { formatEUR, formatFromEUR } from "@/lib/currency";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
 import { LabelDialog, type LabelProduct } from "@/components/LabelDialog";
 import { productImage } from "@/lib/product-image";
@@ -375,8 +375,8 @@ function StockPage() {
                     <TableCell>
                       {ppg ? (
                         <div>
-                          <div>{formatUSD(value)}</div>
-                          <div className="text-xs text-muted-foreground">≈ {formatFromUSD(value, "DZD")}</div>
+                          <div>{formatEUR(value)}</div>
+                          <div className="text-xs text-muted-foreground">≈ {formatFromEUR(value, "DZD")}</div>
                         </div>
                       ) : (
                         <span className="text-muted-foreground">cours manquant</span>

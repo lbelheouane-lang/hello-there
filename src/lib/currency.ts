@@ -1,34 +1,49 @@
 /**
- * Currency utilities. The gold price module stores and displays values in USD
- * by default. These helpers convert from USD to other operating currencies
- * (DZD, EUR, …) and format amounts with clear currency labels.
- *
- * FX rates are approximate and configurable via VITE_ env vars. They express
- * how many units of the target currency equal 1 USD.
+ * Currency utilities. EUR is the application's BASE currency: live gold prices
+ * and product values are stored/displayed in EUR by default. These helpers
+ * convert EUR into the secondary operating currency (DZD) using the
+ * configurable exchange rate stored in store settings, and format amounts with
+ * clear currency labels.
  */
-export const BASE_CURRENCY = "USD";
+import { getStoreSettings } from "@/lib/store-settings";
 
-export const FX_FROM_USD: Record<string, number> = {
-  USD: 1,
-  DZD: Number(import.meta.env.VITE_USD_TO_DZD) || 268,
-  EUR: Number(import.meta.env.VITE_USD_TO_EUR) || 0.92,
-};
+export const BASE_CURRENCY = "EUR";
 
-export const SUPPORTED_CURRENCIES = ["USD", "DZD", "EUR"] as const;
+export const SUPPORTED_CURRENCIES = ["EUR", "DZD", "USD"] as const;
 export type Currency = (typeof SUPPORTED_CURRENCIES)[number];
 
-/** Convert a USD amount into the target currency. */
-export function convertFromUSD(usd: number | null | undefined, currency: string = BASE_CURRENCY): number {
-  if (usd == null || Number.isNaN(usd)) return 0;
-  return usd * (FX_FROM_USD[currency] ?? 1);
+const DEFAULT_EUR_TO_DZD = 145;
+
+/** Configured EUR → DZD exchange rate (from store settings, with a safe fallback). */
+export function eurToDzdRate(): number {
+  const r = Number((getStoreSettings() as { eur_to_dzd?: number }).eur_to_dzd);
+  return Number.isFinite(r) && r > 0 ? r : DEFAULT_EUR_TO_DZD;
 }
 
-/** Convenience: USD → DZD (the store's operating currency for sales). */
-export function dzdFromUsd(usd: number | null | undefined): number {
-  return convertFromUSD(usd, "DZD");
+/** How many units of `currency` equal 1 EUR. */
+function rateFromEur(currency: string): number {
+  switch (currency) {
+    case "EUR":
+      return 1;
+    case "DZD":
+      return eurToDzdRate();
+    default:
+      return 1;
+  }
 }
 
-const FRACTION_DIGITS: Record<string, number> = { USD: 2, EUR: 2, DZD: 0 };
+/** Convert an EUR amount into the target currency. */
+export function convertFromEUR(eur: number | null | undefined, currency: string = BASE_CURRENCY): number {
+  if (eur == null || Number.isNaN(eur)) return 0;
+  return eur * rateFromEur(currency);
+}
+
+/** Convenience: EUR → DZD using the configured rate. */
+export function dzdFromEur(eur: number | null | undefined): number {
+  return convertFromEUR(eur, "DZD");
+}
+
+const FRACTION_DIGITS: Record<string, number> = { EUR: 2, USD: 2, DZD: 0 };
 
 /** Format a value already expressed in `currency`, with the currency symbol/label. */
 export function formatCurrency(
@@ -36,19 +51,19 @@ export function formatCurrency(
   currency: string = BASE_CURRENCY,
 ): string {
   if (value == null || Number.isNaN(value)) return "—";
-  return new Intl.NumberFormat(currency === "DZD" ? "fr-DZ" : "en-US", {
+  return new Intl.NumberFormat(currency === "DZD" ? "fr-DZ" : currency === "EUR" ? "fr-FR" : "en-US", {
     style: "currency",
     currency,
     maximumFractionDigits: FRACTION_DIGITS[currency] ?? 2,
   }).format(value);
 }
 
-/** Format a USD amount. */
-export function formatUSD(value: number | null | undefined): string {
-  return formatCurrency(value, "USD");
+/** Format an EUR amount. */
+export function formatEUR(value: number | null | undefined): string {
+  return formatCurrency(value, "EUR");
 }
 
-/** Format a USD amount converted to the target currency, labelled in that currency. */
-export function formatFromUSD(usd: number | null | undefined, currency: string): string {
-  return formatCurrency(convertFromUSD(usd, currency), currency);
+/** Format an EUR amount converted to the target currency, labelled in that currency. */
+export function formatFromEUR(eur: number | null | undefined, currency: string): string {
+  return formatCurrency(convertFromEUR(eur, currency), currency);
 }

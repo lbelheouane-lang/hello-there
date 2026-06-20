@@ -196,6 +196,81 @@ export type Database = {
         }
         Relationships: []
       }
+      gold_sync_logs: {
+        Row: {
+          alert: boolean
+          app_price_eur: number | null
+          attempts: number
+          created_at: string
+          currency: string
+          data_source: string | null
+          discrepancy_eur: number | null
+          discrepancy_pct: number | null
+          error: string | null
+          eur_dzd_rate: number | null
+          fallback_used: boolean
+          goldrepublic_price_eur: number | null
+          id: string
+          manual_override: boolean
+          price_per_gram_eur: number | null
+          price_per_ounce_eur: number | null
+          products_recalculated: number
+          raw_response: Json | null
+          source: string
+          status: string
+          threshold_pct: number | null
+          usd_eur_rate: number | null
+        }
+        Insert: {
+          alert?: boolean
+          app_price_eur?: number | null
+          attempts?: number
+          created_at?: string
+          currency?: string
+          data_source?: string | null
+          discrepancy_eur?: number | null
+          discrepancy_pct?: number | null
+          error?: string | null
+          eur_dzd_rate?: number | null
+          fallback_used?: boolean
+          goldrepublic_price_eur?: number | null
+          id?: string
+          manual_override?: boolean
+          price_per_gram_eur?: number | null
+          price_per_ounce_eur?: number | null
+          products_recalculated?: number
+          raw_response?: Json | null
+          source: string
+          status: string
+          threshold_pct?: number | null
+          usd_eur_rate?: number | null
+        }
+        Update: {
+          alert?: boolean
+          app_price_eur?: number | null
+          attempts?: number
+          created_at?: string
+          currency?: string
+          data_source?: string | null
+          discrepancy_eur?: number | null
+          discrepancy_pct?: number | null
+          error?: string | null
+          eur_dzd_rate?: number | null
+          fallback_used?: boolean
+          goldrepublic_price_eur?: number | null
+          id?: string
+          manual_override?: boolean
+          price_per_gram_eur?: number | null
+          price_per_ounce_eur?: number | null
+          products_recalculated?: number
+          raw_response?: Json | null
+          source?: string
+          status?: string
+          threshold_pct?: number | null
+          usd_eur_rate?: number | null
+        }
+        Relationships: []
+      }
       invoices: {
         Row: {
           amount_this_tx: number
@@ -580,6 +655,11 @@ export type Database = {
           created_at: string
           currency: string
           email: string | null
+          eur_to_dzd: number
+          gold_auto_sync: boolean
+          gold_discrepancy_threshold_pct: number
+          gold_manual_override: boolean
+          gold_manual_price_eur: number | null
           id: string
           invoice_footer: string | null
           invoice_header: string | null
@@ -606,6 +686,11 @@ export type Database = {
           created_at?: string
           currency?: string
           email?: string | null
+          eur_to_dzd?: number
+          gold_auto_sync?: boolean
+          gold_discrepancy_threshold_pct?: number
+          gold_manual_override?: boolean
+          gold_manual_price_eur?: number | null
           id?: string
           invoice_footer?: string | null
           invoice_header?: string | null
@@ -632,6 +717,11 @@ export type Database = {
           created_at?: string
           currency?: string
           email?: string | null
+          eur_to_dzd?: number
+          gold_auto_sync?: boolean
+          gold_discrepancy_threshold_pct?: number
+          gold_manual_override?: boolean
+          gold_manual_price_eur?: number | null
           id?: string
           invoice_footer?: string | null
           invoice_header?: string | null
