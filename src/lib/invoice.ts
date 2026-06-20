@@ -163,11 +163,11 @@ export function buildInvoiceHtml(inv: InvoiceRecord): string {
   <div class="sheet">
     <div class="top">
       <div class="brand">
-        <div class="logo">M</div>
+        ${logoHtml}
         <div>
-          <div class="store">${esc(STORE_INFO.name)}</div>
-          <div class="sub">${esc(STORE_INFO.tagline)}</div>
-          <div class="company">${esc(STORE_INFO.address)}<br/>${esc(STORE_INFO.phone)} · ${esc(STORE_INFO.email)}<br/>${esc(STORE_INFO.rc)}</div>
+          <div class="store">${esc(store.name)}</div>
+          <div class="sub">${esc(store.tagline)}</div>
+          <div class="company">${esc(store.address)}${contactLine ? `<br/>${contactLine}` : ""}${store.website ? `<br/>${esc(store.website)}` : ""}${store.rc ? `<br/>${esc(store.rc)}` : ""}</div>
         </div>
       </div>
       <div class="doc">
@@ -178,6 +178,9 @@ export function buildInvoiceHtml(inv: InvoiceRecord): string {
         <div class="badge" style="background:${statusColor}">${esc(invoiceStatusLabel(inv.payment_status))}</div>
       </div>
     </div>
+
+    ${s.invoice_header ? `<div class="header-note">${esc(s.invoice_header)}</div>` : ""}
+
 
     <div class="parties">
       <div class="card">
