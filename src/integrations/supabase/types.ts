@@ -14,29 +14,62 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          created_at: string
+          details: Json
+          entity_id: string | null
+          event_type: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          details?: Json
+          entity_id?: string | null
+          event_type: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          details?: Json
+          entity_id?: string | null
+          event_type?: string
+          id?: string
+        }
+        Relationships: []
+      }
       gold_prices: {
         Row: {
           created_at: string
+          currency: string
+          fetched_at: string
           id: string
           karat: number
           price_date: string
           price_per_gram: number
+          price_per_ounce: number | null
           source: string
         }
         Insert: {
           created_at?: string
+          currency?: string
+          fetched_at?: string
           id?: string
           karat: number
           price_date?: string
           price_per_gram: number
+          price_per_ounce?: number | null
           source?: string
         }
         Update: {
           created_at?: string
+          currency?: string
+          fetched_at?: string
           id?: string
           karat?: number
           price_date?: string
           price_per_gram?: number
+          price_per_ounce?: number | null
           source?: string
         }
         Relationships: []
@@ -50,10 +83,13 @@ export type Database = {
           id: string
           internal_code: string
           labor_cost: number
+          making_charge: number
           metal_purchase_price: number
           metal_type: string
           name: string
+          selling_price: number
           status: string
+          stone_cost: number
           supplier_id: string | null
           updated_at: string
           weight_grams: number
@@ -66,10 +102,13 @@ export type Database = {
           id?: string
           internal_code: string
           labor_cost?: number
+          making_charge?: number
           metal_purchase_price?: number
           metal_type?: string
           name: string
+          selling_price?: number
           status?: string
+          stone_cost?: number
           supplier_id?: string | null
           updated_at?: string
           weight_grams?: number
@@ -82,10 +121,13 @@ export type Database = {
           id?: string
           internal_code?: string
           labor_cost?: number
+          making_charge?: number
           metal_purchase_price?: number
           metal_type?: string
           name?: string
+          selling_price?: number
           status?: string
+          stone_cost?: number
           supplier_id?: string | null
           updated_at?: string
           weight_grams?: number
