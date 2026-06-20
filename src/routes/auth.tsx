@@ -30,7 +30,6 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -50,7 +49,7 @@ function AuthPage() {
       password,
       options: {
         emailRedirectTo: window.location.origin,
-        data: { full_name: fullName, phone },
+        data: { full_name: fullName },
       },
     });
     setLoading(false);
@@ -112,10 +111,6 @@ function AuthPage() {
                   <div className="space-y-2">
                     <Label htmlFor="su-name">Nom complet</Label>
                     <Input id="su-name" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="su-phone">Téléphone</Label>
-                    <Input id="su-phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="su-email">Email</Label>
