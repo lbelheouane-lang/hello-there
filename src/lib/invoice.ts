@@ -214,7 +214,7 @@ export function buildInvoiceHtml(inv: InvoiceRecord): string {
 
     <div class="totals">
       <table>
-        <tr><td class="lbl">Prix de vente final</td><td class="val">${esc(formatDZD(inv.total_amount))}</td></tr>
+        <tr><td class="lbl">Sous-total</td><td class="val">${esc(formatDZD(inv.total_amount + inv.discount))}</td></tr>
         ${inv.discount ? `<tr><td class="lbl">Remise</td><td class="val">- ${esc(formatDZD(inv.discount))}</td></tr>` : ""}
         <tr class="grand"><td>Montant total</td><td class="val">${esc(formatDZD(inv.total_amount))}</td></tr>
         ${isPayment ? `<tr><td class="lbl">Montant versé (ce reçu)</td><td class="val">${esc(formatDZD(inv.amount_this_tx))}</td></tr>` : `<tr><td class="lbl">Montant payé</td><td class="val">${esc(formatDZD(inv.amount_this_tx))}</td></tr>`}
