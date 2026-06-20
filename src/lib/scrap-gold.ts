@@ -1,6 +1,6 @@
 import { Recycle, Flame, Sparkles, CheckCircle2, ShoppingCart } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { formatDZD, formatGrams, formatDate, formatDateTime } from "@/lib/format";
+import { formatDZD, formatGrams, formatDate } from "@/lib/format";
 import { getStoreInfo } from "@/lib/invoice";
 import { getStoreSettings } from "@/lib/store-settings";
 
