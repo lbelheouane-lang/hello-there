@@ -965,6 +965,109 @@ export type Database = {
           },
         ]
       }
+      scrap_gold: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          customer_name: string | null
+          gold_karat: number
+          id: string
+          is_demo: boolean
+          notes: string | null
+          price_per_gram: number
+          purchased_at: string
+          reference: string
+          status: string
+          total_amount: number
+          updated_at: string
+          weight_grams: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          customer_name?: string | null
+          gold_karat?: number
+          id?: string
+          is_demo?: boolean
+          notes?: string | null
+          price_per_gram?: number
+          purchased_at?: string
+          reference: string
+          status?: string
+          total_amount?: number
+          updated_at?: string
+          weight_grams?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          customer_name?: string | null
+          gold_karat?: number
+          id?: string
+          is_demo?: boolean
+          notes?: string | null
+          price_per_gram?: number
+          purchased_at?: string
+          reference?: string
+          status?: string
+          total_amount?: number
+          updated_at?: string
+          weight_grams?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scrap_gold_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scrap_gold_events: {
+        Row: {
+          changed_by: string | null
+          created_at: string
+          detail: string | null
+          event_type: string
+          id: string
+          scrap_id: string
+          status: string | null
+          weight_grams: number | null
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string
+          detail?: string | null
+          event_type: string
+          id?: string
+          scrap_id: string
+          status?: string | null
+          weight_grams?: number | null
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string
+          detail?: string | null
+          event_type?: string
+          id?: string
+          scrap_id?: string
+          status?: string | null
+          weight_grams?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scrap_gold_events_scrap_id_fkey"
+            columns: ["scrap_id"]
+            isOneToOne: false
+            referencedRelation: "scrap_gold"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stock_movements: {
         Row: {
           created_at: string
@@ -1193,6 +1296,7 @@ export type Database = {
       next_invoice_number: { Args: { _prefix?: string }; Returns: string }
       next_purchase_number: { Args: never; Returns: string }
       next_repair_number: { Args: never; Returns: string }
+      next_scrap_number: { Args: never; Returns: string }
       next_set_number: { Args: never; Returns: string }
       seed_demo_data: { Args: never; Returns: undefined }
     }

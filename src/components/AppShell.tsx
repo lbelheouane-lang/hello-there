@@ -16,6 +16,7 @@ import {
   Store,
   Wrench,
   Layers,
+  Recycle,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BrandIntro } from "@/components/BrandIntro";
@@ -53,6 +54,7 @@ const NAV: readonly {
   { to: "/reparations", label: "Réparations", icon: Wrench, roles: ["admin", "employe"] },
   { to: "/stock", label: "Stock", icon: Package, roles: ["admin"] },
   { to: "/parures", label: "Parures", icon: Layers, roles: ["admin"] },
+  { to: "/or-casse", label: "Or Cassé", icon: Recycle, roles: ["admin"] },
   { to: "/fournisseurs", label: "Fournisseurs", icon: Truck, roles: ["admin"] },
   { to: "/depenses", label: "Dépenses", icon: Wallet2, roles: ["admin"] },
   { to: "/cours-or", label: "Cours de l'or", icon: Coins, roles: ["admin"] },

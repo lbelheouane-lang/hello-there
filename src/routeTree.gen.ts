@@ -18,6 +18,7 @@ import { Route as AuthenticatedReparationsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedParuresRouteImport } from './routes/_authenticated/parures'
 import { Route as AuthenticatedParametresRouteImport } from './routes/_authenticated/parametres'
 import { Route as AuthenticatedPaiementsEnAttenteRouteImport } from './routes/_authenticated/paiements-en-attente'
+import { Route as AuthenticatedOrCasseRouteImport } from './routes/_authenticated/or-casse'
 import { Route as AuthenticatedNouvelleVenteRouteImport } from './routes/_authenticated/nouvelle-vente'
 import { Route as AuthenticatedFournisseursRouteImport } from './routes/_authenticated/fournisseurs'
 import { Route as AuthenticatedFacturesRouteImport } from './routes/_authenticated/factures'
@@ -77,6 +78,11 @@ const AuthenticatedPaiementsEnAttenteRoute =
     path: '/paiements-en-attente',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedOrCasseRoute = AuthenticatedOrCasseRouteImport.update({
+  id: '/or-casse',
+  path: '/or-casse',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedNouvelleVenteRoute =
   AuthenticatedNouvelleVenteRouteImport.update({
     id: '/nouvelle-vente',
@@ -153,6 +159,7 @@ export interface FileRoutesByFullPath {
   '/factures': typeof AuthenticatedFacturesRoute
   '/fournisseurs': typeof AuthenticatedFournisseursRoute
   '/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
+  '/or-casse': typeof AuthenticatedOrCasseRoute
   '/paiements-en-attente': typeof AuthenticatedPaiementsEnAttenteRoute
   '/parametres': typeof AuthenticatedParametresRoute
   '/parures': typeof AuthenticatedParuresRoute
@@ -175,6 +182,7 @@ export interface FileRoutesByTo {
   '/factures': typeof AuthenticatedFacturesRoute
   '/fournisseurs': typeof AuthenticatedFournisseursRoute
   '/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
+  '/or-casse': typeof AuthenticatedOrCasseRoute
   '/paiements-en-attente': typeof AuthenticatedPaiementsEnAttenteRoute
   '/parametres': typeof AuthenticatedParametresRoute
   '/parures': typeof AuthenticatedParuresRoute
@@ -199,6 +207,7 @@ export interface FileRoutesById {
   '/_authenticated/factures': typeof AuthenticatedFacturesRoute
   '/_authenticated/fournisseurs': typeof AuthenticatedFournisseursRoute
   '/_authenticated/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
+  '/_authenticated/or-casse': typeof AuthenticatedOrCasseRoute
   '/_authenticated/paiements-en-attente': typeof AuthenticatedPaiementsEnAttenteRoute
   '/_authenticated/parametres': typeof AuthenticatedParametresRoute
   '/_authenticated/parures': typeof AuthenticatedParuresRoute
@@ -223,6 +232,7 @@ export interface FileRouteTypes {
     | '/factures'
     | '/fournisseurs'
     | '/nouvelle-vente'
+    | '/or-casse'
     | '/paiements-en-attente'
     | '/parametres'
     | '/parures'
@@ -245,6 +255,7 @@ export interface FileRouteTypes {
     | '/factures'
     | '/fournisseurs'
     | '/nouvelle-vente'
+    | '/or-casse'
     | '/paiements-en-attente'
     | '/parametres'
     | '/parures'
@@ -268,6 +279,7 @@ export interface FileRouteTypes {
     | '/_authenticated/factures'
     | '/_authenticated/fournisseurs'
     | '/_authenticated/nouvelle-vente'
+    | '/_authenticated/or-casse'
     | '/_authenticated/paiements-en-attente'
     | '/_authenticated/parametres'
     | '/_authenticated/parures'
@@ -351,6 +363,13 @@ declare module '@tanstack/react-router' {
       path: '/paiements-en-attente'
       fullPath: '/paiements-en-attente'
       preLoaderRoute: typeof AuthenticatedPaiementsEnAttenteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/or-casse': {
+      id: '/_authenticated/or-casse'
+      path: '/or-casse'
+      fullPath: '/or-casse'
+      preLoaderRoute: typeof AuthenticatedOrCasseRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/nouvelle-vente': {
@@ -449,6 +468,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFacturesRoute: typeof AuthenticatedFacturesRoute
   AuthenticatedFournisseursRoute: typeof AuthenticatedFournisseursRoute
   AuthenticatedNouvelleVenteRoute: typeof AuthenticatedNouvelleVenteRoute
+  AuthenticatedOrCasseRoute: typeof AuthenticatedOrCasseRoute
   AuthenticatedPaiementsEnAttenteRoute: typeof AuthenticatedPaiementsEnAttenteRoute
   AuthenticatedParametresRoute: typeof AuthenticatedParametresRoute
   AuthenticatedParuresRoute: typeof AuthenticatedParuresRoute
@@ -468,6 +488,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFacturesRoute: AuthenticatedFacturesRoute,
   AuthenticatedFournisseursRoute: AuthenticatedFournisseursRoute,
   AuthenticatedNouvelleVenteRoute: AuthenticatedNouvelleVenteRoute,
+  AuthenticatedOrCasseRoute: AuthenticatedOrCasseRoute,
   AuthenticatedPaiementsEnAttenteRoute: AuthenticatedPaiementsEnAttenteRoute,
   AuthenticatedParametresRoute: AuthenticatedParametresRoute,
   AuthenticatedParuresRoute: AuthenticatedParuresRoute,
