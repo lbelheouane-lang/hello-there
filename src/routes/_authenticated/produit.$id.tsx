@@ -74,6 +74,19 @@ function ProductDetailPage() {
     },
   });
 
+  const { data: originEvents } = useQuery({
+    queryKey: ["product-origin-events", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_origin_events")
+        .select("id, event_type, detail, created_at, changed_by")
+        .eq("product_id", id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as OriginEvent[];
+    },
+  });
+
   const metal = product?.gold_karat
     ? `Or ${product.gold_karat}K`
     : METAL_TYPES.find((m) => m.value === product?.metal_type)?.label ?? product?.metal_type;
