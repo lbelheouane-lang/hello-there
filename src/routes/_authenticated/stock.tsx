@@ -67,7 +67,8 @@ function StockPage() {
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState(empty);
   const [search, setSearch] = useState("");
-  const [labelProduct, setLabelProduct] = useState<Product | null>(null);
+  const [labelProducts, setLabelProducts] = useState<LabelProduct[] | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const { data: products } = useQuery({
     queryKey: ["products"],
@@ -86,6 +87,34 @@ function StockPage() {
       return data as { id: string; name: string }[];
     },
   });
+
+  const supplierName = useMemo(() => {
+    const m = new Map<string, string>();
+    suppliers?.forEach((s) => m.set(s.id, s.name));
+    return (id: string | null) => (id ? m.get(id) ?? null : null);
+  }, [suppliers]);
+
+  function toLabel(p: Product): LabelProduct {
+    return { ...p, supplier_name: supplierName(p.supplier_id) };
+  }
+
+  function toggleSelect(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
+  function batchPrint() {
+    const items = (products ?? []).filter((p) => selected.has(p.id)).map(toLabel);
+    if (items.length === 0) {
+      toast.error("Sélectionnez au moins un produit.");
+      return;
+    }
+    setLabelProducts(items);
+  }
+
 
   const filtered = useMemo(() => {
     if (!products) return [];
