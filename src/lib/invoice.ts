@@ -1,12 +1,29 @@
 import { formatDZD, formatDateTime, formatGrams, paymentLabel } from "@/lib/format";
+import { getStoreSettings } from "@/lib/store-settings";
 
+/** Live store identity derived from configurable settings (with fallbacks). */
+export function getStoreInfo() {
+  const s = getStoreSettings();
+  return {
+    name: s.store_name || "Maison d'Or",
+    tagline: s.slogan || s.tagline || "Bijouterie · Or & Joaillerie",
+    address: s.address || "",
+    phone: s.phone || "",
+    email: s.email || "",
+    website: s.website || "",
+    rc: s.tax_id || "",
+    logo: s.logo_url || "",
+  };
+}
+
+/** @deprecated kept for compatibility — prefer getStoreInfo() */
 export const STORE_INFO = {
-  name: "Maison d'Or",
-  tagline: "Bijouterie · Or & Joaillerie",
-  address: "Rue Didouche Mourad, Alger, Algérie",
-  phone: "+213 555 00 00 00",
-  email: "contact@maisondor.dz",
-  rc: "RC 16/00-1234567",
+  get name() { return getStoreInfo().name; },
+  get tagline() { return getStoreInfo().tagline; },
+  get address() { return getStoreInfo().address; },
+  get phone() { return getStoreInfo().phone; },
+  get email() { return getStoreInfo().email; },
+  get rc() { return getStoreInfo().rc; },
 };
 
 export type InvoicePaymentStatus = "paid" | "partial" | "overdue" | "unpaid";
