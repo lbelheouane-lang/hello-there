@@ -73,10 +73,13 @@ function GoldPricePage() {
                 <Coins className="h-4 w-4 text-primary" />
               </div>
               <p className="mt-2 text-2xl font-semibold">
-                {latest?.[k] ? formatDZD(latest[k].price_per_gram) : "—"}
+                {latest?.[k] ? formatUSD(latest[k].price_per_gram) : "—"}
               </p>
               <p className="text-xs text-muted-foreground">
-                {latest?.[k] ? `Maj ${formatDate(latest[k].price_date)}` : "Aucun cours"}
+                {latest?.[k] ? `≈ ${formatFromUSD(latest[k].price_per_gram, "DZD")} / g` : "Aucun cours"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {latest?.[k] ? `Maj ${formatDate(latest[k].price_date)}` : ""}
               </p>
             </CardContent>
           </Card>
