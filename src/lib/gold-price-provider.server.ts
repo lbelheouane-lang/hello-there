@@ -148,7 +148,7 @@ export async function runGoldPriceUpdate(): Promise<UpdateResult> {
       message: "Aucun fournisseur disponible et aucun cours antérieur.",
     });
     return {
-      ok: false, source: "aucun", currency: "DZD", pricePerOunce: 0,
+      ok: false, source: "aucun", currency: "USD", pricePerOunce: 0,
       basePricePerGram: 0, productsRecalculated: 0, fallbackUsed: true,
     };
   }
