@@ -90,11 +90,11 @@ function InvoicesPage() {
   const totalCollected = filtered.reduce((s, i) => s + Number(i.amount_this_tx), 0);
 
   return (
-    <AppShell title="Factures">
+    <AppShell title="Ventes">
       <div className="space-y-6">
         <div className="grid gap-4 sm:grid-cols-3">
           <Card><CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">Factures</p>
+            <p className="text-xs text-muted-foreground">Documents</p>
             <p className="font-serif text-2xl font-semibold">{filtered.length}</p>
           </CardContent></Card>
           <Card><CardContent className="p-4">
@@ -107,9 +107,20 @@ function InvoicesPage() {
           </CardContent></Card>
         </div>
 
+        <Tabs value={tab} onValueChange={setTab}>
+          <TabsList className="flex flex-wrap">
+            <TabsTrigger value="all">Toutes les ventes</TabsTrigger>
+            <TabsTrigger value="full">Payées intégralement</TabsTrigger>
+            <TabsTrigger value="installment">Ventes échelonnées</TabsTrigger>
+            <TabsTrigger value="pending">Paiements en attente</TabsTrigger>
+            <TabsTrigger value="documents">Documents (factures & reçus)</TabsTrigger>
+          </TabsList>
+        </Tabs>
+
         <Card>
           <CardContent className="space-y-4 p-4">
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-5">
+
               <div className="relative lg:col-span-2">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input className="pl-9" placeholder="N° facture, client, téléphone, produit…" value={search} onChange={(e) => setSearch(e.target.value)} />
