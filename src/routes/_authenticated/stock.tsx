@@ -541,6 +541,47 @@ function StockPage() {
                       onChange={(e) => setForm({ ...form, origin: e.target.value })}
                     />
                   </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label>Origine du métal</Label>
+                      <Select
+                        value={form.metal_origin || "none"}
+                        onValueChange={(v) => setForm({
+                          ...form,
+                          metal_origin: v === "none" ? "" : v,
+                          ...(v !== "imported" ? { country_select: "", country_custom: "" } : {}),
+                        })}
+                      >
+                        <SelectTrigger><SelectValue placeholder="Non précisée" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Non précisée</SelectItem>
+                          {METAL_ORIGINS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {form.metal_origin === "imported" && (
+                      <div className="space-y-2">
+                        <Label>Pays d'origine *</Label>
+                        <Select value={form.country_select || ""} onValueChange={(v) => setForm({ ...form, country_select: v })}>
+                          <SelectTrigger><SelectValue placeholder="Choisir un pays" /></SelectTrigger>
+                          <SelectContent>
+                            {ORIGIN_COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  </div>
+                  {form.metal_origin === "imported" && form.country_select === "Autre" && (
+                    <div className="space-y-2">
+                      <Label>Préciser le pays *</Label>
+                      <Input
+                        placeholder="Nom du pays"
+                        value={form.country_custom}
+                        onChange={(e) => setForm({ ...form, country_custom: e.target.value })}
+                      />
+                    </div>
+                  )}
+
                 </div>
                 <DialogFooter>
                   <Button onClick={() => save.mutate()} disabled={save.isPending}>Enregistrer</Button>
