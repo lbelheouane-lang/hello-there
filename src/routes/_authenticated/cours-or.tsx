@@ -161,7 +161,7 @@ function GoldPricePage() {
     }
   }
 
-  const eurToDzd = settings?.eur_to_dzd ?? 145;
+  const eurToDzd = settings?.eur_to_dzd ?? 280;
 
   return (
     <AppShell title="Cours de l'or" allow={["admin"]}>
