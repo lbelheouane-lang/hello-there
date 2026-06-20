@@ -256,9 +256,39 @@ function NewSalePage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Montant payé (DZD)</Label>
-                <Input type="number" min={0} step="1" placeholder="= total si vide" value={amountPaid} onChange={(e) => setAmountPaid(e.target.value)} />
+                <Label>Type de paiement</Label>
+                <Select value={saleType} onValueChange={(v) => setSaleType(v as "full" | "installment")}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="full">Paiement intégral</SelectItem>
+                    <SelectItem value="installment">Paiement échelonné</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+
+              <div className="space-y-2">
+                <Label>{saleType === "installment" ? "Acompte initial (DZD)" : "Montant payé (DZD)"}</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  step="1"
+                  placeholder={saleType === "installment" ? "Acompte versé" : "= total si vide"}
+                  value={amountPaid}
+                  onChange={(e) => setAmountPaid(e.target.value)}
+                />
+                {saleType === "installment" && Number(totalAmount) > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    Reste à payer : {formatDZD(Math.max(Number(totalAmount) - (Number(amountPaid) || 0), 0))}
+                  </p>
+                )}
+              </div>
+
+              {saleType === "installment" && (
+                <div className="space-y-2">
+                  <Label>Date d'échéance</Label>
+                  <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label>Mode de paiement</Label>
