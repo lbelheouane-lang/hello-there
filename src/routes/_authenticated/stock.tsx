@@ -120,14 +120,23 @@ function StockPage() {
     return (id: string | null) => (id ? m.get(id) ?? null : null);
   }, [suppliers]);
 
-  const subsByCategory = useMemo(() => {
+  const { data: categories } = useCategories();
+
+  // Map category name -> list of its subcategory names
+  const subsByCatName = useMemo(() => {
+    const idToName = new Map<string, string>();
+    (categories ?? []).forEach((c) => idToName.set(c.id, c.name));
     const m = new Map<string, string[]>();
     (subcategories ?? []).forEach((s) => {
-      const cat = categoryNames.find((c) => c === s.category_id) ? s.category_id : null;
-      // map by category id; resolved below
+      const name = idToName.get(s.category_id);
+      if (!name) return;
+      const arr = m.get(name) ?? [];
+      arr.push(s.name);
+      m.set(name, arr);
     });
     return m;
-  }, [subcategories, categoryNames]);
+  }, [subcategories, categories]);
+  const subsForCat = (name: string): string[] => subsByCatName.get(name) ?? [];
 
   function toLabel(p: Product): LabelProduct {
     return { ...p, supplier_name: supplierName(p.supplier_id) };
