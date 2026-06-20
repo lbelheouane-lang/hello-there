@@ -128,6 +128,9 @@ export function buildInvoiceHtml(inv: InvoiceRecord): string {
   .top { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #c9a227; padding-bottom: 16px; margin-bottom: 24px; }
   .brand { display: flex; gap: 14px; align-items: center; }
   .logo { width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg,#c9a227,#8a6d10); color: #fff; display: flex; align-items: center; justify-content: center; font-family: Georgia, serif; font-size: 30px; font-weight: 700; }
+  .logo-img { width: 64px; height: 64px; object-fit: contain; border-radius: 12px; }
+  .header-note { font-size: 11px; color: #555; margin: 0 0 16px; white-space: pre-line; }
+  .terms { margin: 18px 0 0; font-size: 10px; color: #777; white-space: pre-line; border-top: 1px dashed #ddd; padding-top: 8px; }
   .store { font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; color: #b8860b; letter-spacing: .5px; }
   .sub { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
   .company { font-size: 11px; color: #555; margin-top: 6px; }
