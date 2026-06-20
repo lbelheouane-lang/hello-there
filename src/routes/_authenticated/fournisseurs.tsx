@@ -156,11 +156,20 @@ function SuppliersPage() {
             <TableBody>
               {data?.map((s) => (
                 <TableRow key={s.id}>
-                  <TableCell className="font-medium">{s.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <Link to="/fournisseurs/$id" params={{ id: s.id }} className="text-primary hover:underline">
+                      {s.name}
+                    </Link>
+                  </TableCell>
                   <TableCell>{s.phone ?? "—"}</TableCell>
                   <TableCell>{s.email ?? "—"}</TableCell>
                   <TableCell>{s.address ?? "—"}</TableCell>
                   <TableCell className="text-right">
+                    <Button variant="ghost" size="icon" title="Historique d'achats" asChild>
+                      <Link to="/fournisseurs/$id" params={{ id: s.id }}>
+                        <History className="h-4 w-4" />
+                      </Link>
+                    </Button>
                     <Button variant="ghost" size="icon" onClick={() => openEdit(s)}>
                       <Pencil className="h-4 w-4" />
                     </Button>
