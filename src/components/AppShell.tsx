@@ -13,10 +13,12 @@ import {
   Wallet,
   FileText,
   Wallet2,
+  Store,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BrandIntro } from "@/components/BrandIntro";
 import { useAuth, type AppRole } from "@/hooks/use-auth";
+import { useStoreSettings } from "@/lib/store-settings";
 import { RequireRole } from "@/components/RequireRole";
 import { Button } from "@/components/ui/button";
 import {
