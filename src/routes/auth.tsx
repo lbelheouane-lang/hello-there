@@ -135,6 +135,7 @@ function AuthPage() {
           busy={busy}
           onDigit={pushDigit}
           onBackspace={popDigit}
+          onValidate={validate}
           onBack={() => setPhase("profiles")}
         />
       )}
