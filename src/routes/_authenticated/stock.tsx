@@ -179,6 +179,32 @@ function StockPage() {
     return byCat;
   }, [products, prices]);
 
+  // Origin reporting: local vs imported totals + breakdown by country
+  const originStats = useMemo(() => {
+    const ppg = (p: Product) => (p.metal_type === "or" ? priceForKarat(prices, p.gold_karat) : null);
+    const inStock = (products ?? []).filter((p) => p.status === "en_stock");
+    const acc = {
+      local: { weight: 0, value: 0 },
+      imported: { weight: 0, value: 0 },
+    };
+    const byCountry = new Map<string, { weight: number; value: number; count: number }>();
+    for (const p of inStock) {
+      const w = Number(p.weight_grams) || 0;
+      const v = metalValue(w, ppg(p));
+      if (p.metal_origin === "local") { acc.local.weight += w; acc.local.value += v; }
+      else if (p.metal_origin === "imported") {
+        acc.imported.weight += w; acc.imported.value += v;
+        const key = p.country_of_origin || "Non précisé";
+        const e = byCountry.get(key) ?? { weight: 0, value: 0, count: 0 };
+        e.weight += w; e.value += v; e.count += 1;
+        byCountry.set(key, e);
+      }
+    }
+    return { ...acc, byCountry: Array.from(byCountry.entries()).sort((a, b) => b[1].weight - a[1].weight) };
+  }, [products, prices]);
+
+
+
   const filtered = useMemo(() => {
     if (!products) return [];
     const q = search.toLowerCase().trim();
