@@ -21,6 +21,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { BrandIntro } from "@/components/BrandIntro";
 import { useAuth, type AppRole } from "@/hooks/use-auth";
+import type { PermissionKey } from "@/lib/permissions";
 import { useStoreSettings } from "@/lib/store-settings";
 import { RequireRole } from "@/components/RequireRole";
 import { Button } from "@/components/ui/button";
@@ -45,22 +46,35 @@ const NAV: readonly {
   label: string;
   icon: typeof Gem;
   roles: readonly AppRole[];
+  perm?: PermissionKey;
 }[] = [
-  { to: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard, roles: ["admin"] },
-  { to: "/nouvelle-vente", label: "Nouvelle vente", icon: ShoppingCart, roles: ["admin", "employe"] },
-  { to: "/clients", label: "Clients", icon: Users, roles: ["admin", "employe"] },
-  { to: "/paiements-en-attente", label: "Paiements en attente", icon: Wallet, roles: ["admin", "employe"] },
-  { to: "/factures", label: "Ventes", icon: FileText, roles: ["admin", "employe"] },
+  { to: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard, roles: ["admin"], perm: "dashboard" },
+  { to: "/nouvelle-vente", label: "Nouvelle vente", icon: ShoppingCart, roles: ["admin", "employe"], perm: "sales" },
+  { to: "/clients", label: "Clients", icon: Users, roles: ["admin", "employe"], perm: "customers" },
+  { to: "/paiements-en-attente", label: "Paiements en attente", icon: Wallet, roles: ["admin", "employe"], perm: "sales" },
+  { to: "/factures", label: "Ventes", icon: FileText, roles: ["admin", "employe"], perm: "invoices" },
   { to: "/reparations", label: "Réparations", icon: Wrench, roles: ["admin", "employe"] },
-  { to: "/stock", label: "Stock", icon: Package, roles: ["admin"] },
-  { to: "/parures", label: "Parures", icon: Layers, roles: ["admin"] },
-  { to: "/or-casse", label: "Or Cassé", icon: Recycle, roles: ["admin"] },
-  { to: "/fournisseurs", label: "Fournisseurs", icon: Truck, roles: ["admin"] },
-  { to: "/depenses", label: "Dépenses", icon: Wallet2, roles: ["admin"] },
+  { to: "/stock", label: "Stock", icon: Package, roles: ["admin"], perm: "inventory" },
+  { to: "/parures", label: "Parures", icon: Layers, roles: ["admin"], perm: "jewelry_sets" },
+  { to: "/or-casse", label: "Or Cassé", icon: Recycle, roles: ["admin"], perm: "scrap_gold" },
+  { to: "/fournisseurs", label: "Fournisseurs", icon: Truck, roles: ["admin"], perm: "suppliers" },
+  { to: "/depenses", label: "Dépenses", icon: Wallet2, roles: ["admin"], perm: "reports" },
   { to: "/cours-or", label: "Cours de l'or", icon: Coins, roles: ["admin"] },
-  { to: "/boutique", label: "Boutique", icon: Store, roles: ["admin"] },
-  { to: "/parametres", label: "Paramètres", icon: Settings, roles: ["admin"] },
+  { to: "/boutique", label: "Boutique", icon: Store, roles: ["admin"], perm: "settings" },
+  { to: "/parametres", label: "Paramètres", icon: Settings, roles: ["admin"], perm: "settings" },
 ];
+
+/** A nav item is visible when the role allows it and (admin, no permission gate,
+ *  or the employee has been granted that permission). */
+function canAccess(
+  item: { roles: readonly AppRole[]; perm?: PermissionKey },
+  role: AppRole | null,
+  permissions: PermissionKey[],
+): boolean {
+  if (role == null || !item.roles.includes(role)) return false;
+  if (role === "admin" || !item.perm) return true;
+  return permissions.includes(item.perm);
+}
 
 function AppSidebar() {
   const navigate = useNavigate();
