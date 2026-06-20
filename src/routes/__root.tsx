@@ -85,14 +85,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Maison d'Or — Gestion de bijouterie" },
+      { name: "description", content: "ERP bijoutier : stock, fournisseurs, ventes et cours de l'or en temps réel." },
+      { name: "author", content: "Maison d'Or" },
+      { property: "og:title", content: "Maison d'Or — Gestion de bijouterie" },
+      { property: "og:description", content: "ERP bijoutier : stock, fournisseurs, ventes et cours de l'or en temps réel." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
