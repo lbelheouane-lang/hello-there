@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedStockRouteImport } from './routes/_authenticated/stock'
 import { Route as AuthenticatedParametresRouteImport } from './routes/_authenticated/parametres'
+import { Route as AuthenticatedPaiementsEnAttenteRouteImport } from './routes/_authenticated/paiements-en-attente'
 import { Route as AuthenticatedNouvelleVenteRouteImport } from './routes/_authenticated/nouvelle-vente'
 import { Route as AuthenticatedFournisseursRouteImport } from './routes/_authenticated/fournisseurs'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -47,6 +48,12 @@ const AuthenticatedParametresRoute = AuthenticatedParametresRouteImport.update({
   path: '/parametres',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPaiementsEnAttenteRoute =
+  AuthenticatedPaiementsEnAttenteRouteImport.update({
+    id: '/paiements-en-attente',
+    path: '/paiements-en-attente',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedNouvelleVenteRoute =
   AuthenticatedNouvelleVenteRouteImport.update({
     id: '/nouvelle-vente',
@@ -99,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fournisseurs': typeof AuthenticatedFournisseursRoute
   '/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
+  '/paiements-en-attente': typeof AuthenticatedPaiementsEnAttenteRoute
   '/parametres': typeof AuthenticatedParametresRoute
   '/stock': typeof AuthenticatedStockRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
@@ -113,6 +121,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fournisseurs': typeof AuthenticatedFournisseursRoute
   '/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
+  '/paiements-en-attente': typeof AuthenticatedPaiementsEnAttenteRoute
   '/parametres': typeof AuthenticatedParametresRoute
   '/stock': typeof AuthenticatedStockRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
@@ -129,6 +138,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/fournisseurs': typeof AuthenticatedFournisseursRoute
   '/_authenticated/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
+  '/_authenticated/paiements-en-attente': typeof AuthenticatedPaiementsEnAttenteRoute
   '/_authenticated/parametres': typeof AuthenticatedParametresRoute
   '/_authenticated/stock': typeof AuthenticatedStockRoute
   '/_authenticated/clients_/$id': typeof AuthenticatedClientsIdRoute
@@ -145,6 +155,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/fournisseurs'
     | '/nouvelle-vente'
+    | '/paiements-en-attente'
     | '/parametres'
     | '/stock'
     | '/clients/$id'
@@ -159,6 +170,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/fournisseurs'
     | '/nouvelle-vente'
+    | '/paiements-en-attente'
     | '/parametres'
     | '/stock'
     | '/clients/$id'
@@ -174,6 +186,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/fournisseurs'
     | '/_authenticated/nouvelle-vente'
+    | '/_authenticated/paiements-en-attente'
     | '/_authenticated/parametres'
     | '/_authenticated/stock'
     | '/_authenticated/clients_/$id'
@@ -223,6 +236,13 @@ declare module '@tanstack/react-router' {
       path: '/parametres'
       fullPath: '/parametres'
       preLoaderRoute: typeof AuthenticatedParametresRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/paiements-en-attente': {
+      id: '/_authenticated/paiements-en-attente'
+      path: '/paiements-en-attente'
+      fullPath: '/paiements-en-attente'
+      preLoaderRoute: typeof AuthenticatedPaiementsEnAttenteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/nouvelle-vente': {
@@ -290,6 +310,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFournisseursRoute: typeof AuthenticatedFournisseursRoute
   AuthenticatedNouvelleVenteRoute: typeof AuthenticatedNouvelleVenteRoute
+  AuthenticatedPaiementsEnAttenteRoute: typeof AuthenticatedPaiementsEnAttenteRoute
   AuthenticatedParametresRoute: typeof AuthenticatedParametresRoute
   AuthenticatedStockRoute: typeof AuthenticatedStockRoute
   AuthenticatedClientsIdRoute: typeof AuthenticatedClientsIdRoute
@@ -302,6 +323,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFournisseursRoute: AuthenticatedFournisseursRoute,
   AuthenticatedNouvelleVenteRoute: AuthenticatedNouvelleVenteRoute,
+  AuthenticatedPaiementsEnAttenteRoute: AuthenticatedPaiementsEnAttenteRoute,
   AuthenticatedParametresRoute: AuthenticatedParametresRoute,
   AuthenticatedStockRoute: AuthenticatedStockRoute,
   AuthenticatedClientsIdRoute: AuthenticatedClientsIdRoute,

@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   Wallet, Search, AlertTriangle, CalendarClock, Users as UsersIcon, TrendingUp,
-  Receipt, Printer, Plus, User as UserIcon, History, CircleDollarSign,
+  Receipt, Plus, User as UserIcon, History, CircleDollarSign,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
