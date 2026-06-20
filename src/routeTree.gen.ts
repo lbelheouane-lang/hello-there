@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuiviTokenRouteImport } from './routes/suivi.$token'
 import { Route as AuthenticatedStockRouteImport } from './routes/_authenticated/stock'
 import { Route as AuthenticatedReparationsRouteImport } from './routes/_authenticated/reparations'
+import { Route as AuthenticatedParuresRouteImport } from './routes/_authenticated/parures'
 import { Route as AuthenticatedParametresRouteImport } from './routes/_authenticated/parametres'
 import { Route as AuthenticatedPaiementsEnAttenteRouteImport } from './routes/_authenticated/paiements-en-attente'
 import { Route as AuthenticatedNouvelleVenteRouteImport } from './routes/_authenticated/nouvelle-vente'
@@ -60,6 +61,11 @@ const AuthenticatedReparationsRoute =
     path: '/reparations',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedParuresRoute = AuthenticatedParuresRouteImport.update({
+  id: '/parures',
+  path: '/parures',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedParametresRoute = AuthenticatedParametresRouteImport.update({
   id: '/parametres',
   path: '/parametres',
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
   '/paiements-en-attente': typeof AuthenticatedPaiementsEnAttenteRoute
   '/parametres': typeof AuthenticatedParametresRoute
+  '/parures': typeof AuthenticatedParuresRoute
   '/reparations': typeof AuthenticatedReparationsRoute
   '/stock': typeof AuthenticatedStockRoute
   '/suivi/$token': typeof SuiviTokenRoute
@@ -170,6 +177,7 @@ export interface FileRoutesByTo {
   '/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
   '/paiements-en-attente': typeof AuthenticatedPaiementsEnAttenteRoute
   '/parametres': typeof AuthenticatedParametresRoute
+  '/parures': typeof AuthenticatedParuresRoute
   '/reparations': typeof AuthenticatedReparationsRoute
   '/stock': typeof AuthenticatedStockRoute
   '/suivi/$token': typeof SuiviTokenRoute
@@ -193,6 +201,7 @@ export interface FileRoutesById {
   '/_authenticated/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
   '/_authenticated/paiements-en-attente': typeof AuthenticatedPaiementsEnAttenteRoute
   '/_authenticated/parametres': typeof AuthenticatedParametresRoute
+  '/_authenticated/parures': typeof AuthenticatedParuresRoute
   '/_authenticated/reparations': typeof AuthenticatedReparationsRoute
   '/_authenticated/stock': typeof AuthenticatedStockRoute
   '/suivi/$token': typeof SuiviTokenRoute
@@ -216,6 +225,7 @@ export interface FileRouteTypes {
     | '/nouvelle-vente'
     | '/paiements-en-attente'
     | '/parametres'
+    | '/parures'
     | '/reparations'
     | '/stock'
     | '/suivi/$token'
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/nouvelle-vente'
     | '/paiements-en-attente'
     | '/parametres'
+    | '/parures'
     | '/reparations'
     | '/stock'
     | '/suivi/$token'
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/_authenticated/nouvelle-vente'
     | '/_authenticated/paiements-en-attente'
     | '/_authenticated/parametres'
+    | '/_authenticated/parures'
     | '/_authenticated/reparations'
     | '/_authenticated/stock'
     | '/suivi/$token'
@@ -318,6 +330,13 @@ declare module '@tanstack/react-router' {
       path: '/reparations'
       fullPath: '/reparations'
       preLoaderRoute: typeof AuthenticatedReparationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/parures': {
+      id: '/_authenticated/parures'
+      path: '/parures'
+      fullPath: '/parures'
+      preLoaderRoute: typeof AuthenticatedParuresRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/parametres': {
@@ -432,6 +451,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedNouvelleVenteRoute: typeof AuthenticatedNouvelleVenteRoute
   AuthenticatedPaiementsEnAttenteRoute: typeof AuthenticatedPaiementsEnAttenteRoute
   AuthenticatedParametresRoute: typeof AuthenticatedParametresRoute
+  AuthenticatedParuresRoute: typeof AuthenticatedParuresRoute
   AuthenticatedReparationsRoute: typeof AuthenticatedReparationsRoute
   AuthenticatedStockRoute: typeof AuthenticatedStockRoute
   AuthenticatedClientsIdRoute: typeof AuthenticatedClientsIdRoute
@@ -450,6 +470,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedNouvelleVenteRoute: AuthenticatedNouvelleVenteRoute,
   AuthenticatedPaiementsEnAttenteRoute: AuthenticatedPaiementsEnAttenteRoute,
   AuthenticatedParametresRoute: AuthenticatedParametresRoute,
+  AuthenticatedParuresRoute: AuthenticatedParuresRoute,
   AuthenticatedReparationsRoute: AuthenticatedReparationsRoute,
   AuthenticatedStockRoute: AuthenticatedStockRoute,
   AuthenticatedClientsIdRoute: AuthenticatedClientsIdRoute,

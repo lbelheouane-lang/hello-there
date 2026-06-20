@@ -28,6 +28,7 @@ import { formatFromEUR } from "@/lib/currency";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
 import { LabelDialog, type LabelProduct } from "@/components/LabelDialog";
 import { productImage } from "@/lib/product-image";
+import { useCategoryNames } from "@/hooks/use-categories";
 
 export const Route = createFileRoute("/_authenticated/stock")({
   component: StockPage,
@@ -64,6 +65,7 @@ function statusVariant(s: string): "default" | "secondary" | "destructive" {
 
 function StockPage() {
   const qc = useQueryClient();
+  const categoryNames = useCategoryNames();
   const { data: prices } = useLatestGoldPrices();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
@@ -226,8 +228,9 @@ function StockPage() {
                   <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                      {categoryNames.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                     </SelectContent>
+
                   </Select>
                 </div>
                 <div className="space-y-2">
