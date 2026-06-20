@@ -1,4 +1,6 @@
 import { formatDZD, formatDateTime, paymentLabel } from "@/lib/format";
+import { getStoreInfo } from "@/lib/invoice";
+import { getStoreSettings } from "@/lib/store-settings";
 
 export interface ReceiptData {
   storeName: string;
