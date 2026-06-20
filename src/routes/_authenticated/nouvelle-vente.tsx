@@ -31,6 +31,7 @@ interface SaleProduct {
   metal_type: string;
   gold_karat: number | null;
   weight_grams: number;
+  metal_purchase_price: number | null;
 }
 
 interface CustomerOption {
