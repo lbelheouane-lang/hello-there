@@ -126,7 +126,9 @@ function GoldPricePage() {
               <TableRow>
                 <TableHead>Date</TableHead>
                 <TableHead>Titre</TableHead>
-                <TableHead>Prix / gramme</TableHead>
+                <TableHead>Prix / g (USD)</TableHead>
+                <TableHead>Prix / g (DZD)</TableHead>
+                <TableHead>Devise</TableHead>
                 <TableHead>Source</TableHead>
               </TableRow>
             </TableHeader>
@@ -135,7 +137,9 @@ function GoldPricePage() {
                 <TableRow key={row.id}>
                   <TableCell>{formatDate(row.price_date)}</TableCell>
                   <TableCell>{row.karat}K</TableCell>
-                  <TableCell>{formatDZD(row.price_per_gram)}</TableCell>
+                  <TableCell>{formatCurrency(row.price_per_gram, row.currency || "USD")}</TableCell>
+                  <TableCell className="text-muted-foreground">{formatFromUSD(row.price_per_gram, "DZD")}</TableCell>
+                  <TableCell>{row.currency || "USD"}</TableCell>
                   <TableCell className="capitalize">{row.source}</TableCell>
                 </TableRow>
               ))}
