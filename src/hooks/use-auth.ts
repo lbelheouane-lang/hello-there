@@ -43,7 +43,7 @@ export function useAuth(): AuthState {
       if (resolvedRole === "admin") {
         setPermissions(ALL_PERMISSIONS);
       } else {
-        setPermissions(((emp?.permissions ?? []) as PermissionKey[]) ?? []);
+        setPermissions((emp?.permissions ?? []) as PermissionKey[]);
       }
 
       // Deactivated employees are signed out immediately.
