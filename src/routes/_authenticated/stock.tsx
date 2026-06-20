@@ -46,6 +46,7 @@ interface Product {
   origin: string | null;
   created_at: string;
   status: string;
+  is_demo: boolean;
 }
 
 const empty: Record<string, string> = {
