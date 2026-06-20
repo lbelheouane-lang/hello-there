@@ -814,7 +814,7 @@ function StockPage() {
                   })}
                   {filtered.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
+                      <TableCell colSpan={9} className="py-10 text-center text-muted-foreground">
                         <Package className="mx-auto mb-2 h-8 w-8 opacity-40" />
                         Aucun bijou ne correspond.
                       </TableCell>
