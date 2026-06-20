@@ -12,6 +12,7 @@ import {
   Settings,
   Wallet,
   FileText,
+  Wallet2,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BrandIntro } from "@/components/BrandIntro";
