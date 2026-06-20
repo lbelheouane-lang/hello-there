@@ -179,7 +179,12 @@ function ClientsPage() {
             <TableBody>
               {filtered.map((c) => (
                 <TableRow key={c.id}>
-                  <TableCell className="font-medium">{c.full_name}</TableCell>
+                  <TableCell className="font-medium">
+                    <span className="flex items-center gap-2">
+                      {c.full_name}
+                      {c.is_demo && <Badge variant="secondary" className="text-[10px]">Démo</Badge>}
+                    </span>
+                  </TableCell>
                   <TableCell>
                     {c.phone ? <span className="flex items-center gap-1"><Phone className="h-3 w-3 text-muted-foreground" />{c.phone}</span> : "—"}
                   </TableCell>
