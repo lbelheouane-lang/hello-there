@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Package, Pencil, Trash2, Tag, Search, Printer } from "lucide-react";
+import { Plus, Package, Pencil, Trash2, Tag, Search, Printer, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
@@ -25,6 +26,7 @@ import {
 } from "@/lib/format";
 import { formatUSD, formatFromUSD } from "@/lib/currency";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
+import { LabelDialog, type LabelProduct } from "@/components/LabelDialog";
 
 export const Route = createFileRoute("/_authenticated/stock")({
   component: StockPage,
@@ -41,13 +43,15 @@ interface Product {
   metal_purchase_price: number;
   labor_cost: number;
   supplier_id: string | null;
+  origin: string | null;
+  created_at: string;
   status: string;
 }
 
 const empty: Record<string, string> = {
   name: "", category: CATEGORIES[0], metal_type: "or", gold_karat: "21",
   weight_grams: "", metal_purchase_price: "", labor_cost: "", supplier_id: "",
-  status: "en_stock",
+  origin: "", status: "en_stock",
 };
 
 function statusVariant(s: string): "default" | "secondary" | "destructive" {
