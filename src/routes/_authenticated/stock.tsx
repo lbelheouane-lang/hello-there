@@ -413,12 +413,12 @@ function StockPage() {
                       <Select
                         value={form.subcategory || "none"}
                         onValueChange={(v) => setForm({ ...form, subcategory: v === "none" ? "" : v })}
-                        disabled={subcatNames(subcategories, form.category).length === 0}
+                        disabled={subsForCat(form.category).length === 0}
                       >
                         <SelectTrigger><SelectValue placeholder="Aucune" /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="none">Aucune</SelectItem>
-                          {subcatNames(subcategories, form.category).map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                          {subsForCat(form.category).map((s: string) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                         </SelectContent>
                       </Select>
                     </div>
