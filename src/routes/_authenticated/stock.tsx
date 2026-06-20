@@ -731,6 +731,7 @@ function StockPage() {
                     <TableHead>Titre</TableHead>
                     <TableHead>Poids</TableHead>
                     <TableHead>Valeur métal (DZD)</TableHead>
+                    <TableHead>Origine</TableHead>
                     <TableHead>Statut</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
