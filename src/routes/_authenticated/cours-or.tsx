@@ -62,7 +62,7 @@ function GoldPricePage() {
   });
 
   return (
-    <AppShell title="Cours de l'or">
+    <AppShell title="Cours de l'or" allow={["admin"]}>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {KARATS.map((k) => (
           <Card key={k}>
