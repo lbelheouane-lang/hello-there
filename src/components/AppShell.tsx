@@ -9,6 +9,7 @@ import {
   LogOut,
   ShoppingCart,
   Users,
+  Settings,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BrandIntro } from "@/components/BrandIntro";
@@ -43,6 +44,7 @@ const NAV: readonly {
   { to: "/stock", label: "Stock", icon: Package, roles: ["admin"] },
   { to: "/fournisseurs", label: "Fournisseurs", icon: Truck, roles: ["admin"] },
   { to: "/cours-or", label: "Cours de l'or", icon: Coins, roles: ["admin"] },
+  { to: "/parametres", label: "Paramètres", icon: Settings, roles: ["admin"] },
 ];
 
 function AppSidebar() {

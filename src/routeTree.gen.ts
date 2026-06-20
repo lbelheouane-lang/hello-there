@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedStockRouteImport } from './routes/_authenticated/stock'
+import { Route as AuthenticatedParametresRouteImport } from './routes/_authenticated/parametres'
 import { Route as AuthenticatedNouvelleVenteRouteImport } from './routes/_authenticated/nouvelle-vente'
 import { Route as AuthenticatedFournisseursRouteImport } from './routes/_authenticated/fournisseurs'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -38,6 +39,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedStockRoute = AuthenticatedStockRouteImport.update({
   id: '/stock',
   path: '/stock',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedParametresRoute = AuthenticatedParametresRouteImport.update({
+  id: '/parametres',
+  path: '/parametres',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedNouvelleVenteRoute =
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fournisseurs': typeof AuthenticatedFournisseursRoute
   '/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
+  '/parametres': typeof AuthenticatedParametresRoute
   '/stock': typeof AuthenticatedStockRoute
   '/produit/$id': typeof AuthenticatedProduitIdRoute
   '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fournisseurs': typeof AuthenticatedFournisseursRoute
   '/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
+  '/parametres': typeof AuthenticatedParametresRoute
   '/stock': typeof AuthenticatedStockRoute
   '/produit/$id': typeof AuthenticatedProduitIdRoute
   '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/fournisseurs': typeof AuthenticatedFournisseursRoute
   '/_authenticated/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
+  '/_authenticated/parametres': typeof AuthenticatedParametresRoute
   '/_authenticated/stock': typeof AuthenticatedStockRoute
   '/_authenticated/produit/$id': typeof AuthenticatedProduitIdRoute
   '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/fournisseurs'
     | '/nouvelle-vente'
+    | '/parametres'
     | '/stock'
     | '/produit/$id'
     | '/api/public/hooks/update-gold-prices'
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/fournisseurs'
     | '/nouvelle-vente'
+    | '/parametres'
     | '/stock'
     | '/produit/$id'
     | '/api/public/hooks/update-gold-prices'
@@ -152,6 +163,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/fournisseurs'
     | '/_authenticated/nouvelle-vente'
+    | '/_authenticated/parametres'
     | '/_authenticated/stock'
     | '/_authenticated/produit/$id'
     | '/api/public/hooks/update-gold-prices'
@@ -192,6 +204,13 @@ declare module '@tanstack/react-router' {
       path: '/stock'
       fullPath: '/stock'
       preLoaderRoute: typeof AuthenticatedStockRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/parametres': {
+      id: '/_authenticated/parametres'
+      path: '/parametres'
+      fullPath: '/parametres'
+      preLoaderRoute: typeof AuthenticatedParametresRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/nouvelle-vente': {
@@ -252,6 +271,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFournisseursRoute: typeof AuthenticatedFournisseursRoute
   AuthenticatedNouvelleVenteRoute: typeof AuthenticatedNouvelleVenteRoute
+  AuthenticatedParametresRoute: typeof AuthenticatedParametresRoute
   AuthenticatedStockRoute: typeof AuthenticatedStockRoute
   AuthenticatedProduitIdRoute: typeof AuthenticatedProduitIdRoute
 }
@@ -262,6 +282,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFournisseursRoute: AuthenticatedFournisseursRoute,
   AuthenticatedNouvelleVenteRoute: AuthenticatedNouvelleVenteRoute,
+  AuthenticatedParametresRoute: AuthenticatedParametresRoute,
   AuthenticatedStockRoute: AuthenticatedStockRoute,
   AuthenticatedProduitIdRoute: AuthenticatedProduitIdRoute,
 }

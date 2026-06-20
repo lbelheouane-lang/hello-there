@@ -12,6 +12,7 @@ import {
   METAL_TYPES, formatGrams, formatDZD, statusLabel,
 } from "@/lib/format";
 import { LabelDialog, type LabelProduct } from "@/components/LabelDialog";
+import { productImage } from "@/lib/product-image";
 
 export const Route = createFileRoute("/_authenticated/produit/$id")({
   component: ProductDetailPage,
@@ -31,6 +32,7 @@ interface ProductRow {
   status: string;
   created_at: string;
   supplier_id: string | null;
+  is_demo: boolean;
   suppliers: { name: string } | null;
 }
 
@@ -95,9 +97,19 @@ function ProductDetailPage() {
                 <CardTitle className="font-serif text-2xl">{product.name}</CardTitle>
                 <p className="mt-1 font-mono text-sm text-muted-foreground">{product.internal_code}</p>
               </div>
-              <Badge>{statusLabel(product.status)}</Badge>
+              <div className="flex items-center gap-2">
+                {product.is_demo && <Badge variant="secondary">Démo</Badge>}
+                <Badge>{statusLabel(product.status)}</Badge>
+              </div>
             </CardHeader>
             <CardContent>
+              <img
+                src={productImage(product.category)}
+                alt={product.name}
+                loading="lazy"
+                className="mb-4 aspect-video w-full rounded-lg object-cover"
+              />
+
               <Row label="Catégorie" value={product.category} />
               <Row label="Métal" value={metal} />
               <Row label="Poids" value={formatGrams(Number(product.weight_grams))} />
