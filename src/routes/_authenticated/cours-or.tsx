@@ -482,7 +482,7 @@ function GoldPricePage() {
   );
 }
 
-function Diag({ label, children }: { label: string; children: React.ReactNode }) {
+function Diag({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="rounded-lg border p-3">
       <p className="text-xs text-muted-foreground">{label}</p>
