@@ -152,7 +152,7 @@ function ParuresPage() {
       m.set(it.set_id, arr);
     });
     return m;
-  }, [setItems]);
+  }, [setProducts]);
 
   const eventsBySet = useMemo(() => {
     const m = new Map<string, SetEvent[]>();
