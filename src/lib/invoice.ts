@@ -41,6 +41,8 @@ export interface InvoiceRecord {
   metal_type: string | null;
   gold_karat: number | null;
   weight_grams: number | null;
+  purchase_price_per_gram: number | null;
+  gold_value: number | null;
   quantity: number;
   unit_price: number;
   discount: number;
