@@ -15,6 +15,7 @@ import {
   Wallet2,
   Store,
   Wrench,
+  Layers,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BrandIntro } from "@/components/BrandIntro";
