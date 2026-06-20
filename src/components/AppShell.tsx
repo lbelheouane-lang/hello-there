@@ -78,7 +78,7 @@ function canAccess(
 
 function AppSidebar() {
   const navigate = useNavigate();
-  const { user, role } = useAuth();
+  const { user, role, permissions } = useAuth();
   const { data: settings } = useStoreSettings();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
