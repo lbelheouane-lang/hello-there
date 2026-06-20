@@ -171,6 +171,56 @@ function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
+              <Tags className="h-5 w-5 text-primary" />
+              Sous-catégories
+            </CardTitle>
+            <CardDescription>
+              Affinez chaque catégorie avec des sous-catégories personnalisées
+              (ex. Bague → Alliance, Bague de fiançailles).
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-wrap gap-2">
+              <Select value={subCatId} onValueChange={setSubCatId}>
+                <SelectTrigger className="w-56"><SelectValue placeholder="Catégorie…" /></SelectTrigger>
+                <SelectContent>
+                  {(cats.data ?? []).map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Input
+                className="flex-1"
+                placeholder="Nouvelle sous-catégorie…"
+                value={newSub}
+                onChange={(e) => setNewSub(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") addSub.mutate(); }}
+              />
+              <Button onClick={() => addSub.mutate()} disabled={addSub.isPending}>
+                <Plus className="mr-2 h-4 w-4" /> Ajouter
+              </Button>
+            </div>
+            {subCatId && (
+              <div className="flex flex-wrap gap-2">
+                {(subs.data ?? []).filter((s) => s.category_id === subCatId).map((s) => (
+                  <Badge key={s.id} variant="outline" className="gap-1 py-1">
+                    {s.name}
+                    <button onClick={() => delSub.mutate(s.id)} className="ml-1 text-destructive" title="Supprimer">
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+                {(subs.data ?? []).filter((s) => s.category_id === subCatId).length === 0 && (
+                  <p className="text-sm text-muted-foreground">Aucune sous-catégorie pour « {catName(subCatId)} ».</p>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
               <Database className="h-5 w-5 text-primary" />
               Données de démonstration
               {data?.active && <Badge variant="secondary">Mode démo actif</Badge>}
