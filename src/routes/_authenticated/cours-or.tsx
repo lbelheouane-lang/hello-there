@@ -90,7 +90,7 @@ function GoldPricePage() {
       {isAdmin && (
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle className="text-lg">Mettre à jour le cours du jour (DZD / gramme)</CardTitle>
+            <CardTitle className="text-lg">Mettre à jour le cours du jour (USD / gramme)</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
