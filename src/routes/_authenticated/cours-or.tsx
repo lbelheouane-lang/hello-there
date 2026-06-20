@@ -13,7 +13,8 @@ import { Label } from "@/components/ui/label";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { KARATS, formatDZD, formatDate } from "@/lib/format";
+import { KARATS, formatDate } from "@/lib/format";
+import { formatUSD, formatFromUSD, formatCurrency } from "@/lib/currency";
 import { useLatestGoldPrices, type GoldPrice } from "@/hooks/use-gold-prices";
 
 export const Route = createFileRoute("/_authenticated/cours-or")({
@@ -46,6 +47,7 @@ function GoldPricePage() {
       const rows = KARATS.filter((k) => draft[k] && Number(draft[k]) > 0).map((k) => ({
         karat: k,
         price_per_gram: Number(draft[k]),
+        currency: "USD",
         price_date: today,
         source: "manuel",
       }));
@@ -72,10 +74,13 @@ function GoldPricePage() {
                 <Coins className="h-4 w-4 text-primary" />
               </div>
               <p className="mt-2 text-2xl font-semibold">
-                {latest?.[k] ? formatDZD(latest[k].price_per_gram) : "—"}
+                {latest?.[k] ? formatUSD(latest[k].price_per_gram) : "—"}
               </p>
               <p className="text-xs text-muted-foreground">
-                {latest?.[k] ? `Maj ${formatDate(latest[k].price_date)}` : "Aucun cours"}
+                {latest?.[k] ? `≈ ${formatFromUSD(latest[k].price_per_gram, "DZD")} / g` : "Aucun cours"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {latest?.[k] ? `Maj ${formatDate(latest[k].price_date)}` : ""}
               </p>
             </CardContent>
           </Card>
@@ -85,7 +90,7 @@ function GoldPricePage() {
       {isAdmin && (
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle className="text-lg">Mettre à jour le cours du jour (DZD / gramme)</CardTitle>
+            <CardTitle className="text-lg">Mettre à jour le cours du jour (USD / gramme)</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -121,7 +126,9 @@ function GoldPricePage() {
               <TableRow>
                 <TableHead>Date</TableHead>
                 <TableHead>Titre</TableHead>
-                <TableHead>Prix / gramme</TableHead>
+                <TableHead>Prix / g (USD)</TableHead>
+                <TableHead>Prix / g (DZD)</TableHead>
+                <TableHead>Devise</TableHead>
                 <TableHead>Source</TableHead>
               </TableRow>
             </TableHeader>
@@ -130,13 +137,15 @@ function GoldPricePage() {
                 <TableRow key={row.id}>
                   <TableCell>{formatDate(row.price_date)}</TableCell>
                   <TableCell>{row.karat}K</TableCell>
-                  <TableCell>{formatDZD(row.price_per_gram)}</TableCell>
+                  <TableCell>{formatCurrency(row.price_per_gram, row.currency || "USD")}</TableCell>
+                  <TableCell className="text-muted-foreground">{formatFromUSD(row.price_per_gram, "DZD")}</TableCell>
+                  <TableCell>{row.currency || "USD"}</TableCell>
                   <TableCell className="capitalize">{row.source}</TableCell>
                 </TableRow>
               ))}
               {history.data?.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center text-muted-foreground">
                     Aucun cours enregistré.
                   </TableCell>
                 </TableRow>

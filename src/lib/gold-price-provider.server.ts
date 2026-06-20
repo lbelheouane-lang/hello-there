@@ -15,14 +15,14 @@ const PURITY: Record<number, number> = {
 };
 const KARATS = [24, 22, 21, 18, 14] as const;
 
-/** Taux de conversion USD -> DZD (configurable via secret, fallback raisonnable). */
+/** Taux de conversion USD -> DZD (configurable via secret) pour la valorisation produit. */
 function usdToDzd(): number {
   const raw = Number(process.env.GOLD_USD_TO_DZD);
   return Number.isFinite(raw) && raw > 0 ? raw : 268;
 }
 
 export interface SpotPrice {
-  /** Prix de l'once d'or pur (24K) dans la devise indiquée. */
+  /** Prix de l'once d'or pur (24K) en USD. */
   pricePerOunce: number;
   currency: string;
   source: string;
@@ -54,7 +54,7 @@ async function fetchJson(url: string, timeoutMs = 8000): Promise<any | null> {
 /**
  * Fournisseur GoldRepublic. GoldRepublic n'expose pas d'API publique documentée
  * de cotation en temps réel ; on tente un endpoint connu, sinon on renvoie null
- * et la chaîne de fournisseurs bascule sur le suivant.
+ * et la chaîne de fournisseurs bascule sur le suivant. Cotation en USD.
  */
 const goldRepublicSource: GoldPriceSource = {
   name: "goldrepublic",
@@ -63,8 +63,8 @@ const goldRepublicSource: GoldPriceSource = {
     const usdPerGram = Number(data?.ask ?? data?.price ?? data?.bid);
     if (!Number.isFinite(usdPerGram) || usdPerGram <= 0) return null;
     return {
-      pricePerOunce: usdPerGram * OUNCE_TO_GRAM * usdToDzd(),
-      currency: "DZD",
+      pricePerOunce: usdPerGram * OUNCE_TO_GRAM,
+      currency: "USD",
       source: this.name,
     };
   },
@@ -78,8 +78,8 @@ const goldApiSource: GoldPriceSource = {
     const usdPerOunce = Number(data?.price);
     if (!Number.isFinite(usdPerOunce) || usdPerOunce <= 0) return null;
     return {
-      pricePerOunce: usdPerOunce * usdToDzd(),
-      currency: "DZD",
+      pricePerOunce: usdPerOunce,
+      currency: "USD",
       source: this.name,
     };
   },
@@ -115,7 +115,7 @@ async function lastKnownOunce(): Promise<SpotPrice | null> {
   if (!row?.price_per_ounce) return null;
   return {
     pricePerOunce: Number(row.price_per_ounce),
-    currency: row.currency ?? "DZD",
+    currency: row.currency ?? "USD",
     source: `${row.source ?? "inconnu"} (repli)`,
   };
 }
@@ -148,7 +148,7 @@ export async function runGoldPriceUpdate(): Promise<UpdateResult> {
       message: "Aucun fournisseur disponible et aucun cours antérieur.",
     });
     return {
-      ok: false, source: "aucun", currency: "DZD", pricePerOunce: 0,
+      ok: false, source: "aucun", currency: "USD", pricePerOunce: 0,
       basePricePerGram: 0, productsRecalculated: 0, fallbackUsed: true,
     };
   }
@@ -193,10 +193,12 @@ export async function runGoldPriceUpdate(): Promise<UpdateResult> {
 }
 
 /**
- * Recalcule le prix de vente de chaque produit en or :
- * Prix = (Poids × Cours or pur × Facteur pureté) + Façon + Pierres + Main d'œuvre
+ * Recalcule le prix de vente de chaque produit en or.
+ * Le cours est désormais stocké en USD ; les frais (façon, pierres, main
+ * d'œuvre) et le prix de vente restent en DZD (devise d'exploitation).
+ * Prix DZD = (Poids × Cours USD/g × Pureté × taux USD→DZD) + Façon + Pierres + Main d'œuvre
  */
-async function recalcProducts(basePricePerGram: number, currency: string): Promise<number> {
+async function recalcProducts(baseUsdPerGram: number, currency: string): Promise<number> {
   const { data: products } = await supabaseAdmin
     .from("products")
     .select("id, metal_type, gold_karat, weight_grams, making_charge, stone_cost, labor_cost, selling_price")
@@ -205,6 +207,7 @@ async function recalcProducts(basePricePerGram: number, currency: string): Promi
 
   if (!products?.length) return 0;
 
+  const rate = usdToDzd();
   let count = 0;
   let valuationBefore = 0;
   let valuationAfter = 0;
@@ -212,10 +215,10 @@ async function recalcProducts(basePricePerGram: number, currency: string): Promi
   for (const p of products as any[]) {
     const purity = PURITY[p.gold_karat as number] ?? 0;
     if (!purity) continue;
-    const metalValue = Number(p.weight_grams) * basePricePerGram * purity;
+    const metalValueDzd = Number(p.weight_grams) * baseUsdPerGram * purity * rate;
     const selling =
       Math.round(
-        (metalValue +
+        (metalValueDzd +
           Number(p.making_charge ?? 0) +
           Number(p.stone_cost ?? 0) +
           Number(p.labor_cost ?? 0)) * 100,
@@ -234,15 +237,18 @@ async function recalcProducts(basePricePerGram: number, currency: string): Promi
         await logAudit("product_recalc", p.id, {
           oldSellingPrice: Number(p.selling_price ?? 0),
           newSellingPrice: selling,
-          basePricePerGram,
-          currency,
+          baseUsdPerGram,
+          usdToDzd: rate,
+          priceCurrency: currency,
+          sellingCurrency: "DZD",
         });
       }
     }
   }
 
   await logAudit("inventory_valuation", null, {
-    currency,
+    priceCurrency: currency,
+    sellingCurrency: "DZD",
     valuationBefore: Math.round(valuationBefore * 100) / 100,
     valuationAfter: Math.round(valuationAfter * 100) / 100,
     productsRecalculated: count,

@@ -21,8 +21,9 @@ import {
 } from "@/components/ui/table";
 import {
   KARATS, CATEGORIES, METAL_TYPES, PRODUCT_STATUSES,
-  formatDZD, formatGrams, statusLabel, metalValue,
+  formatGrams, statusLabel, metalValue,
 } from "@/lib/format";
+import { formatUSD, formatFromUSD } from "@/lib/currency";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
 
 export const Route = createFileRoute("/_authenticated/stock")({
@@ -267,7 +268,7 @@ function StockPage() {
                 <TableHead>Bijou</TableHead>
                 <TableHead>Titre</TableHead>
                 <TableHead>Poids</TableHead>
-                <TableHead>Valeur métal</TableHead>
+                <TableHead>Valeur métal (USD)</TableHead>
                 <TableHead>Statut</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -285,7 +286,16 @@ function StockPage() {
                     </TableCell>
                     <TableCell>{p.gold_karat ? `${p.gold_karat}K` : METAL_TYPES.find((m) => m.value === p.metal_type)?.label}</TableCell>
                     <TableCell>{formatGrams(Number(p.weight_grams))}</TableCell>
-                    <TableCell>{ppg ? formatDZD(value) : <span className="text-muted-foreground">cours manquant</span>}</TableCell>
+                    <TableCell>
+                      {ppg ? (
+                        <div>
+                          <div>{formatUSD(value)}</div>
+                          <div className="text-xs text-muted-foreground">≈ {formatFromUSD(value, "DZD")}</div>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">cours manquant</span>
+                      )}
+                    </TableCell>
                     <TableCell><Badge variant={statusVariant(p.status)}>{statusLabel(p.status)}</Badge></TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="icon" title="Étiquette" onClick={() => setLabelProduct(p)}>

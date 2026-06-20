@@ -16,6 +16,7 @@ import {
 import {
   PAYMENT_METHODS, METAL_TYPES, formatDZD, formatGrams, metalValue,
 } from "@/lib/format";
+import { dzdFromUsd, formatUSD } from "@/lib/currency";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
 
 export const Route = createFileRoute("/_authenticated/nouvelle-vente")({
@@ -87,12 +88,14 @@ function NewSalePage() {
   }, [products, productSearch]);
 
   const selectedProduct = products?.find((p) => p.id === productId) ?? null;
-  const suggestedValue = selectedProduct
+  const suggestedUsd = selectedProduct
     ? metalValue(
         Number(selectedProduct.weight_grams),
         selectedProduct.metal_type === "or" ? priceForKarat(prices, selectedProduct.gold_karat) : null,
       )
     : 0;
+  // Le cours est en USD ; le prix de vente est facturé en DZD.
+  const suggestedValue = dzdFromUsd(suggestedUsd);
 
   const addCustomer = useMutation({
     mutationFn: async () => {
@@ -175,7 +178,8 @@ function NewSalePage() {
             <div className="max-h-80 space-y-2 overflow-y-auto">
               {filteredProducts.map((p) => {
                 const ppg = p.metal_type === "or" ? priceForKarat(prices, p.gold_karat) : null;
-                const value = metalValue(Number(p.weight_grams), ppg);
+                const valueUsd = metalValue(Number(p.weight_grams), ppg);
+                const valueDzd = dzdFromUsd(valueUsd);
                 const active = p.id === productId;
                 return (
                   <button
@@ -183,7 +187,7 @@ function NewSalePage() {
                     type="button"
                     onClick={() => {
                       setProductId(p.id);
-                      if (value) setTotalAmount(String(Math.round(value)));
+                      if (valueDzd) setTotalAmount(String(Math.round(valueDzd)));
                     }}
                     className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-colors ${active ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`}
                   >
@@ -195,8 +199,9 @@ function NewSalePage() {
                         {" · "}{formatGrams(Number(p.weight_grams))}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">{ppg ? formatDZD(value) : "—"}</span>
+                    <div className="flex flex-col items-end gap-0.5">
+                      <span className="text-sm font-medium">{ppg ? formatDZD(valueDzd) : "—"}</span>
+                      {ppg ? <span className="text-xs text-muted-foreground">{formatUSD(valueUsd)}</span> : null}
                       {active && <Check className="h-4 w-4 text-primary" />}
                     </div>
                   </button>
