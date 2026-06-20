@@ -141,6 +141,23 @@ function AppSidebar() {
   );
 }
 
+/** Redirects employees who reach a route they lack permission for (direct URL). */
+function PermissionGuard({ children }: { children: ReactNode }) {
+  const navigate = useNavigate();
+  const { role, permissions, loading } = useAuth();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  useEffect(() => {
+    if (loading || role == null || role === "admin") return;
+    const item = NAV.find((n) => n.to === pathname);
+    if (item && !canAccess(item, role, permissions)) {
+      navigate({ to: "/nouvelle-vente", replace: true });
+    }
+  }, [loading, role, permissions, pathname, navigate]);
+
+  return <>{children}</>;
+}
+
 export function AppShell({
   title,
   children,
@@ -163,7 +180,7 @@ export function AppShell({
           className="flex-1 p-4 md:p-6"
           style={{ animation: "brand-content-in 0.6s ease-out both" }}
         >
-          {children}
+          <PermissionGuard>{children}</PermissionGuard>
         </main>
       </SidebarInset>
     </SidebarProvider>
