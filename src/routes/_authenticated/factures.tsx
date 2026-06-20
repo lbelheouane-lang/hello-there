@@ -15,6 +15,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDZD, formatDateTime } from "@/lib/format";
 import {
   type InvoiceRecord, buildInvoiceHtml, printInvoice,
