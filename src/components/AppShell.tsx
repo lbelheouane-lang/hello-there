@@ -10,6 +10,7 @@ import {
   ShoppingCart,
   Users,
   Settings,
+  Wallet,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BrandIntro } from "@/components/BrandIntro";
