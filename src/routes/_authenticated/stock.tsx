@@ -374,10 +374,7 @@ function StockPage() {
                     <TableCell>{formatGrams(Number(p.weight_grams))}</TableCell>
                     <TableCell>
                       {ppg ? (
-                        <div>
-                          <div>{formatEUR(value)}</div>
-                          <div className="text-xs text-muted-foreground">≈ {formatFromEUR(value, "DZD")}</div>
-                        </div>
+                        <div className="font-medium">{formatFromEUR(value, "DZD")}</div>
                       ) : (
                         <span className="text-muted-foreground">cours manquant</span>
                       )}
