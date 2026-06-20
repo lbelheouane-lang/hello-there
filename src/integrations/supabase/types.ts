@@ -38,6 +38,42 @@ export type Database = {
         }
         Relationships: []
       }
+      customers: {
+        Row: {
+          address: string | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          full_name: string
+          id: string
+          notes: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       gold_prices: {
         Row: {
           created_at: string
@@ -165,6 +201,69 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      sales: {
+        Row: {
+          amount_paid: number
+          created_at: string
+          customer_id: string | null
+          id: string
+          notes: string | null
+          payment_method: string
+          product_id: string | null
+          product_name: string | null
+          sale_number: string
+          sold_by: string | null
+          total_amount: number
+          updated_at: string
+          weight_grams: number
+        }
+        Insert: {
+          amount_paid?: number
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          notes?: string | null
+          payment_method?: string
+          product_id?: string | null
+          product_name?: string | null
+          sale_number: string
+          sold_by?: string | null
+          total_amount?: number
+          updated_at?: string
+          weight_grams?: number
+        }
+        Update: {
+          amount_paid?: number
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          notes?: string | null
+          payment_method?: string
+          product_id?: string | null
+          product_name?: string | null
+          sale_number?: string
+          sold_by?: string | null
+          total_amount?: number
+          updated_at?: string
+          weight_grams?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       stock_movements: {
         Row: {
