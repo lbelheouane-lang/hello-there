@@ -28,8 +28,8 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  KARATS, CATEGORIES, METAL_TYPES, PRODUCT_STATUSES,
-  formatGrams, statusLabel, metalValue,
+  KARATS, CATEGORIES, METAL_TYPES, PRODUCT_STATUSES, METAL_ORIGINS, ORIGIN_COUNTRIES,
+  formatGrams, statusLabel, metalValue, metalOriginLabel,
 } from "@/lib/format";
 import { formatFromEUR } from "@/lib/currency";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
@@ -57,6 +57,8 @@ interface Product {
   labor_cost: number;
   supplier_id: string | null;
   origin: string | null;
+  metal_origin: string | null;
+  country_of_origin: string | null;
   created_at: string;
   status: string;
   is_demo: boolean;
@@ -66,6 +68,7 @@ const empty: Record<string, string> = {
   name: "", category: CATEGORIES[0], subcategory: "", metal_type: "or", gold_karat: "21",
   weight_grams: "", metal_purchase_price: "", labor_cost: "", supplier_id: "",
   origin: "", status: "en_stock",
+  metal_origin: "", country_select: "", country_custom: "",
 };
 
 function statusVariant(s: string): "default" | "secondary" | "destructive" {
@@ -92,6 +95,8 @@ function StockPage() {
   const [metalFilter, setMetalFilter] = useState("all");
   const [karatFilter, setKaratFilter] = useState("all");
   const [supplierFilter, setSupplierFilter] = useState("all");
+  const [originFilter, setOriginFilter] = useState("all");
+  const [countryFilter, setCountryFilter] = useState("all");
   const [minWeight, setMinWeight] = useState("");
   const [maxWeight, setMaxWeight] = useState("");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
@@ -174,6 +179,32 @@ function StockPage() {
     return byCat;
   }, [products, prices]);
 
+  // Origin reporting: local vs imported totals + breakdown by country
+  const originStats = useMemo(() => {
+    const ppg = (p: Product) => (p.metal_type === "or" ? priceForKarat(prices, p.gold_karat) : null);
+    const inStock = (products ?? []).filter((p) => p.status === "en_stock");
+    const acc = {
+      local: { weight: 0, value: 0 },
+      imported: { weight: 0, value: 0 },
+    };
+    const byCountry = new Map<string, { weight: number; value: number; count: number }>();
+    for (const p of inStock) {
+      const w = Number(p.weight_grams) || 0;
+      const v = metalValue(w, ppg(p));
+      if (p.metal_origin === "local") { acc.local.weight += w; acc.local.value += v; }
+      else if (p.metal_origin === "imported") {
+        acc.imported.weight += w; acc.imported.value += v;
+        const key = p.country_of_origin || "Non précisé";
+        const e = byCountry.get(key) ?? { weight: 0, value: 0, count: 0 };
+        e.weight += w; e.value += v; e.count += 1;
+        byCountry.set(key, e);
+      }
+    }
+    return { ...acc, byCountry: Array.from(byCountry.entries()).sort((a, b) => b[1].weight - a[1].weight) };
+  }, [products, prices]);
+
+
+
   const filtered = useMemo(() => {
     if (!products) return [];
     const q = search.toLowerCase().trim();
@@ -185,6 +216,8 @@ function StockPage() {
       if (metalFilter !== "all" && p.metal_type !== metalFilter) return false;
       if (karatFilter !== "all" && String(p.gold_karat ?? "") !== karatFilter) return false;
       if (supplierFilter !== "all" && p.supplier_id !== supplierFilter) return false;
+      if (originFilter !== "all" && (p.metal_origin ?? "") !== originFilter) return false;
+      if (countryFilter !== "all" && (p.country_of_origin ?? "") !== countryFilter) return false;
       if (min != null && Number(p.weight_grams) < min) return false;
       if (max != null && Number(p.weight_grams) > max) return false;
       if (q && !(
@@ -195,17 +228,27 @@ function StockPage() {
       )) return false;
       return true;
     });
-  }, [products, search, catFilter, subFilter, metalFilter, karatFilter, supplierFilter, minWeight, maxWeight]);
+  }, [products, search, catFilter, subFilter, metalFilter, karatFilter, supplierFilter, originFilter, countryFilter, minWeight, maxWeight]);
+
+  // Distinct countries of origin present in the inventory
+  const countries = useMemo(() => {
+    const s = new Set<string>();
+    (products ?? []).forEach((p) => { if (p.country_of_origin) s.add(p.country_of_origin); });
+    return Array.from(s).sort();
+  }, [products]);
 
   const activeFilters =
     (catFilter ? 1 : 0) + (subFilter ? 1 : 0) +
     (metalFilter !== "all" ? 1 : 0) + (karatFilter !== "all" ? 1 : 0) +
-    (supplierFilter !== "all" ? 1 : 0) + (minWeight ? 1 : 0) + (maxWeight ? 1 : 0);
+    (supplierFilter !== "all" ? 1 : 0) + (originFilter !== "all" ? 1 : 0) +
+    (countryFilter !== "all" ? 1 : 0) + (minWeight ? 1 : 0) + (maxWeight ? 1 : 0);
 
   function clearFilters() {
     setCatFilter(null); setSubFilter(null); setMetalFilter("all");
-    setKaratFilter("all"); setSupplierFilter("all"); setMinWeight(""); setMaxWeight("");
+    setKaratFilter("all"); setSupplierFilter("all"); setOriginFilter("all");
+    setCountryFilter("all"); setMinWeight(""); setMaxWeight("");
   }
+
 
 
 
@@ -216,20 +259,32 @@ function StockPage() {
   }
   function openEdit(p: Product) {
     setEditing(p);
+    const country = p.country_of_origin ?? "";
+    const known = (ORIGIN_COUNTRIES as readonly string[]).includes(country);
     setForm({
       name: p.name, category: p.category, subcategory: p.subcategory ?? "", metal_type: p.metal_type,
       gold_karat: p.gold_karat ? String(p.gold_karat) : "",
       weight_grams: String(p.weight_grams), metal_purchase_price: String(p.metal_purchase_price),
       labor_cost: String(p.labor_cost), supplier_id: p.supplier_id ?? "",
       origin: p.origin ?? "", status: p.status,
+      metal_origin: p.metal_origin ?? "",
+      country_select: country ? (known && country !== "Autre" ? country : "Autre") : "",
+      country_custom: country && (!known || country === "Autre") ? country : "",
     });
     setOpen(true);
   }
+
 
   const save = useMutation({
     mutationFn: async () => {
       if (!form.name.trim()) throw new Error("Le nom du bijou est obligatoire.");
       if (!form.category) throw new Error("La catégorie est obligatoire.");
+      let countryOfOrigin: string | null = null;
+      if (form.metal_origin === "imported") {
+        const c = form.country_select === "Autre" ? form.country_custom.trim() : form.country_select;
+        if (!c) throw new Error("Le pays d'origine est obligatoire pour un métal importé.");
+        countryOfOrigin = c;
+      }
       const payload = {
         name: form.name.trim(),
         category: form.category,
@@ -241,6 +296,8 @@ function StockPage() {
         labor_cost: Number(form.labor_cost) || 0,
         supplier_id: form.supplier_id || null,
         origin: form.origin.trim() || null,
+        metal_origin: form.metal_origin || null,
+        country_of_origin: countryOfOrigin,
         status: form.status,
       };
       if (editing) {
@@ -374,6 +431,46 @@ function StockPage() {
             </div>
           )}
 
+          {/* Origin reporting (in-stock) */}
+          {(originStats.local.weight > 0 || originStats.imported.weight > 0) && (
+            <Card>
+              <CardContent className="space-y-3 p-4">
+                <p className="text-sm font-medium">Rapport par origine du métal (en stock)</p>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <div className="rounded-lg border p-3">
+                    <p className="text-xs text-muted-foreground">Poids or local</p>
+                    <p className="text-lg font-semibold">{formatGrams(originStats.local.weight)}</p>
+                  </div>
+                  <div className="rounded-lg border p-3">
+                    <p className="text-xs text-muted-foreground">Valeur or local</p>
+                    <p className="text-lg font-semibold">{formatFromEUR(originStats.local.value, "DZD")}</p>
+                  </div>
+                  <div className="rounded-lg border p-3">
+                    <p className="text-xs text-muted-foreground">Poids or importé</p>
+                    <p className="text-lg font-semibold">{formatGrams(originStats.imported.weight)}</p>
+                  </div>
+                  <div className="rounded-lg border p-3">
+                    <p className="text-xs text-muted-foreground">Valeur or importé</p>
+                    <p className="text-lg font-semibold">{formatFromEUR(originStats.imported.value, "DZD")}</p>
+                  </div>
+                </div>
+                {originStats.byCountry.length > 0 && (
+                  <div>
+                    <p className="mb-1 text-xs text-muted-foreground">Répartition par pays d'origine</p>
+                    <div className="flex flex-wrap gap-2">
+                      {originStats.byCountry.map(([country, e]) => (
+                        <Badge key={country} variant="outline" className="gap-1">
+                          {country} · {formatGrams(e.weight)} · {formatFromEUR(e.value, "DZD")}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="relative w-full max-w-xs">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -484,6 +581,47 @@ function StockPage() {
                       onChange={(e) => setForm({ ...form, origin: e.target.value })}
                     />
                   </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label>Origine du métal</Label>
+                      <Select
+                        value={form.metal_origin || "none"}
+                        onValueChange={(v) => setForm({
+                          ...form,
+                          metal_origin: v === "none" ? "" : v,
+                          ...(v !== "imported" ? { country_select: "", country_custom: "" } : {}),
+                        })}
+                      >
+                        <SelectTrigger><SelectValue placeholder="Non précisée" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Non précisée</SelectItem>
+                          {METAL_ORIGINS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {form.metal_origin === "imported" && (
+                      <div className="space-y-2">
+                        <Label>Pays d'origine *</Label>
+                        <Select value={form.country_select || ""} onValueChange={(v) => setForm({ ...form, country_select: v })}>
+                          <SelectTrigger><SelectValue placeholder="Choisir un pays" /></SelectTrigger>
+                          <SelectContent>
+                            {ORIGIN_COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  </div>
+                  {form.metal_origin === "imported" && form.country_select === "Autre" && (
+                    <div className="space-y-2">
+                      <Label>Préciser le pays *</Label>
+                      <Input
+                        placeholder="Nom du pays"
+                        value={form.country_custom}
+                        onChange={(e) => setForm({ ...form, country_custom: e.target.value })}
+                      />
+                    </div>
+                  )}
+
                 </div>
                 <DialogFooter>
                   <Button onClick={() => save.mutate()} disabled={save.isPending}>Enregistrer</Button>
@@ -525,6 +663,27 @@ function StockPage() {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Origine</Label>
+                <Select value={originFilter} onValueChange={setOriginFilter}>
+                  <SelectTrigger className="h-9 w-32"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes</SelectItem>
+                    {METAL_ORIGINS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Pays d'origine</Label>
+                <Select value={countryFilter} onValueChange={setCountryFilter} disabled={countries.length === 0}>
+                  <SelectTrigger className="h-9 w-44"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous</SelectItem>
+                    {countries.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="space-y-1">
                 <Label className="text-xs">Poids min (g)</Label>
                 <Input type="number" min={0} step="0.001" className="h-9 w-24" value={minWeight} onChange={(e) => setMinWeight(e.target.value)} />
@@ -572,6 +731,7 @@ function StockPage() {
                     <TableHead>Titre</TableHead>
                     <TableHead>Poids</TableHead>
                     <TableHead>Valeur métal (DZD)</TableHead>
+                    <TableHead>Origine</TableHead>
                     <TableHead>Statut</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -618,6 +778,20 @@ function StockPage() {
                             <span className="text-muted-foreground">cours manquant</span>
                           )}
                         </TableCell>
+                        <TableCell>
+                          {p.metal_origin ? (
+                            <div className="text-xs">
+                              <Badge variant={p.metal_origin === "imported" ? "default" : "secondary"} className="text-[10px]">
+                                {metalOriginLabel(p.metal_origin)}
+                              </Badge>
+                              {p.metal_origin === "imported" && p.country_of_origin && (
+                                <div className="mt-0.5 text-muted-foreground">{p.country_of_origin}</div>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
                         <TableCell><Badge variant={statusVariant(p.status)}>{statusLabel(p.status)}</Badge></TableCell>
                         <TableCell className="text-right">
                           <Button variant="ghost" size="icon" title="Étiquette & QR" onClick={() => setLabelProducts([toLabel(p)])}>
@@ -640,7 +814,7 @@ function StockPage() {
                   })}
                   {filtered.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
+                      <TableCell colSpan={9} className="py-10 text-center text-muted-foreground">
                         <Package className="mx-auto mb-2 h-8 w-8 opacity-40" />
                         Aucun bijou ne correspond.
                       </TableCell>

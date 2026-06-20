@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import {
-  METAL_TYPES, formatGrams, formatDZD, statusLabel,
+  METAL_TYPES, formatGrams, formatDZD, statusLabel, metalOriginLabel, formatDateTime,
 } from "@/lib/format";
 import { LabelDialog, type LabelProduct } from "@/components/LabelDialog";
 import { productImage } from "@/lib/product-image";
@@ -29,11 +29,21 @@ interface ProductRow {
   metal_purchase_price: number;
   labor_cost: number;
   origin: string | null;
+  metal_origin: string | null;
+  country_of_origin: string | null;
   status: string;
   created_at: string;
   supplier_id: string | null;
   is_demo: boolean;
   suppliers: { name: string } | null;
+}
+
+interface OriginEvent {
+  id: string;
+  event_type: string;
+  detail: string | null;
+  created_at: string;
+  changed_by: string | null;
 }
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
@@ -61,6 +71,19 @@ function ProductDetailPage() {
         .maybeSingle();
       if (error) throw error;
       return data as ProductRow | null;
+    },
+  });
+
+  const { data: originEvents } = useQuery({
+    queryKey: ["product-origin-events", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_origin_events")
+        .select("id, event_type, detail, created_at, changed_by")
+        .eq("product_id", id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as OriginEvent[];
     },
   });
 
@@ -114,6 +137,10 @@ function ProductDetailPage() {
               <Row label="Métal" value={metal} />
               <Row label="Poids" value={formatGrams(Number(product.weight_grams))} />
               <Row label="Fournisseur" value={product.suppliers?.name ?? "—"} />
+              <Row label="Origine du métal" value={metalOriginLabel(product.metal_origin)} />
+              {product.metal_origin === "imported" && (
+                <Row label="Pays d'origine" value={product.country_of_origin ?? "—"} />
+              )}
               <Row label="Origine" value={product.origin ?? "—"} />
               <Row label="Date d'entrée" value={new Date(product.created_at).toLocaleDateString("fr-DZ")} />
               {isAdmin && (
@@ -124,6 +151,27 @@ function ProductDetailPage() {
               )}
             </CardContent>
           </Card>
+
+          {originEvents && originEvents.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Historique de l'origine</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {originEvents.map((e) => (
+                  <div key={e.id} className="flex items-start gap-3 border-b border-border/60 pb-3 last:border-0 last:pb-0">
+                    <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
+                    <div className="min-w-0">
+                      <p className="text-sm">{e.detail ?? e.event_type}</p>
+                      <p className="text-xs text-muted-foreground">{formatDateTime(e.created_at)}</p>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+
 
           {isAdmin && (
             <Button className="w-full" onClick={() => setLabelOpen(true)}>

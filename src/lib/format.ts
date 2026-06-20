@@ -22,6 +22,27 @@ export const METAL_TYPES = [
   { value: "platine", label: "Platine" },
 ] as const;
 
+export const METAL_ORIGINS = [
+  { value: "local", label: "Local" },
+  { value: "imported", label: "Importé" },
+] as const;
+
+/** Pays d'origine courants pour le métal importé. */
+export const ORIGIN_COUNTRIES = [
+  "Italie",
+  "Turquie",
+  "Émirats arabes unis",
+  "Arabie saoudite",
+  "Inde",
+  "France",
+  "Autre",
+] as const;
+
+export function metalOriginLabel(value: string | null | undefined): string {
+  if (!value) return "—";
+  return METAL_ORIGINS.find((o) => o.value === value)?.label ?? value;
+}
+
 export const PAYMENT_METHODS = [
   { value: "especes", label: "Espèces" },
   { value: "cheque", label: "Chèque" },
