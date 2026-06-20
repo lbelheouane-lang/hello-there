@@ -228,8 +228,9 @@ function StockPage() {
                   <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                      {categoryNames.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                     </SelectContent>
+
                   </Select>
                 </div>
                 <div className="space-y-2">
