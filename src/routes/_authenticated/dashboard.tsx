@@ -85,7 +85,7 @@ function DashboardPage() {
         <StatCard icon={Scale} label="Poids vendu (mois)" value={formatGrams(stats?.soldGramsMonth ?? 0)} hint={`Aujourd'hui : ${formatGrams(stats?.soldGramsDay ?? 0)}`} />
         <StatCard icon={ShoppingBag} label="Ventes du mois" value={String(stats?.salesMonth ?? 0)} hint={`Total : ${stats?.salesTotal ?? 0}`} />
         <StatCard icon={Package} label="Stock total" value={formatGrams(stats?.stockGrams ?? 0)} hint={`${stats?.stockCount ?? 0} pièces en stock`} />
-        <StatCard icon={Coins} label="Cours 18K (gramme)" value={prices?.[18] ? formatDZD(prices[18].price_per_gram) : "—"} hint="Dernier cours connu" />
+        <StatCard icon={Coins} label="Cours 18K (gramme)" value={prices?.[18] ? formatUSD(prices[18].price_per_gram) : "—"} hint={prices?.[18] ? `≈ ${formatFromUSD(prices[18].price_per_gram, "DZD")}` : "Dernier cours connu"} />
       </div>
 
       <div className="mt-6">
