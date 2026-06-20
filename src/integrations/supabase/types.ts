@@ -536,6 +536,38 @@ export type Database = {
         }
         Relationships: []
       }
+      product_subcategories: {
+        Row: {
+          category_id: string
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_subcategories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "product_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           category: string
@@ -555,6 +587,7 @@ export type Database = {
           set_id: string | null
           status: string
           stone_cost: number
+          subcategory: string | null
           supplier_id: string | null
           updated_at: string
           weight_grams: number
@@ -577,6 +610,7 @@ export type Database = {
           set_id?: string | null
           status?: string
           stone_cost?: number
+          subcategory?: string | null
           supplier_id?: string | null
           updated_at?: string
           weight_grams?: number
@@ -599,6 +633,7 @@ export type Database = {
           set_id?: string | null
           status?: string
           stone_cost?: number
+          subcategory?: string | null
           supplier_id?: string | null
           updated_at?: string
           weight_grams?: number
