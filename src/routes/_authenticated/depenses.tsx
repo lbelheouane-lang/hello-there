@@ -48,7 +48,17 @@ interface Expense {
   spent_at: string;
 }
 
-const emptyForm = {
+interface ExpenseForm {
+  category: string;
+  description: string;
+  amount: string;
+  payment_method: string;
+  supplier_id: string;
+  notes: string;
+  spent_at: string;
+}
+
+const emptyForm: ExpenseForm = {
   category: "",
   description: "",
   amount: "",
