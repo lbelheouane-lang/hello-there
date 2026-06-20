@@ -372,6 +372,7 @@ function ScrapGoldPage() {
                         </td>
                         <td className="px-3 py-2">
                           <div className="flex justify-end gap-1">
+                            <Button size="icon" variant="ghost" title="Bon d'achat (imprimer / PDF)" onClick={() => printScrapInvoice(invoiceFromScrap(s))}><FileText className="h-4 w-4" /></Button>
                             <Button size="icon" variant="ghost" title="Détails & historique" onClick={() => setDetail(s)}><History className="h-4 w-4" /></Button>
                             <Button size="icon" variant="ghost" title="Modifier" onClick={() => openEdit(s)}><Pencil className="h-4 w-4" /></Button>
                             <Button size="icon" variant="ghost" title="Supprimer" onClick={() => setDeleteTarget(s)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
