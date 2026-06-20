@@ -10,7 +10,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { useCategories } from "@/hooks/use-categories";
+import { useCategories, useSubcategories } from "@/hooks/use-categories";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import {
   getDemoStatus, generateDemoData, deleteDemoData,
 } from "@/lib/demo-data.functions";
@@ -90,6 +93,40 @@ function SettingsPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  // Subcategories
+  const subs = useSubcategories();
+  const [subCatId, setSubCatId] = useState("");
+  const [newSub, setNewSub] = useState("");
+  const catName = (id: string) => cats.data?.find((c) => c.id === id)?.name ?? "";
+  const addSub = useMutation({
+    mutationFn: async () => {
+      if (!subCatId) throw new Error("Choisissez d'abord une catégorie.");
+      const name = newSub.trim();
+      if (!name) throw new Error("Nom de sous-catégorie requis.");
+      const { error } = await supabase.from("product_subcategories").insert({ category_id: subCatId, name });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Sous-catégorie ajoutée.");
+      setNewSub("");
+      qc.invalidateQueries({ queryKey: ["product_subcategories"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const delSub = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("product_subcategories").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Sous-catégorie supprimée.");
+      qc.invalidateQueries({ queryKey: ["product_subcategories"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+
+
   return (
     <AppShell title="Paramètres" allow={["admin"]}>
       <div className="mx-auto max-w-2xl space-y-6">
@@ -130,6 +167,56 @@ function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Tags className="h-5 w-5 text-primary" />
+              Sous-catégories
+            </CardTitle>
+            <CardDescription>
+              Affinez chaque catégorie avec des sous-catégories personnalisées
+              (ex. Bague → Alliance, Bague de fiançailles).
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-wrap gap-2">
+              <Select value={subCatId} onValueChange={setSubCatId}>
+                <SelectTrigger className="w-56"><SelectValue placeholder="Catégorie…" /></SelectTrigger>
+                <SelectContent>
+                  {(cats.data ?? []).map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Input
+                className="flex-1"
+                placeholder="Nouvelle sous-catégorie…"
+                value={newSub}
+                onChange={(e) => setNewSub(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") addSub.mutate(); }}
+              />
+              <Button onClick={() => addSub.mutate()} disabled={addSub.isPending}>
+                <Plus className="mr-2 h-4 w-4" /> Ajouter
+              </Button>
+            </div>
+            {subCatId && (
+              <div className="flex flex-wrap gap-2">
+                {(subs.data ?? []).filter((s) => s.category_id === subCatId).map((s) => (
+                  <Badge key={s.id} variant="outline" className="gap-1 py-1">
+                    {s.name}
+                    <button onClick={() => delSub.mutate(s.id)} className="ml-1 text-destructive" title="Supprimer">
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+                {(subs.data ?? []).filter((s) => s.category_id === subCatId).length === 0 && (
+                  <p className="text-sm text-muted-foreground">Aucune sous-catégorie pour « {catName(subCatId)} ».</p>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+
 
         <Card>
           <CardHeader>

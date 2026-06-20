@@ -9,6 +9,13 @@ export interface ProductCategory {
   created_at: string;
 }
 
+export interface ProductSubcategory {
+  id: string;
+  category_id: string;
+  name: string;
+  created_at: string;
+}
+
 /**
  * Loads the jewelry categories from the database, falling back to the built-in
  * defaults if none are available yet. Administrators can add custom categories.
@@ -24,6 +31,21 @@ export function useCategories() {
         .order("name");
       if (error) throw error;
       return data as ProductCategory[];
+    },
+  });
+}
+
+/** Loads custom subcategories grouped under each category. */
+export function useSubcategories() {
+  return useQuery({
+    queryKey: ["product_subcategories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_subcategories")
+        .select("*")
+        .order("name");
+      if (error) throw error;
+      return data as ProductSubcategory[];
     },
   });
 }
