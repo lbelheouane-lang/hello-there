@@ -13,6 +13,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { BrandIntro } from "@/components/BrandIntro";
 import { useAuth, type AppRole } from "@/hooks/use-auth";
+import { RequireRole } from "@/components/RequireRole";
 import { Button } from "@/components/ui/button";
 import {
   Sidebar,
