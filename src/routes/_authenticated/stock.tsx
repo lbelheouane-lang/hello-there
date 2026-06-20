@@ -27,6 +27,7 @@ import {
 import { formatUSD, formatFromUSD } from "@/lib/currency";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
 import { LabelDialog, type LabelProduct } from "@/components/LabelDialog";
+import { productImage } from "@/lib/product-image";
 
 export const Route = createFileRoute("/_authenticated/stock")({
   component: StockPage,
