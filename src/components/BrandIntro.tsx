@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Gem } from "lucide-react";
+import { useStoreSettings } from "@/lib/store-settings";
 
 const SESSION_KEY = "maisondor:intro-shown";
 
