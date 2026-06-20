@@ -75,7 +75,7 @@ export function GoldPriceWidget({ canRefresh = false }: { canRefresh?: boolean }
           <div>
             <p className="text-3xl font-semibold">
               {latest ? formatEUR(latest.price_per_gram) : "—"}
-              <span className="ml-1 text-sm font-normal text-muted-foreground">/ g (USD)</span>
+              <span className="ml-1 text-sm font-normal text-muted-foreground">/ g (EUR)</span>
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
               {latest?.price_per_ounce ? formatEUR(latest.price_per_ounce) : "—"}
