@@ -26,6 +26,7 @@ import { Route as AuthenticatedCoursOrRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedClientsRouteImport } from './routes/_authenticated/clients'
 import { Route as AuthenticatedBoutiqueRouteImport } from './routes/_authenticated/boutique'
 import { Route as AuthenticatedProduitIdRouteImport } from './routes/_authenticated/produit.$id'
+import { Route as AuthenticatedFournisseursIdRouteImport } from './routes/_authenticated/fournisseurs_.$id'
 import { Route as AuthenticatedClientsIdRouteImport } from './routes/_authenticated/clients_.$id'
 import { Route as ApiPublicHooksUpdateGoldPricesRouteImport } from './routes/api/public/hooks/update-gold-prices'
 
@@ -117,6 +118,12 @@ const AuthenticatedProduitIdRoute = AuthenticatedProduitIdRouteImport.update({
   path: '/produit/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFournisseursIdRoute =
+  AuthenticatedFournisseursIdRouteImport.update({
+    id: '/fournisseurs_/$id',
+    path: '/fournisseurs/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedClientsIdRoute = AuthenticatedClientsIdRouteImport.update({
   id: '/clients_/$id',
   path: '/clients/$id',
@@ -146,6 +153,7 @@ export interface FileRoutesByFullPath {
   '/stock': typeof AuthenticatedStockRoute
   '/suivi/$token': typeof SuiviTokenRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
+  '/fournisseurs/$id': typeof AuthenticatedFournisseursIdRoute
   '/produit/$id': typeof AuthenticatedProduitIdRoute
   '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
 }
@@ -166,6 +174,7 @@ export interface FileRoutesByTo {
   '/stock': typeof AuthenticatedStockRoute
   '/suivi/$token': typeof SuiviTokenRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
+  '/fournisseurs/$id': typeof AuthenticatedFournisseursIdRoute
   '/produit/$id': typeof AuthenticatedProduitIdRoute
   '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
 }
@@ -188,6 +197,7 @@ export interface FileRoutesById {
   '/_authenticated/stock': typeof AuthenticatedStockRoute
   '/suivi/$token': typeof SuiviTokenRoute
   '/_authenticated/clients_/$id': typeof AuthenticatedClientsIdRoute
+  '/_authenticated/fournisseurs_/$id': typeof AuthenticatedFournisseursIdRoute
   '/_authenticated/produit/$id': typeof AuthenticatedProduitIdRoute
   '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
 }
@@ -210,6 +220,7 @@ export interface FileRouteTypes {
     | '/stock'
     | '/suivi/$token'
     | '/clients/$id'
+    | '/fournisseurs/$id'
     | '/produit/$id'
     | '/api/public/hooks/update-gold-prices'
   fileRoutesByTo: FileRoutesByTo
@@ -230,6 +241,7 @@ export interface FileRouteTypes {
     | '/stock'
     | '/suivi/$token'
     | '/clients/$id'
+    | '/fournisseurs/$id'
     | '/produit/$id'
     | '/api/public/hooks/update-gold-prices'
   id:
@@ -251,6 +263,7 @@ export interface FileRouteTypes {
     | '/_authenticated/stock'
     | '/suivi/$token'
     | '/_authenticated/clients_/$id'
+    | '/_authenticated/fournisseurs_/$id'
     | '/_authenticated/produit/$id'
     | '/api/public/hooks/update-gold-prices'
   fileRoutesById: FileRoutesById
@@ -384,6 +397,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProduitIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/fournisseurs_/$id': {
+      id: '/_authenticated/fournisseurs_/$id'
+      path: '/fournisseurs/$id'
+      fullPath: '/fournisseurs/$id'
+      preLoaderRoute: typeof AuthenticatedFournisseursIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/clients_/$id': {
       id: '/_authenticated/clients_/$id'
       path: '/clients/$id'
@@ -415,6 +435,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReparationsRoute: typeof AuthenticatedReparationsRoute
   AuthenticatedStockRoute: typeof AuthenticatedStockRoute
   AuthenticatedClientsIdRoute: typeof AuthenticatedClientsIdRoute
+  AuthenticatedFournisseursIdRoute: typeof AuthenticatedFournisseursIdRoute
   AuthenticatedProduitIdRoute: typeof AuthenticatedProduitIdRoute
 }
 
@@ -432,6 +453,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReparationsRoute: AuthenticatedReparationsRoute,
   AuthenticatedStockRoute: AuthenticatedStockRoute,
   AuthenticatedClientsIdRoute: AuthenticatedClientsIdRoute,
+  AuthenticatedFournisseursIdRoute: AuthenticatedFournisseursIdRoute,
   AuthenticatedProduitIdRoute: AuthenticatedProduitIdRoute,
 }
 
