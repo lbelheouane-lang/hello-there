@@ -206,7 +206,7 @@ function ScrapGoldPage() {
         const { error } = await supabase.from("scrap_gold").update(payload).eq("id", editing.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("scrap_gold").insert({ ...payload, created_by: user!.id });
+        const { error } = await supabase.from("scrap_gold").insert({ ...payload, reference: "", created_by: user!.id });
         if (error) throw error;
       }
     },
