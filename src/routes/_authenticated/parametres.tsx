@@ -241,9 +241,9 @@ function SettingsPage() {
             )}
           </CardContent>
         </Card>
+          </TabsContent>
 
-
-
+          <TabsContent value="backup" className="space-y-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
