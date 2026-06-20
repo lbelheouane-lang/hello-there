@@ -259,15 +259,21 @@ function StockPage() {
   }
   function openEdit(p: Product) {
     setEditing(p);
+    const country = p.country_of_origin ?? "";
+    const known = (ORIGIN_COUNTRIES as readonly string[]).includes(country);
     setForm({
       name: p.name, category: p.category, subcategory: p.subcategory ?? "", metal_type: p.metal_type,
       gold_karat: p.gold_karat ? String(p.gold_karat) : "",
       weight_grams: String(p.weight_grams), metal_purchase_price: String(p.metal_purchase_price),
       labor_cost: String(p.labor_cost), supplier_id: p.supplier_id ?? "",
       origin: p.origin ?? "", status: p.status,
+      metal_origin: p.metal_origin ?? "",
+      country_select: country ? (known && country !== "Autre" ? country : "Autre") : "",
+      country_custom: country && (!known || country === "Autre") ? country : "",
     });
     setOpen(true);
   }
+
 
   const save = useMutation({
     mutationFn: async () => {
