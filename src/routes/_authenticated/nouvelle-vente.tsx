@@ -90,12 +90,13 @@ function NewSalePage() {
   }, [products, productSearch]);
 
   const selectedProduct = products?.find((p) => p.id === productId) ?? null;
-  // Le cours de l'or est en EUR (devise de base) ; le prix de vente est facturé en EUR.
+  // Le cours de l'or est en EUR (devise de base) ; la valeur métal est convertie
+  // en DZD pour toutes les ventes et documents.
   const suggestedValue = selectedProduct
-    ? metalValue(
+    ? dzdFromEur(metalValue(
         Number(selectedProduct.weight_grams),
         selectedProduct.metal_type === "or" ? priceForKarat(prices, selectedProduct.gold_karat) : null,
-      )
+      ))
     : 0;
 
   const addCustomer = useMutation({
