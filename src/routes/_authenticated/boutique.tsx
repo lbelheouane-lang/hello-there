@@ -77,7 +77,7 @@ function sampleInvoice(): InvoiceRecord {
     customer_name: "Amina Benali", customer_phone: "+213 661 00 11 22",
     customer_address: "Cité 1000 logements, Alger",
     product_sku: "BJ-001", product_name: "Bague solitaire éclat", metal_type: "or",
-    gold_karat: 18, weight_grams: 3.2, quantity: 1, unit_price: 98000, discount: 0,
+    gold_karat: 18, weight_grams: 3.2, purchase_price_per_gram: 13750, gold_value: 44000, quantity: 1, unit_price: 98000, discount: 0,
     total_amount: 98000, amount_this_tx: 60000, total_paid: 60000, balance: 38000,
     payment_method: "especes", payment_status: "partial", sale_type: "installment",
     employee_name: "Karim H.", notes: null, issued_at: new Date().toISOString(),
