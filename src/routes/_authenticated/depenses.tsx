@@ -3,8 +3,8 @@ import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
-  Wallet, Plus, Search, Printer, Pencil, Trash2, Paperclip,
-  FileDown, Receipt, Download, X,
+  Plus, Search, Printer, Pencil, Trash2, Paperclip,
+  FileDown, X,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
