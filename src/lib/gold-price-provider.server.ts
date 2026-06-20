@@ -367,16 +367,17 @@ async function recalcProducts(baseEurPerGram: number, eurToDzd: number): Promise
           oldSellingPrice: Number(p.selling_price ?? 0),
           newSellingPrice: selling,
           baseEurPerGram,
-          currency: "EUR",
+          eurToDzd,
+          currency: "DZD",
         });
       }
     }
   }
 
   await logAudit("inventory_valuation", null, {
-    currency: "EUR",
-    valuationBefore: Math.round(valuationBefore * 100) / 100,
-    valuationAfter: Math.round(valuationAfter * 100) / 100,
+    currency: "DZD",
+    valuationBefore: Math.round(valuationBefore),
+    valuationAfter: Math.round(valuationAfter),
     productsRecalculated: count,
   });
 
