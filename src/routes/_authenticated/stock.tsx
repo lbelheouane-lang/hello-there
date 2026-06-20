@@ -24,7 +24,7 @@ import {
   KARATS, CATEGORIES, METAL_TYPES, PRODUCT_STATUSES,
   formatGrams, statusLabel, metalValue,
 } from "@/lib/format";
-import { formatEUR, formatFromEUR } from "@/lib/currency";
+import { formatFromEUR } from "@/lib/currency";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
 import { LabelDialog, type LabelProduct } from "@/components/LabelDialog";
 import { productImage } from "@/lib/product-image";
