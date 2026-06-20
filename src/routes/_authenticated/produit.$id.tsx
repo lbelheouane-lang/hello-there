@@ -137,6 +137,10 @@ function ProductDetailPage() {
               <Row label="Métal" value={metal} />
               <Row label="Poids" value={formatGrams(Number(product.weight_grams))} />
               <Row label="Fournisseur" value={product.suppliers?.name ?? "—"} />
+              <Row label="Origine du métal" value={metalOriginLabel(product.metal_origin)} />
+              {product.metal_origin === "imported" && (
+                <Row label="Pays d'origine" value={product.country_of_origin ?? "—"} />
+              )}
               <Row label="Origine" value={product.origin ?? "—"} />
               <Row label="Date d'entrée" value={new Date(product.created_at).toLocaleDateString("fr-DZ")} />
               {isAdmin && (
