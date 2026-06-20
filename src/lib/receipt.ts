@@ -78,10 +78,11 @@ export function buildReceiptHtml(d: ReceiptData): string {
   <div class="sep"></div>
   ${row("Encaissé par", d.employeeName)}
   <div class="sign">
-    <div>Signature client</div>
-    <div>Cachet & signature</div>
+    <div>${esc(s.signature_left || "Signature client")}</div>
+    <div>${esc(s.signature_right || "Cachet & signature")}</div>
   </div>
-  <div class="foot">Merci de votre confiance — ${esc(d.storeName)}</div>
+  <div class="foot">${esc(s.thank_you_message || s.invoice_footer || `Merci de votre confiance — ${name}`)}</div>
+
 </body></html>`;
 }
 
