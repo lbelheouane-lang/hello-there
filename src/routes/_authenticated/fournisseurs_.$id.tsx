@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft, Phone, Mail, MapPin, StickyNote, CalendarClock, Package,
-  Scale, Wrench, Wallet, Printer, FileDown, Search,
+  Scale, Wrench, Wallet, Printer, FileDown, Search, Sigma, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -43,23 +43,26 @@ interface Supplier {
   created_at: string;
 }
 
-interface ProductRow {
+interface PurchaseRecord {
   id: string;
-  internal_code: string;
-  name: string;
-  metal_type: string;
+  reference: string;
+  sku: string | null;
+  product_name: string | null;
+  metal_type: string | null;
   gold_karat: number | null;
   weight_grams: number;
+  quantity: number;
   metal_purchase_price: number;
   labor_cost: number;
-  making_charge: number | null;
-  stone_cost: number | null;
-  origin: string | null;
-  created_by: string | null;
-  created_at: string;
+  unit_cost: number;
+  total_cost: number;
+  notes: string | null;
+  employee_name: string | null;
+  purchased_at: string;
 }
 
 const CHART_COLORS = ["#c9a227", "#b8860b", "#8a6d10", "#d4af37", "#a67c00"];
+const PAGE_SIZE = 25;
 
 function StatCard({ icon: Icon, label, value }: { icon: typeof Package; label: string; value: string }) {
   return (
@@ -75,6 +78,26 @@ function StatCard({ icon: Icon, label, value }: { icon: typeof Package; label: s
   );
 }
 
+function toRow(p: PurchaseRecord): PurchaseRow {
+  return {
+    id: p.id,
+    reference: p.reference,
+    sku: p.sku ?? "—",
+    product_name: p.product_name ?? "—",
+    metal_type: p.metal_type ?? "—",
+    gold_karat: p.gold_karat,
+    weight_grams: Number(p.weight_grams),
+    quantity: p.quantity,
+    metal_purchase_price: Number(p.metal_purchase_price),
+    labor_cost: Number(p.labor_cost),
+    unit_cost: Number(p.unit_cost),
+    total_cost: Number(p.total_cost),
+    employee_name: p.employee_name ?? "—",
+    origin: p.notes,
+    created_at: p.purchased_at,
+  };
+}
+
 function SupplierProfilePage() {
   const { id } = Route.useParams();
   const [search, setSearch] = useState("");
@@ -83,6 +106,7 @@ function SupplierProfilePage() {
   const [to, setTo] = useState("");
   const [minAmount, setMinAmount] = useState("");
   const [maxAmount, setMaxAmount] = useState("");
+  const [page, setPage] = useState(0);
 
   const { data: supplier } = useQuery({
     queryKey: ["supplier", id],
@@ -93,54 +117,20 @@ function SupplierProfilePage() {
     },
   });
 
-  const { data: products } = useQuery({
+  const { data: purchases } = useQuery({
     queryKey: ["supplier-purchases", id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("products")
-        .select("id,internal_code,name,metal_type,gold_karat,weight_grams,metal_purchase_price,labor_cost,making_charge,stone_cost,origin,created_by,created_at")
+        .from("purchases")
+        .select("id,reference,sku,product_name,metal_type,gold_karat,weight_grams,quantity,metal_purchase_price,labor_cost,unit_cost,total_cost,notes,employee_name,purchased_at")
         .eq("supplier_id", id)
-        .order("created_at", { ascending: false });
+        .order("purchased_at", { ascending: false });
       if (error) throw error;
-      return data as ProductRow[];
+      return (data as PurchaseRecord[]).map(toRow);
     },
   });
 
-  const { data: employees } = useQuery({
-    queryKey: ["employee-names"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("id, full_name");
-      if (error) throw error;
-      const m = new Map<string, string>();
-      (data as { id: string; full_name: string | null }[]).forEach((p) => m.set(p.id, p.full_name ?? "—"));
-      return m;
-    },
-  });
-
-  const allRows = useMemo<PurchaseRow[]>(() => {
-    return (products ?? []).map((p) => {
-      const unit =
-        Number(p.metal_purchase_price) + Number(p.labor_cost) +
-        Number(p.making_charge ?? 0) + Number(p.stone_cost ?? 0);
-      return {
-        id: p.id,
-        reference: p.internal_code,
-        sku: p.internal_code,
-        product_name: p.name,
-        metal_type: p.metal_type,
-        gold_karat: p.gold_karat,
-        weight_grams: Number(p.weight_grams),
-        quantity: 1,
-        metal_purchase_price: Number(p.metal_purchase_price),
-        labor_cost: Number(p.labor_cost),
-        unit_cost: unit,
-        total_cost: unit,
-        employee_name: p.created_by ? employees?.get(p.created_by) ?? "—" : "—",
-        origin: p.origin,
-        created_at: p.created_at,
-      };
-    });
-  }, [products, employees]);
+  const allRows = purchases ?? [];
 
   const rows = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -159,6 +149,11 @@ function SupplierProfilePage() {
   }, [allRows, search, metalFilter, from, to, minAmount, maxAmount]);
 
   const summary = useMemo(() => summarize(rows), [rows]);
+  const avgCost = rows.length ? summary.totalSpent / rows.length : 0;
+
+  const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount - 1);
+  const paged = rows.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
 
   const byMonth = useMemo(() => {
     const m = new Map<string, { count: number; spent: number; weight: number }>();
@@ -219,11 +214,12 @@ function SupplierProfilePage() {
       </Card>
 
       {/* Dashboard cards */}
-      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <StatCard icon={Package} label="Total achats" value={String(summary.count)} />
         <StatCard icon={Scale} label="Poids total" value={formatGrams(summary.totalWeight)} />
         <StatCard icon={Wrench} label="Main-d'œuvre" value={formatDZD(summary.totalLabor)} />
         <StatCard icon={Wallet} label="Total dépensé" value={formatDZD(summary.totalSpent)} />
+        <StatCard icon={Sigma} label="Coût moyen" value={formatDZD(avgCost)} />
         <StatCard icon={CalendarClock} label="Dernier achat" value={summary.lastPurchase ? formatDate(summary.lastPurchase) : "—"} />
       </div>
 
@@ -239,11 +235,11 @@ function SupplierProfilePage() {
             <CardContent className="grid gap-3 p-4 md:grid-cols-3 lg:grid-cols-6">
               <div className="relative md:col-span-3 lg:col-span-2">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input className="pl-8" placeholder="Réf., SKU, métal…" value={search} onChange={(e) => setSearch(e.target.value)} />
+                <Input className="pl-8" placeholder="Réf., SKU, produit, métal…" value={search} onChange={(e) => { setSearch(e.target.value); setPage(0); }} />
               </div>
               <div>
                 <Label className="text-xs">Métal</Label>
-                <Select value={metalFilter} onValueChange={setMetalFilter}>
+                <Select value={metalFilter} onValueChange={(v) => { setMetalFilter(v); setPage(0); }}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Tous</SelectItem>
@@ -255,20 +251,20 @@ function SupplierProfilePage() {
               </div>
               <div>
                 <Label className="text-xs">Du</Label>
-                <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+                <Input type="date" value={from} onChange={(e) => { setFrom(e.target.value); setPage(0); }} />
               </div>
               <div>
                 <Label className="text-xs">Au</Label>
-                <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+                <Input type="date" value={to} onChange={(e) => { setTo(e.target.value); setPage(0); }} />
               </div>
               <div className="grid grid-cols-2 gap-2 lg:col-span-1">
                 <div>
                   <Label className="text-xs">Min</Label>
-                  <Input type="number" value={minAmount} onChange={(e) => setMinAmount(e.target.value)} />
+                  <Input type="number" value={minAmount} onChange={(e) => { setMinAmount(e.target.value); setPage(0); }} />
                 </div>
                 <div>
                   <Label className="text-xs">Max</Label>
-                  <Input type="number" value={maxAmount} onChange={(e) => setMaxAmount(e.target.value)} />
+                  <Input type="number" value={maxAmount} onChange={(e) => { setMaxAmount(e.target.value); setPage(0); }} />
                 </div>
               </div>
             </CardContent>
@@ -277,7 +273,7 @@ function SupplierProfilePage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-base">{rows.length} achat(s)</CardTitle>
-              <Button variant="outline" size="sm" onClick={printReport}>
+              <Button variant="outline" size="sm" onClick={printReport} disabled={rows.length === 0}>
                 <Printer className="mr-2 h-4 w-4" /> Imprimer (A4)
               </Button>
             </CardHeader>
@@ -291,6 +287,7 @@ function SupplierProfilePage() {
                     <TableHead>Métal / Titre</TableHead>
                     <TableHead className="text-right">Poids</TableHead>
                     <TableHead className="text-right">Qté</TableHead>
+                    <TableHead className="text-right">Métal</TableHead>
                     <TableHead className="text-right">M.O.</TableHead>
                     <TableHead className="text-right">Coût total</TableHead>
                     <TableHead>Par</TableHead>
@@ -298,13 +295,14 @@ function SupplierProfilePage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {rows.map((r) => (
+                  {paged.map((r) => (
                     <TableRow key={r.id}>
                       <TableCell className="font-mono text-xs">{r.reference}</TableCell>
                       <TableCell className="whitespace-nowrap text-xs">{formatDateTime(r.created_at)}</TableCell>
                       <TableCell>
                         <div className="font-medium">{r.product_name}</div>
                         <div className="font-mono text-xs text-muted-foreground">{r.sku}</div>
+                        {r.origin ? <div className="text-xs text-muted-foreground">{r.origin}</div> : null}
                       </TableCell>
                       <TableCell>
                         <Badge variant="secondary">{purchaseMetalLabel(r.metal_type)}</Badge>
@@ -312,6 +310,7 @@ function SupplierProfilePage() {
                       </TableCell>
                       <TableCell className="text-right">{formatGrams(r.weight_grams)}</TableCell>
                       <TableCell className="text-right">{r.quantity}</TableCell>
+                      <TableCell className="text-right">{formatDZD(r.metal_purchase_price)}</TableCell>
                       <TableCell className="text-right">{formatDZD(r.labor_cost)}</TableCell>
                       <TableCell className="text-right font-semibold">{formatDZD(r.total_cost)}</TableCell>
                       <TableCell className="text-xs">{r.employee_name}</TableCell>
@@ -324,15 +323,32 @@ function SupplierProfilePage() {
                   ))}
                   {rows.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={10} className="py-10 text-center text-muted-foreground">
+                      <TableCell colSpan={11} className="py-10 text-center text-muted-foreground">
                         <Package className="mx-auto mb-2 h-8 w-8 opacity-40" />
-                        Aucun achat trouvé.
+                        {allRows.length === 0
+                          ? "Ce fournisseur n'a aucun historique d'achat pour le moment."
+                          : "Aucun achat ne correspond aux filtres."}
                       </TableCell>
                     </TableRow>
                   )}
                 </TableBody>
               </Table>
             </CardContent>
+            {pageCount > 1 && (
+              <div className="flex items-center justify-between border-t p-3 text-sm">
+                <span className="text-muted-foreground">
+                  Page {safePage + 1} / {pageCount}
+                </span>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" disabled={safePage === 0} onClick={() => setPage(safePage - 1)}>
+                    <ChevronLeft className="h-4 w-4" /> Précédent
+                  </Button>
+                  <Button variant="outline" size="sm" disabled={safePage >= pageCount - 1} onClick={() => setPage(safePage + 1)}>
+                    Suivant <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </Card>
         </TabsContent>
 
