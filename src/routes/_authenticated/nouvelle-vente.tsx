@@ -31,6 +31,7 @@ interface SaleProduct {
   metal_type: string;
   gold_karat: number | null;
   weight_grams: number;
+  metal_purchase_price: number | null;
 }
 
 interface CustomerOption {
@@ -63,7 +64,7 @@ function NewSalePage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("id, internal_code, name, category, metal_type, gold_karat, weight_grams")
+        .select("id, internal_code, name, category, metal_type, gold_karat, weight_grams, metal_purchase_price")
         .eq("status", "en_stock")
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -142,6 +143,10 @@ function NewSalePage() {
         product_id: selectedProduct.id,
         product_name: selectedProduct.name,
         weight_grams: Number(selectedProduct.weight_grams),
+        purchase_price_per_gram:
+          Number(selectedProduct.weight_grams) > 0 && selectedProduct.metal_purchase_price != null
+            ? Number(selectedProduct.metal_purchase_price) / Number(selectedProduct.weight_grams)
+            : null,
         total_amount: total,
         amount_paid: paid,
         payment_method: paymentMethod,

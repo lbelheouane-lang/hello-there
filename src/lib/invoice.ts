@@ -41,6 +41,8 @@ export interface InvoiceRecord {
   metal_type: string | null;
   gold_karat: number | null;
   weight_grams: number | null;
+  purchase_price_per_gram: number | null;
+  gold_value: number | null;
   quantity: number;
   unit_price: number;
   discount: number;
@@ -201,6 +203,14 @@ export function buildInvoiceHtml(inv: InvoiceRecord): string {
       <thead><tr><th>Référence</th><th>Désignation</th><th class="num">Qté</th><th class="num">Prix unitaire</th><th class="num">Total</th></tr></thead>
       <tbody>${productRows}</tbody>
     </table>` : ""}
+
+    ${inv.weight_grams != null || inv.purchase_price_per_gram != null ? `<div class="totals">
+      <table>
+        <tr><td class="lbl">Poids (grammes)</td><td class="val">${esc(formatGrams(inv.weight_grams))}</td></tr>
+        <tr><td class="lbl">Prix d'achat par gramme</td><td class="val">${esc(inv.purchase_price_per_gram != null ? `${formatDZD(inv.purchase_price_per_gram)}/g` : "—")}</td></tr>
+        <tr><td class="lbl">Valeur or calculée</td><td class="val">${esc(inv.gold_value != null ? formatDZD(inv.gold_value) : "—")}</td></tr>
+      </table>
+    </div>` : ""}
 
     <div class="totals">
       <table>
