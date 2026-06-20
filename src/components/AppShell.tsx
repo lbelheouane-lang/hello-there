@@ -14,6 +14,7 @@ import {
   FileText,
   Wallet2,
   Store,
+  Wrench,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BrandIntro } from "@/components/BrandIntro";
@@ -48,6 +49,7 @@ const NAV: readonly {
   { to: "/clients", label: "Clients", icon: Users, roles: ["admin", "employe"] },
   { to: "/paiements-en-attente", label: "Paiements en attente", icon: Wallet, roles: ["admin", "employe"] },
   { to: "/factures", label: "Ventes", icon: FileText, roles: ["admin", "employe"] },
+  { to: "/reparations", label: "Réparations", icon: Wrench, roles: ["admin", "employe"] },
   { to: "/stock", label: "Stock", icon: Package, roles: ["admin"] },
   { to: "/fournisseurs", label: "Fournisseurs", icon: Truck, roles: ["admin"] },
   { to: "/depenses", label: "Dépenses", icon: Wallet2, roles: ["admin"] },
