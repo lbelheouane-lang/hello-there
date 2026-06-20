@@ -188,8 +188,7 @@ function NewSalePage() {
             <div className="max-h-80 space-y-2 overflow-y-auto">
               {filteredProducts.map((p) => {
                 const ppg = p.metal_type === "or" ? priceForKarat(prices, p.gold_karat) : null;
-                const valueUsd = metalValue(Number(p.weight_grams), ppg);
-                const valueDzd = dzdFromEur(valueUsd);
+                const valueEur = metalValue(Number(p.weight_grams), ppg);
                 const active = p.id === productId;
                 return (
                   <button
@@ -197,7 +196,7 @@ function NewSalePage() {
                     type="button"
                     onClick={() => {
                       setProductId(p.id);
-                      if (valueDzd) setTotalAmount(String(Math.round(valueDzd)));
+                      if (valueEur) setTotalAmount(String(Math.round(valueEur * 100) / 100));
                     }}
                     className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-colors ${active ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`}
                   >
@@ -210,8 +209,8 @@ function NewSalePage() {
                       </p>
                     </div>
                     <div className="flex flex-col items-end gap-0.5">
-                      <span className="text-sm font-medium">{ppg ? formatDZD(valueDzd) : "—"}</span>
-                      {ppg ? <span className="text-xs text-muted-foreground">{formatEUR(valueUsd)}</span> : null}
+                      <span className="text-sm font-medium">{ppg ? formatDZD(valueEur) : "—"}</span>
+                      {ppg ? <span className="text-xs text-muted-foreground">≈ {formatFromEUR(valueEur, "DZD")}</span> : null}
                       {active && <Check className="h-4 w-4 text-primary" />}
                     </div>
                   </button>
