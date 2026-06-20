@@ -31,6 +31,7 @@ interface ProductRow {
   status: string;
   created_at: string;
   supplier_id: string | null;
+  is_demo: boolean;
   suppliers: { name: string } | null;
 }
 
