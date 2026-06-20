@@ -1,5 +1,5 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import {
   Gem,
   LayoutDashboard,
@@ -21,6 +21,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { BrandIntro } from "@/components/BrandIntro";
 import { useAuth, type AppRole } from "@/hooks/use-auth";
+import type { PermissionKey } from "@/lib/permissions";
 import { useStoreSettings } from "@/lib/store-settings";
 import { RequireRole } from "@/components/RequireRole";
 import { Button } from "@/components/ui/button";
@@ -45,26 +46,39 @@ const NAV: readonly {
   label: string;
   icon: typeof Gem;
   roles: readonly AppRole[];
+  perm?: PermissionKey;
 }[] = [
-  { to: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard, roles: ["admin"] },
-  { to: "/nouvelle-vente", label: "Nouvelle vente", icon: ShoppingCart, roles: ["admin", "employe"] },
-  { to: "/clients", label: "Clients", icon: Users, roles: ["admin", "employe"] },
-  { to: "/paiements-en-attente", label: "Paiements en attente", icon: Wallet, roles: ["admin", "employe"] },
-  { to: "/factures", label: "Ventes", icon: FileText, roles: ["admin", "employe"] },
+  { to: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard, roles: ["admin"], perm: "dashboard" },
+  { to: "/nouvelle-vente", label: "Nouvelle vente", icon: ShoppingCart, roles: ["admin", "employe"], perm: "sales" },
+  { to: "/clients", label: "Clients", icon: Users, roles: ["admin", "employe"], perm: "customers" },
+  { to: "/paiements-en-attente", label: "Paiements en attente", icon: Wallet, roles: ["admin", "employe"], perm: "sales" },
+  { to: "/factures", label: "Ventes", icon: FileText, roles: ["admin", "employe"], perm: "invoices" },
   { to: "/reparations", label: "Réparations", icon: Wrench, roles: ["admin", "employe"] },
-  { to: "/stock", label: "Stock", icon: Package, roles: ["admin"] },
-  { to: "/parures", label: "Parures", icon: Layers, roles: ["admin"] },
-  { to: "/or-casse", label: "Or Cassé", icon: Recycle, roles: ["admin"] },
-  { to: "/fournisseurs", label: "Fournisseurs", icon: Truck, roles: ["admin"] },
-  { to: "/depenses", label: "Dépenses", icon: Wallet2, roles: ["admin"] },
+  { to: "/stock", label: "Stock", icon: Package, roles: ["admin"], perm: "inventory" },
+  { to: "/parures", label: "Parures", icon: Layers, roles: ["admin"], perm: "jewelry_sets" },
+  { to: "/or-casse", label: "Or Cassé", icon: Recycle, roles: ["admin"], perm: "scrap_gold" },
+  { to: "/fournisseurs", label: "Fournisseurs", icon: Truck, roles: ["admin"], perm: "suppliers" },
+  { to: "/depenses", label: "Dépenses", icon: Wallet2, roles: ["admin"], perm: "reports" },
   { to: "/cours-or", label: "Cours de l'or", icon: Coins, roles: ["admin"] },
-  { to: "/boutique", label: "Boutique", icon: Store, roles: ["admin"] },
-  { to: "/parametres", label: "Paramètres", icon: Settings, roles: ["admin"] },
+  { to: "/boutique", label: "Boutique", icon: Store, roles: ["admin"], perm: "settings" },
+  { to: "/parametres", label: "Paramètres", icon: Settings, roles: ["admin"], perm: "settings" },
 ];
+
+/** A nav item is visible when the role allows it and (admin, no permission gate,
+ *  or the employee has been granted that permission). */
+function canAccess(
+  item: { roles: readonly AppRole[]; perm?: PermissionKey },
+  role: AppRole | null,
+  permissions: PermissionKey[],
+): boolean {
+  if (role == null || !item.roles.includes(role)) return false;
+  if (role === "admin" || !item.perm) return true;
+  return permissions.includes(item.perm);
+}
 
 function AppSidebar() {
   const navigate = useNavigate();
-  const { user, role } = useAuth();
+  const { user, role, permissions } = useAuth();
   const { data: settings } = useStoreSettings();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
@@ -98,7 +112,7 @@ function AppSidebar() {
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {NAV.filter((item) => role != null && item.roles.includes(role)).map((item) => (
+              {NAV.filter((item) => canAccess(item, role, permissions)).map((item) => (
                 <SidebarMenuItem key={item.to}>
                   <SidebarMenuButton asChild isActive={pathname === item.to}>
                     <Link to={item.to}>
@@ -127,6 +141,23 @@ function AppSidebar() {
   );
 }
 
+/** Redirects employees who reach a route they lack permission for (direct URL). */
+function PermissionGuard({ children }: { children: ReactNode }) {
+  const navigate = useNavigate();
+  const { role, permissions, loading } = useAuth();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  useEffect(() => {
+    if (loading || role == null || role === "admin") return;
+    const item = NAV.find((n) => n.to === pathname);
+    if (item && !canAccess(item, role, permissions)) {
+      navigate({ to: "/nouvelle-vente", replace: true });
+    }
+  }, [loading, role, permissions, pathname, navigate]);
+
+  return <>{children}</>;
+}
+
 export function AppShell({
   title,
   children,
@@ -149,7 +180,7 @@ export function AppShell({
           className="flex-1 p-4 md:p-6"
           style={{ animation: "brand-content-in 0.6s ease-out both" }}
         >
-          {children}
+          <PermissionGuard>{children}</PermissionGuard>
         </main>
       </SidebarInset>
     </SidebarProvider>

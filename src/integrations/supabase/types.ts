@@ -77,6 +77,92 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_credentials: {
+        Row: {
+          backing_email: string
+          backing_password: string
+          employee_id: string
+          pin_hash: string
+          pin_salt: string
+          updated_at: string
+        }
+        Insert: {
+          backing_email: string
+          backing_password: string
+          employee_id: string
+          pin_hash: string
+          pin_salt: string
+          updated_at?: string
+        }
+        Update: {
+          backing_email?: string
+          backing_password?: string
+          employee_id?: string
+          pin_hash?: string
+          pin_salt?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_credentials_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: true
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employees: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          first_name: string
+          id: string
+          is_active: boolean
+          is_bootstrap: boolean
+          last_login_at: string | null
+          last_name: string
+          permissions: string[]
+          phone: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+          user_id: string | null
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          first_name?: string
+          id?: string
+          is_active?: boolean
+          is_bootstrap?: boolean
+          last_login_at?: string | null
+          last_name?: string
+          permissions?: string[]
+          phone?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id?: string | null
+          username: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          first_name?: string
+          id?: string
+          is_active?: boolean
+          is_bootstrap?: boolean
+          last_login_at?: string | null
+          last_name?: string
+          permissions?: string[]
+          phone?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id?: string | null
+          username?: string
+        }
+        Relationships: []
+      }
       expense_categories: {
         Row: {
           created_at: string
@@ -517,6 +603,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pin_audit_log: {
+        Row: {
+          action: string
+          actor_name: string | null
+          actor_user_id: string | null
+          created_at: string
+          id: string
+          target_name: string | null
+          target_user_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_name?: string | null
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          target_name?: string | null
+          target_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_name?: string | null
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          target_name?: string | null
+          target_user_id?: string | null
+        }
+        Relationships: []
       }
       product_categories: {
         Row: {

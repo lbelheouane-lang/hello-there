@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useCategories, useSubcategories } from "@/hooks/use-categories";
 import {
@@ -17,6 +18,9 @@ import {
 import {
   getDemoStatus, generateDemoData, deleteDemoData,
 } from "@/lib/demo-data.functions";
+import {
+  EmployeesCard, ChangeOwnPinCard, PinAuditCard,
+} from "@/components/settings/employee-management";
 
 export const Route = createFileRoute("/_authenticated/parametres")({
   component: SettingsPage,
@@ -129,7 +133,29 @@ function SettingsPage() {
 
   return (
     <AppShell title="Paramètres" allow={["admin"]}>
-      <div className="mx-auto max-w-2xl space-y-6">
+      <div className="mx-auto max-w-5xl">
+        <Tabs defaultValue="employes" className="space-y-6">
+          <TabsList className="flex flex-wrap h-auto">
+            <TabsTrigger value="general">Catégories</TabsTrigger>
+            <TabsTrigger value="employes">Employés</TabsTrigger>
+            <TabsTrigger value="pin">Gestion PIN</TabsTrigger>
+            <TabsTrigger value="logs">Journal système</TabsTrigger>
+            <TabsTrigger value="backup">Sauvegarde & démo</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="employes" className="space-y-6">
+            <EmployeesCard />
+          </TabsContent>
+
+          <TabsContent value="pin" className="space-y-6">
+            <ChangeOwnPinCard />
+          </TabsContent>
+
+          <TabsContent value="logs" className="space-y-6">
+            <PinAuditCard />
+          </TabsContent>
+
+          <TabsContent value="general" className="space-y-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -215,9 +241,9 @@ function SettingsPage() {
             )}
           </CardContent>
         </Card>
+          </TabsContent>
 
-
-
+          <TabsContent value="backup" className="space-y-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -263,6 +289,8 @@ function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </AppShell>
   );

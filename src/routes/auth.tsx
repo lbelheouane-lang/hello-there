@@ -101,17 +101,20 @@ function AuthPage() {
   );
 
   const pushDigit = (d: string) => {
-    if (busy || pin.length >= 4) return;
+    if (busy || pin.length >= 8) return;
     setError(false);
-    const next = pin + d;
-    setPin(next);
-    if (next.length === 4) submitPin(next);
+    setPin((p) => p + d);
   };
 
   const popDigit = () => {
     if (busy) return;
     setError(false);
     setPin((p) => p.slice(0, -1));
+  };
+
+  const validate = () => {
+    if (busy || pin.length < 4) return;
+    submitPin(pin);
   };
 
   return (
@@ -132,6 +135,7 @@ function AuthPage() {
           busy={busy}
           onDigit={pushDigit}
           onBackspace={popDigit}
+          onValidate={validate}
           onBack={() => setPhase("profiles")}
         />
       )}
@@ -266,6 +270,7 @@ function PinEntry({
   busy,
   onDigit,
   onBackspace,
+  onValidate,
   onBack,
 }: {
   profile: { key: Profile; label: string; icon: typeof Shield };
@@ -274,6 +279,7 @@ function PinEntry({
   busy: boolean;
   onDigit: (d: string) => void;
   onBackspace: () => void;
+  onValidate: () => void;
   onBack: () => void;
 }) {
   // Hardware keyboard support
@@ -281,10 +287,13 @@ function PinEntry({
     const handler = (e: KeyboardEvent) => {
       if (e.key >= "0" && e.key <= "9") onDigit(e.key);
       else if (e.key === "Backspace") onBackspace();
+      else if (e.key === "Enter") onValidate();
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [onDigit, onBackspace]);
+  }, [onDigit, onBackspace, onValidate]);
+
+  const dots = Math.max(pin.length, 4);
 
   return (
     <div
@@ -304,11 +313,11 @@ function PinEntry({
           <profile.icon className="h-7 w-7" />
         </div>
         <h2 className="mt-4 font-serif text-xl font-semibold">{profile.label}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Saisissez votre code PIN</p>
+        <p className="mt-1 text-sm text-muted-foreground">Saisissez votre code PIN (4 à 8 chiffres)</p>
       </div>
 
-      <div className={`mt-7 flex justify-center gap-3 ${error ? "animate-auth-shake" : ""}`}>
-        {Array.from({ length: 4 }).map((_, i) => {
+      <div className={`mt-7 flex flex-wrap justify-center gap-3 ${error ? "animate-auth-shake" : ""}`}>
+        {Array.from({ length: dots }).map((_, i) => {
           const filled = i < pin.length;
           return (
             <span
@@ -335,12 +344,14 @@ function PinEntry({
             {d}
           </PinKey>
         ))}
-        <div />
+        <PinKey disabled={busy} onClick={onBackspace} aria-label="Effacer">
+          <Delete className="h-5 w-5" />
+        </PinKey>
         <PinKey disabled={busy} onClick={() => onDigit("0")}>
           0
         </PinKey>
-        <PinKey disabled={busy} onClick={onBackspace} aria-label="Effacer">
-          <Delete className="h-5 w-5" />
+        <PinKey disabled={busy || pin.length < 4} onClick={onValidate} aria-label="Valider">
+          <Check className="h-5 w-5" />
         </PinKey>
       </div>
 
