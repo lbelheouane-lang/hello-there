@@ -190,6 +190,8 @@ function StockPage() {
       if (metalFilter !== "all" && p.metal_type !== metalFilter) return false;
       if (karatFilter !== "all" && String(p.gold_karat ?? "") !== karatFilter) return false;
       if (supplierFilter !== "all" && p.supplier_id !== supplierFilter) return false;
+      if (originFilter !== "all" && (p.metal_origin ?? "") !== originFilter) return false;
+      if (countryFilter !== "all" && (p.country_of_origin ?? "") !== countryFilter) return false;
       if (min != null && Number(p.weight_grams) < min) return false;
       if (max != null && Number(p.weight_grams) > max) return false;
       if (q && !(
