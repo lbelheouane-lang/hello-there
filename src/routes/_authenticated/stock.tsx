@@ -154,6 +154,7 @@ function StockPage() {
         metal_purchase_price: Number(form.metal_purchase_price) || 0,
         labor_cost: Number(form.labor_cost) || 0,
         supplier_id: form.supplier_id || null,
+        origin: form.origin.trim() || null,
         status: form.status,
       };
       if (editing) {
