@@ -302,11 +302,32 @@ function StockPage() {
         </Dialog>
       </div>
 
+      {selected.size > 0 && (
+        <div className="mb-3 flex flex-wrap items-center gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-2.5">
+          <span className="text-sm font-medium">{selected.size} produit(s) sélectionné(s)</span>
+          <Button size="sm" onClick={batchPrint}>
+            <Printer className="mr-2 h-4 w-4" /> Imprimer les étiquettes en lot
+          </Button>
+          <Button size="sm" variant="ghost" onClick={() => setSelected(new Set())}>
+            Désélectionner
+          </Button>
+        </div>
+      )}
+
       <Card>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-10">
+                  <Checkbox
+                    checked={filtered.length > 0 && filtered.every((p) => selected.has(p.id))}
+                    onCheckedChange={(c) =>
+                      setSelected(c ? new Set(filtered.map((p) => p.id)) : new Set())
+                    }
+                    aria-label="Tout sélectionner"
+                  />
+                </TableHead>
                 <TableHead>Code</TableHead>
                 <TableHead>Bijou</TableHead>
                 <TableHead>Titre</TableHead>
@@ -321,7 +342,14 @@ function StockPage() {
                 const ppg = p.metal_type === "or" ? priceForKarat(prices, p.gold_karat) : null;
                 const value = metalValue(Number(p.weight_grams), ppg);
                 return (
-                  <TableRow key={p.id}>
+                  <TableRow key={p.id} data-state={selected.has(p.id) ? "selected" : undefined}>
+                    <TableCell>
+                      <Checkbox
+                        checked={selected.has(p.id)}
+                        onCheckedChange={() => toggleSelect(p.id)}
+                        aria-label={`Sélectionner ${p.name}`}
+                      />
+                    </TableCell>
                     <TableCell className="font-mono text-xs">{p.internal_code}</TableCell>
                     <TableCell>
                       <div className="font-medium">{p.name}</div>
@@ -341,8 +369,13 @@ function StockPage() {
                     </TableCell>
                     <TableCell><Badge variant={statusVariant(p.status)}>{statusLabel(p.status)}</Badge></TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" title="Étiquette" onClick={() => setLabelProduct(p)}>
+                      <Button variant="ghost" size="icon" title="Étiquette & QR" onClick={() => setLabelProducts([toLabel(p)])}>
                         <Tag className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" title="Ouvrir la fiche" asChild>
+                        <Link to="/produit/$id" params={{ id: p.id }}>
+                          <ExternalLink className="h-4 w-4" />
+                        </Link>
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => openEdit(p)}>
                         <Pencil className="h-4 w-4" />
@@ -356,7 +389,7 @@ function StockPage() {
               })}
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="py-10 text-center text-muted-foreground">
+                  <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
                     <Package className="mx-auto mb-2 h-8 w-8 opacity-40" />
                     Aucun bijou en stock.
                   </TableCell>
@@ -367,44 +400,8 @@ function StockPage() {
         </CardContent>
       </Card>
 
-      <LabelDialog product={labelProduct} onClose={() => setLabelProduct(null)} />
+      <LabelDialog products={labelProducts} onClose={() => setLabelProducts(null)} isAdmin />
     </AppShell>
   );
 }
 
-function LabelDialog({ product, onClose }: { product: Product | null; onClose: () => void }) {
-  function print() {
-    window.print();
-  }
-  return (
-    <Dialog open={!!product} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Étiquette produit</DialogTitle>
-        </DialogHeader>
-        {product && (
-          <div id="label-print" className="mx-auto w-64 rounded-lg border-2 border-dashed border-border p-4 text-center">
-            <p className="font-serif text-lg font-semibold">{product.name}</p>
-            <p className="text-sm text-muted-foreground">
-              {product.gold_karat ? `Or ${product.gold_karat}K` : METAL_TYPES.find((m) => m.value === product.metal_type)?.label}
-              {" · "}{formatGrams(Number(product.weight_grams))}
-            </p>
-            <div className="my-3 flex justify-center">
-              <img
-                alt={`QR ${product.internal_code}`}
-                className="h-28 w-28"
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(product.internal_code)}`}
-              />
-            </div>
-            <p className="font-mono text-sm font-semibold tracking-wider">{product.internal_code}</p>
-          </div>
-        )}
-        <DialogFooter>
-          <Button onClick={print}>
-            <Printer className="mr-2 h-4 w-4" /> Imprimer
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
