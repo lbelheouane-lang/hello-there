@@ -202,17 +202,27 @@ function StockPage() {
       )) return false;
       return true;
     });
-  }, [products, search, catFilter, subFilter, metalFilter, karatFilter, supplierFilter, minWeight, maxWeight]);
+  }, [products, search, catFilter, subFilter, metalFilter, karatFilter, supplierFilter, originFilter, countryFilter, minWeight, maxWeight]);
+
+  // Distinct countries of origin present in the inventory
+  const countries = useMemo(() => {
+    const s = new Set<string>();
+    (products ?? []).forEach((p) => { if (p.country_of_origin) s.add(p.country_of_origin); });
+    return Array.from(s).sort();
+  }, [products]);
 
   const activeFilters =
     (catFilter ? 1 : 0) + (subFilter ? 1 : 0) +
     (metalFilter !== "all" ? 1 : 0) + (karatFilter !== "all" ? 1 : 0) +
-    (supplierFilter !== "all" ? 1 : 0) + (minWeight ? 1 : 0) + (maxWeight ? 1 : 0);
+    (supplierFilter !== "all" ? 1 : 0) + (originFilter !== "all" ? 1 : 0) +
+    (countryFilter !== "all" ? 1 : 0) + (minWeight ? 1 : 0) + (maxWeight ? 1 : 0);
 
   function clearFilters() {
     setCatFilter(null); setSubFilter(null); setMetalFilter("all");
-    setKaratFilter("all"); setSupplierFilter("all"); setMinWeight(""); setMaxWeight("");
+    setKaratFilter("all"); setSupplierFilter("all"); setOriginFilter("all");
+    setCountryFilter("all"); setMinWeight(""); setMaxWeight("");
   }
+
 
 
 
