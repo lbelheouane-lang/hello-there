@@ -1,12 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Database, Sparkles, RotateCcw, Trash2, Info } from "lucide-react";
+import { Database, Sparkles, RotateCcw, Trash2, Info, Tags, Plus } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { useCategories } from "@/hooks/use-categories";
 import {
   getDemoStatus, generateDemoData, deleteDemoData,
 } from "@/lib/demo-data.functions";
