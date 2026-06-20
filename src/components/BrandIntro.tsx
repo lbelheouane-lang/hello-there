@@ -12,6 +12,10 @@ const SESSION_KEY = "maisondor:intro-shown";
  */
 export function BrandIntro() {
   const [show, setShow] = useState(false);
+  const { data: settings } = useStoreSettings();
+  const storeName = settings?.store_name || "Maison d'Or";
+  const storeTag = settings?.slogan || settings?.tagline || "Gestion de bijouterie";
+
 
   useEffect(() => {
     if (typeof window === "undefined") return;
