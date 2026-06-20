@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { formatDZD, formatRelativeTime, KARATS } from "@/lib/format";
+import { formatRelativeTime, KARATS } from "@/lib/format";
+import { formatUSD, formatFromUSD } from "@/lib/currency";
 import { useLatestGoldPrices, useGoldPriceChange } from "@/hooks/use-gold-prices";
 import { refreshGoldPrices } from "@/lib/gold-prices.functions";
 
