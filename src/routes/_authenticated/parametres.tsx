@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useCategories, useSubcategories } from "@/hooks/use-categories";
 import {
@@ -17,6 +18,9 @@ import {
 import {
   getDemoStatus, generateDemoData, deleteDemoData,
 } from "@/lib/demo-data.functions";
+import {
+  EmployeesCard, ChangeOwnPinCard, PinAuditCard,
+} from "@/components/settings/employee-management";
 
 export const Route = createFileRoute("/_authenticated/parametres")({
   component: SettingsPage,
