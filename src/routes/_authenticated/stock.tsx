@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Package, Pencil, Trash2, Tag, Search, Printer } from "lucide-react";
+import { Plus, Package, Pencil, Trash2, Tag, Search, Printer, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
@@ -25,6 +26,7 @@ import {
 } from "@/lib/format";
 import { formatUSD, formatFromUSD } from "@/lib/currency";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
+import { LabelDialog, type LabelProduct } from "@/components/LabelDialog";
 
 export const Route = createFileRoute("/_authenticated/stock")({
   component: StockPage,
@@ -41,13 +43,15 @@ interface Product {
   metal_purchase_price: number;
   labor_cost: number;
   supplier_id: string | null;
+  origin: string | null;
+  created_at: string;
   status: string;
 }
 
 const empty: Record<string, string> = {
   name: "", category: CATEGORIES[0], metal_type: "or", gold_karat: "21",
   weight_grams: "", metal_purchase_price: "", labor_cost: "", supplier_id: "",
-  status: "en_stock",
+  origin: "", status: "en_stock",
 };
 
 function statusVariant(s: string): "default" | "secondary" | "destructive" {
@@ -63,7 +67,8 @@ function StockPage() {
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState(empty);
   const [search, setSearch] = useState("");
-  const [labelProduct, setLabelProduct] = useState<Product | null>(null);
+  const [labelProducts, setLabelProducts] = useState<LabelProduct[] | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const { data: products } = useQuery({
     queryKey: ["products"],
@@ -82,6 +87,34 @@ function StockPage() {
       return data as { id: string; name: string }[];
     },
   });
+
+  const supplierName = useMemo(() => {
+    const m = new Map<string, string>();
+    suppliers?.forEach((s) => m.set(s.id, s.name));
+    return (id: string | null) => (id ? m.get(id) ?? null : null);
+  }, [suppliers]);
+
+  function toLabel(p: Product): LabelProduct {
+    return { ...p, supplier_name: supplierName(p.supplier_id) };
+  }
+
+  function toggleSelect(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
+  function batchPrint() {
+    const items = (products ?? []).filter((p) => selected.has(p.id)).map(toLabel);
+    if (items.length === 0) {
+      toast.error("Sélectionnez au moins un produit.");
+      return;
+    }
+    setLabelProducts(items);
+  }
+
 
   const filtered = useMemo(() => {
     if (!products) return [];
@@ -103,7 +136,8 @@ function StockPage() {
       name: p.name, category: p.category, metal_type: p.metal_type,
       gold_karat: p.gold_karat ? String(p.gold_karat) : "",
       weight_grams: String(p.weight_grams), metal_purchase_price: String(p.metal_purchase_price),
-      labor_cost: String(p.labor_cost), supplier_id: p.supplier_id ?? "", status: p.status,
+      labor_cost: String(p.labor_cost), supplier_id: p.supplier_id ?? "",
+      origin: p.origin ?? "", status: p.status,
     });
     setOpen(true);
   }
@@ -120,6 +154,7 @@ function StockPage() {
         metal_purchase_price: Number(form.metal_purchase_price) || 0,
         labor_cost: Number(form.labor_cost) || 0,
         supplier_id: form.supplier_id || null,
+        origin: form.origin.trim() || null,
         status: form.status,
       };
       if (editing) {
@@ -251,6 +286,14 @@ function StockPage() {
                   </Select>
                 </div>
               </div>
+              <div className="space-y-2">
+                <Label>Origine du produit</Label>
+                <Input
+                  placeholder="Ex. Italie, Dubaï, fabrication locale…"
+                  value={form.origin}
+                  onChange={(e) => setForm({ ...form, origin: e.target.value })}
+                />
+              </div>
             </div>
             <DialogFooter>
               <Button onClick={() => save.mutate()} disabled={save.isPending}>Enregistrer</Button>
@@ -259,11 +302,32 @@ function StockPage() {
         </Dialog>
       </div>
 
+      {selected.size > 0 && (
+        <div className="mb-3 flex flex-wrap items-center gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-2.5">
+          <span className="text-sm font-medium">{selected.size} produit(s) sélectionné(s)</span>
+          <Button size="sm" onClick={batchPrint}>
+            <Printer className="mr-2 h-4 w-4" /> Imprimer les étiquettes en lot
+          </Button>
+          <Button size="sm" variant="ghost" onClick={() => setSelected(new Set())}>
+            Désélectionner
+          </Button>
+        </div>
+      )}
+
       <Card>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-10">
+                  <Checkbox
+                    checked={filtered.length > 0 && filtered.every((p) => selected.has(p.id))}
+                    onCheckedChange={(c) =>
+                      setSelected(c ? new Set(filtered.map((p) => p.id)) : new Set())
+                    }
+                    aria-label="Tout sélectionner"
+                  />
+                </TableHead>
                 <TableHead>Code</TableHead>
                 <TableHead>Bijou</TableHead>
                 <TableHead>Titre</TableHead>
@@ -278,7 +342,14 @@ function StockPage() {
                 const ppg = p.metal_type === "or" ? priceForKarat(prices, p.gold_karat) : null;
                 const value = metalValue(Number(p.weight_grams), ppg);
                 return (
-                  <TableRow key={p.id}>
+                  <TableRow key={p.id} data-state={selected.has(p.id) ? "selected" : undefined}>
+                    <TableCell>
+                      <Checkbox
+                        checked={selected.has(p.id)}
+                        onCheckedChange={() => toggleSelect(p.id)}
+                        aria-label={`Sélectionner ${p.name}`}
+                      />
+                    </TableCell>
                     <TableCell className="font-mono text-xs">{p.internal_code}</TableCell>
                     <TableCell>
                       <div className="font-medium">{p.name}</div>
@@ -298,8 +369,13 @@ function StockPage() {
                     </TableCell>
                     <TableCell><Badge variant={statusVariant(p.status)}>{statusLabel(p.status)}</Badge></TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" title="Étiquette" onClick={() => setLabelProduct(p)}>
+                      <Button variant="ghost" size="icon" title="Étiquette & QR" onClick={() => setLabelProducts([toLabel(p)])}>
                         <Tag className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" title="Ouvrir la fiche" asChild>
+                        <Link to="/produit/$id" params={{ id: p.id }}>
+                          <ExternalLink className="h-4 w-4" />
+                        </Link>
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => openEdit(p)}>
                         <Pencil className="h-4 w-4" />
@@ -313,7 +389,7 @@ function StockPage() {
               })}
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="py-10 text-center text-muted-foreground">
+                  <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
                     <Package className="mx-auto mb-2 h-8 w-8 opacity-40" />
                     Aucun bijou en stock.
                   </TableCell>
@@ -324,44 +400,8 @@ function StockPage() {
         </CardContent>
       </Card>
 
-      <LabelDialog product={labelProduct} onClose={() => setLabelProduct(null)} />
+      <LabelDialog products={labelProducts} onClose={() => setLabelProducts(null)} isAdmin />
     </AppShell>
   );
 }
 
-function LabelDialog({ product, onClose }: { product: Product | null; onClose: () => void }) {
-  function print() {
-    window.print();
-  }
-  return (
-    <Dialog open={!!product} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Étiquette produit</DialogTitle>
-        </DialogHeader>
-        {product && (
-          <div id="label-print" className="mx-auto w-64 rounded-lg border-2 border-dashed border-border p-4 text-center">
-            <p className="font-serif text-lg font-semibold">{product.name}</p>
-            <p className="text-sm text-muted-foreground">
-              {product.gold_karat ? `Or ${product.gold_karat}K` : METAL_TYPES.find((m) => m.value === product.metal_type)?.label}
-              {" · "}{formatGrams(Number(product.weight_grams))}
-            </p>
-            <div className="my-3 flex justify-center">
-              <img
-                alt={`QR ${product.internal_code}`}
-                className="h-28 w-28"
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(product.internal_code)}`}
-              />
-            </div>
-            <p className="font-mono text-sm font-semibold tracking-wider">{product.internal_code}</p>
-          </div>
-        )}
-        <DialogFooter>
-          <Button onClick={print}>
-            <Printer className="mr-2 h-4 w-4" /> Imprimer
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
