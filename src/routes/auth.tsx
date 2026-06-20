@@ -209,19 +209,23 @@ function Intro() {
         className="flex h-20 w-20 items-center justify-center rounded-3xl bg-primary text-primary-foreground shadow-2xl"
         style={{ animation: "brand-logo-reveal 1.1s cubic-bezier(0.22,1,0.36,1) both" }}
       >
-        <Gem className="h-10 w-10" />
+        {settings?.logo_url ? (
+          <img src={settings.logo_url} alt={storeName} className="h-14 w-14 object-contain" />
+        ) : (
+          <Gem className="h-10 w-10" />
+        )}
       </div>
       <h1
         className="mt-6 bg-gradient-to-r from-foreground via-primary to-foreground bg-[length:200%_100%] bg-clip-text font-serif text-4xl font-semibold text-transparent"
         style={{ animation: "brand-text-rise 1s ease-out 0.3s both, brand-shimmer 2.5s linear 0.3s infinite" }}
       >
-        Maison d'Or
+        {storeName}
       </h1>
       <p
         className="mt-2 text-sm tracking-wide text-muted-foreground"
         style={{ animation: "auth-rise 0.8s ease-out 0.7s both" }}
       >
-        Gestion de bijouterie d'exception
+        {storeTag}
       </p>
     </div>
   );
