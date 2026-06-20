@@ -13,7 +13,8 @@ import { Label } from "@/components/ui/label";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { KARATS, formatDZD, formatDate } from "@/lib/format";
+import { KARATS, formatDate } from "@/lib/format";
+import { formatUSD, formatFromUSD, formatCurrency } from "@/lib/currency";
 import { useLatestGoldPrices, type GoldPrice } from "@/hooks/use-gold-prices";
 
 export const Route = createFileRoute("/_authenticated/cours-or")({
