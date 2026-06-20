@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   Plus, Search, Pencil, Trash2, Recycle, Scale, Coins, Wallet, X, History,
-  Package, Layers,
+  Package, Layers, FileText,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
@@ -29,8 +29,21 @@ import {
 import { formatDZD, formatGrams, formatDate, formatDateTime } from "@/lib/format";
 import {
   SCRAP_KARATS, SCRAP_STATUSES, scrapStatusDef, scrapStatusLabel,
-  scrapEventLabel, SCRAP_EVENT_ICON,
+  scrapEventLabel, SCRAP_EVENT_ICON, printScrapInvoice,
 } from "@/lib/scrap-gold";
+
+function invoiceFromScrap(s: Scrap) {
+  return {
+    reference: s.reference,
+    purchasedAt: s.purchased_at,
+    customerName: s.customer_name,
+    weightGrams: Number(s.weight_grams),
+    goldKarat: s.gold_karat,
+    pricePerGram: Number(s.price_per_gram),
+    totalAmount: Number(s.total_amount),
+    notes: s.notes,
+  };
+}
 
 export const Route = createFileRoute("/_authenticated/or-casse")({
   component: ScrapGoldPage,
@@ -359,6 +372,7 @@ function ScrapGoldPage() {
                         </td>
                         <td className="px-3 py-2">
                           <div className="flex justify-end gap-1">
+                            <Button size="icon" variant="ghost" title="Bon d'achat (imprimer / PDF)" onClick={() => printScrapInvoice(invoiceFromScrap(s))}><FileText className="h-4 w-4" /></Button>
                             <Button size="icon" variant="ghost" title="Détails & historique" onClick={() => setDetail(s)}><History className="h-4 w-4" /></Button>
                             <Button size="icon" variant="ghost" title="Modifier" onClick={() => openEdit(s)}><Pencil className="h-4 w-4" /></Button>
                             <Button size="icon" variant="ghost" title="Supprimer" onClick={() => setDeleteTarget(s)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
@@ -541,6 +555,7 @@ function ScrapDetailDialog({ scrap, onClose, onEdit }: { scrap: Scrap | null; on
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose}><X className="mr-2 h-4 w-4" /> Fermer</Button>
+          <Button variant="outline" onClick={() => printScrapInvoice(invoiceFromScrap(scrap))}><FileText className="mr-2 h-4 w-4" /> Bon d'achat</Button>
           <Button onClick={() => onEdit(scrap)}><Pencil className="mr-2 h-4 w-4" /> Modifier</Button>
         </DialogFooter>
       </DialogContent>
