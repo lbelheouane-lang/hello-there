@@ -10,6 +10,7 @@ import {
   ShoppingCart,
   Users,
   Settings,
+  Wallet,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BrandIntro } from "@/components/BrandIntro";
@@ -41,6 +42,7 @@ const NAV: readonly {
   { to: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard, roles: ["admin"] },
   { to: "/nouvelle-vente", label: "Nouvelle vente", icon: ShoppingCart, roles: ["admin", "employe"] },
   { to: "/clients", label: "Clients", icon: Users, roles: ["admin", "employe"] },
+  { to: "/paiements-en-attente", label: "Paiements en attente", icon: Wallet, roles: ["admin", "employe"] },
   { to: "/stock", label: "Stock", icon: Package, roles: ["admin"] },
   { to: "/fournisseurs", label: "Fournisseurs", icon: Truck, roles: ["admin"] },
   { to: "/cours-or", label: "Cours de l'or", icon: Coins, roles: ["admin"] },
