@@ -289,6 +289,8 @@ function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </AppShell>
   );
