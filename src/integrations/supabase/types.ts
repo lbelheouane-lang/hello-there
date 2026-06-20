@@ -46,6 +46,7 @@ export type Database = {
           email: string | null
           full_name: string
           id: string
+          is_demo: boolean
           notes: string | null
           phone: string | null
           updated_at: string
@@ -57,6 +58,7 @@ export type Database = {
           email?: string | null
           full_name: string
           id?: string
+          is_demo?: boolean
           notes?: string | null
           phone?: string | null
           updated_at?: string
@@ -68,6 +70,7 @@ export type Database = {
           email?: string | null
           full_name?: string
           id?: string
+          is_demo?: boolean
           notes?: string | null
           phone?: string | null
           updated_at?: string
@@ -80,6 +83,7 @@ export type Database = {
           currency: string
           fetched_at: string
           id: string
+          is_demo: boolean
           karat: number
           price_date: string
           price_per_gram: number
@@ -91,6 +95,7 @@ export type Database = {
           currency?: string
           fetched_at?: string
           id?: string
+          is_demo?: boolean
           karat: number
           price_date?: string
           price_per_gram: number
@@ -102,6 +107,7 @@ export type Database = {
           currency?: string
           fetched_at?: string
           id?: string
+          is_demo?: boolean
           karat?: number
           price_date?: string
           price_per_gram?: number
@@ -118,6 +124,7 @@ export type Database = {
           gold_karat: number | null
           id: string
           internal_code: string
+          is_demo: boolean
           labor_cost: number
           making_charge: number
           metal_purchase_price: number
@@ -138,6 +145,7 @@ export type Database = {
           gold_karat?: number | null
           id?: string
           internal_code: string
+          is_demo?: boolean
           labor_cost?: number
           making_charge?: number
           metal_purchase_price?: number
@@ -158,6 +166,7 @@ export type Database = {
           gold_karat?: number | null
           id?: string
           internal_code?: string
+          is_demo?: boolean
           labor_cost?: number
           making_charge?: number
           metal_purchase_price?: number
@@ -211,6 +220,7 @@ export type Database = {
           created_at: string
           customer_id: string | null
           id: string
+          is_demo: boolean
           notes: string | null
           payment_method: string
           product_id: string | null
@@ -226,6 +236,7 @@ export type Database = {
           created_at?: string
           customer_id?: string | null
           id?: string
+          is_demo?: boolean
           notes?: string | null
           payment_method?: string
           product_id?: string | null
@@ -241,6 +252,7 @@ export type Database = {
           created_at?: string
           customer_id?: string | null
           id?: string
+          is_demo?: boolean
           notes?: string | null
           payment_method?: string
           product_id?: string | null
@@ -310,6 +322,7 @@ export type Database = {
           created_by: string | null
           email: string | null
           id: string
+          is_demo: boolean
           name: string
           notes: string | null
           phone: string | null
@@ -321,6 +334,7 @@ export type Database = {
           created_by?: string | null
           email?: string | null
           id?: string
+          is_demo?: boolean
           name: string
           notes?: string | null
           phone?: string | null
@@ -332,6 +346,7 @@ export type Database = {
           created_by?: string | null
           email?: string | null
           id?: string
+          is_demo?: boolean
           name?: string
           notes?: string | null
           phone?: string | null
@@ -362,6 +377,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_demo_data: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -369,6 +385,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      seed_demo_data: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "employe"
