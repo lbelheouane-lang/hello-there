@@ -1,5 +1,6 @@
 import { formatDZD, formatDateTime, formatDate, paymentLabel } from "@/lib/format";
-import { STORE_INFO } from "@/lib/invoice";
+import { getStoreInfo } from "@/lib/invoice";
+
 
 export interface ExpenseRow {
   id: string;
