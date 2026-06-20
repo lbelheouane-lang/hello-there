@@ -97,7 +97,7 @@ function DashboardPage() {
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Coins className="h-5 w-5 text-primary" /> Cours de l'or au gramme (USD)
+              <Coins className="h-5 w-5 text-primary" /> Cours de l'or au gramme (EUR)
             </CardTitle>
           </CardHeader>
           <CardContent>
