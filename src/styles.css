@@ -267,11 +267,14 @@
     margin: 0 !important;
     display: flex;
     flex-wrap: wrap;
-    gap: 4mm;
+    gap: 1mm;
   }
   .jewel-label {
     break-inside: avoid;
     page-break-inside: avoid;
     box-shadow: none !important;
+    border-color: #000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }
