@@ -49,6 +49,13 @@ export const listEmployees = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<EmployeeRow[]> => {
     await assertAdmin(context);
+    // Ensure the two default accounts exist so they always appear in the list.
+    try {
+      const { ensureBootstrapAccounts } = await import("./pin-auth.server");
+      await ensureBootstrapAccounts();
+    } catch {
+      // non-fatal
+    }
     const { data, error } = await context.supabase
       .from("employees")
       .select(
