@@ -115,7 +115,7 @@ async function lastKnownOunce(): Promise<SpotPrice | null> {
   if (!row?.price_per_ounce) return null;
   return {
     pricePerOunce: Number(row.price_per_ounce),
-    currency: row.currency ?? "DZD",
+    currency: row.currency ?? "USD",
     source: `${row.source ?? "inconnu"} (repli)`,
   };
 }
