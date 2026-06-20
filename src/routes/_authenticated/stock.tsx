@@ -28,8 +28,8 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  KARATS, CATEGORIES, METAL_TYPES, PRODUCT_STATUSES,
-  formatGrams, statusLabel, metalValue,
+  KARATS, CATEGORIES, METAL_TYPES, PRODUCT_STATUSES, METAL_ORIGINS, ORIGIN_COUNTRIES,
+  formatGrams, statusLabel, metalValue, metalOriginLabel,
 } from "@/lib/format";
 import { formatFromEUR } from "@/lib/currency";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
