@@ -21,8 +21,9 @@ import {
 } from "@/components/ui/table";
 import {
   KARATS, CATEGORIES, METAL_TYPES, PRODUCT_STATUSES,
-  formatDZD, formatGrams, statusLabel, metalValue,
+  formatGrams, statusLabel, metalValue,
 } from "@/lib/format";
+import { formatUSD, formatFromUSD } from "@/lib/currency";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
 
 export const Route = createFileRoute("/_authenticated/stock")({
