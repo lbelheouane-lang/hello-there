@@ -65,6 +65,7 @@ function statusVariant(s: string): "default" | "secondary" | "destructive" {
 
 function StockPage() {
   const qc = useQueryClient();
+  const categoryNames = useCategoryNames();
   const { data: prices } = useLatestGoldPrices();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
