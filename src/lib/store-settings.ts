@@ -52,6 +52,11 @@ export const DEFAULT_SETTINGS: StoreSettings = {
   terms: null,
   signature_left: "Signature du client",
   signature_right: "Cachet & signature du représentant",
+  eur_to_dzd: 145,
+  gold_auto_sync: true,
+  gold_manual_override: false,
+  gold_manual_price_eur: null,
+  gold_discrepancy_threshold_pct: 2,
 };
 
 export const STORE_SETTINGS_QUERY_KEY = ["store-settings"] as const;
