@@ -145,7 +145,7 @@ function GoldPricePage() {
               ))}
               {history.data?.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center text-muted-foreground">
                     Aucun cours enregistré.
                   </TableCell>
                 </TableRow>
