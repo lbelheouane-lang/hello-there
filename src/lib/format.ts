@@ -1,11 +1,13 @@
-export const KARATS = [24, 22, 21, 18] as const;
+export const KARATS = [24, 22, 21, 18, 14] as const;
 export type Karat = (typeof KARATS)[number];
 
+/** Facteur de pureté (titre) appliqué au cours de l'or pur (24K = 100%). */
 export const KARAT_PURITY: Record<number, number> = {
-  24: 0.999,
+  24: 1.0,
   22: 0.916,
   21: 0.875,
   18: 0.75,
+  14: 0.585,
 };
 
 export const PRODUCT_STATUSES = [
