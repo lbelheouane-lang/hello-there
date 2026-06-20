@@ -354,8 +354,21 @@ function StockPage() {
                     </TableCell>
                     <TableCell className="font-mono text-xs">{p.internal_code}</TableCell>
                     <TableCell>
-                      <div className="font-medium">{p.name}</div>
-                      <div className="text-xs text-muted-foreground">{p.category}</div>
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={productImage(p.category)}
+                          alt={p.name}
+                          loading="lazy"
+                          className="h-10 w-10 shrink-0 rounded-md object-cover"
+                        />
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{p.name}</span>
+                            {p.is_demo && <Badge variant="secondary" className="text-[10px]">Démo</Badge>}
+                          </div>
+                          <div className="text-xs text-muted-foreground">{p.category}</div>
+                        </div>
+                      </div>
                     </TableCell>
                     <TableCell>{p.gold_karat ? `${p.gold_karat}K` : METAL_TYPES.find((m) => m.value === p.metal_type)?.label}</TableCell>
                     <TableCell>{formatGrams(Number(p.weight_grams))}</TableCell>
