@@ -45,15 +45,27 @@ export const CATEGORIES = [
   "Autre",
 ] as const;
 
-const dzd = new Intl.NumberFormat("fr-DZ", {
-  style: "currency",
-  currency: "DZD",
-  maximumFractionDigits: 0,
-});
+import { getStoreSettings } from "@/lib/store-settings";
 
+const formatterCache = new Map<string, Intl.NumberFormat>();
+
+function moneyFormatter(currency: string): Intl.NumberFormat {
+  let f = formatterCache.get(currency);
+  if (!f) {
+    try {
+      f = new Intl.NumberFormat("fr-DZ", { style: "currency", currency, maximumFractionDigits: 0 });
+    } catch {
+      f = new Intl.NumberFormat("fr-DZ", { maximumFractionDigits: 0 });
+    }
+    formatterCache.set(currency, f);
+  }
+  return f;
+}
+
+/** Formats an amount using the store's configured currency (defaults to DZD). */
 export function formatDZD(value: number | null | undefined): string {
   if (value == null || Number.isNaN(value)) return "—";
-  return dzd.format(value);
+  return moneyFormatter(getStoreSettings().currency || "DZD").format(value);
 }
 
 export function formatGrams(value: number | null | undefined): string {

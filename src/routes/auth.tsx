@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Gem, Shield, ShoppingCart, Delete, Loader2, ArrowLeft, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { pinLogin } from "@/lib/pin-auth.functions";
+import { useStoreSettings } from "@/lib/store-settings";
 
 export const Route = createFileRoute("/auth")({
   beforeLoad: async () => {
@@ -152,6 +153,8 @@ function AmbientGlow() {
 }
 
 function Brand({ subtitle }: { subtitle?: string }) {
+  const { data: settings } = useStoreSettings();
+  const storeName = settings?.store_name || "Maison d'Or";
   return (
     <div className="flex flex-col items-center text-center">
       <div className="relative">
@@ -160,17 +163,24 @@ function Brand({ subtitle }: { subtitle?: string }) {
           style={{ animation: "auth-glow 4s ease-in-out infinite" }}
           aria-hidden
         />
-        <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-primary text-primary-foreground shadow-lg">
-          <Gem className="h-8 w-8" />
+        <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-3xl bg-primary text-primary-foreground shadow-lg">
+          {settings?.logo_url ? (
+            <img src={settings.logo_url} alt={storeName} className="h-full w-full object-contain" />
+          ) : (
+            <Gem className="h-8 w-8" />
+          )}
         </div>
       </div>
-      <h1 className="mt-5 font-serif text-3xl font-semibold tracking-tight">Maison d'Or</h1>
+      <h1 className="mt-5 font-serif text-3xl font-semibold tracking-tight">{storeName}</h1>
       {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
     </div>
   );
 }
 
 function Intro() {
+  const { data: settings } = useStoreSettings();
+  const storeName = settings?.store_name || "Maison d'Or";
+  const storeTag = settings?.slogan || settings?.tagline || "Gestion de bijouterie d'exception";
   return (
     <div className="brand-intro relative flex flex-col items-center text-center">
       {/* expanding rings */}
@@ -199,19 +209,23 @@ function Intro() {
         className="flex h-20 w-20 items-center justify-center rounded-3xl bg-primary text-primary-foreground shadow-2xl"
         style={{ animation: "brand-logo-reveal 1.1s cubic-bezier(0.22,1,0.36,1) both" }}
       >
-        <Gem className="h-10 w-10" />
+        {settings?.logo_url ? (
+          <img src={settings.logo_url} alt={storeName} className="h-14 w-14 object-contain" />
+        ) : (
+          <Gem className="h-10 w-10" />
+        )}
       </div>
       <h1
         className="mt-6 bg-gradient-to-r from-foreground via-primary to-foreground bg-[length:200%_100%] bg-clip-text font-serif text-4xl font-semibold text-transparent"
         style={{ animation: "brand-text-rise 1s ease-out 0.3s both, brand-shimmer 2.5s linear 0.3s infinite" }}
       >
-        Maison d'Or
+        {storeName}
       </h1>
       <p
         className="mt-2 text-sm tracking-wide text-muted-foreground"
         style={{ animation: "auth-rise 0.8s ease-out 0.7s both" }}
       >
-        Gestion de bijouterie d'exception
+        {storeTag}
       </p>
     </div>
   );

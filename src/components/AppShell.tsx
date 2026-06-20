@@ -13,10 +13,12 @@ import {
   Wallet,
   FileText,
   Wallet2,
+  Store,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BrandIntro } from "@/components/BrandIntro";
 import { useAuth, type AppRole } from "@/hooks/use-auth";
+import { useStoreSettings } from "@/lib/store-settings";
 import { RequireRole } from "@/components/RequireRole";
 import { Button } from "@/components/ui/button";
 import {
@@ -50,13 +52,18 @@ const NAV: readonly {
   { to: "/fournisseurs", label: "Fournisseurs", icon: Truck, roles: ["admin"] },
   { to: "/depenses", label: "Dépenses", icon: Wallet2, roles: ["admin"] },
   { to: "/cours-or", label: "Cours de l'or", icon: Coins, roles: ["admin"] },
+  { to: "/boutique", label: "Boutique", icon: Store, roles: ["admin"] },
   { to: "/parametres", label: "Paramètres", icon: Settings, roles: ["admin"] },
 ];
 
 function AppSidebar() {
   const navigate = useNavigate();
   const { user, role } = useAuth();
+  const { data: settings } = useStoreSettings();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  const storeName = settings?.store_name || "Maison d'Or";
+  const storeTag = settings?.slogan || settings?.tagline || "Gestion bijouterie";
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -67,12 +74,16 @@ function AppSidebar() {
     <Sidebar>
       <SidebarHeader>
         <div className="flex items-center gap-3 px-2 py-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground">
-            <Gem className="h-5 w-5" />
+          <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-sidebar-primary text-sidebar-primary-foreground">
+            {settings?.logo_url ? (
+              <img src={settings.logo_url} alt={storeName} className="h-full w-full object-contain" />
+            ) : (
+              <Gem className="h-5 w-5" />
+            )}
           </div>
           <div className="leading-tight">
-            <p className="font-serif text-lg font-semibold">Maison d'Or</p>
-            <p className="text-xs text-sidebar-foreground/60">Gestion bijouterie</p>
+            <p className="font-serif text-lg font-semibold">{storeName}</p>
+            <p className="text-xs text-sidebar-foreground/60">{storeTag}</p>
           </div>
         </div>
       </SidebarHeader>

@@ -22,6 +22,7 @@ import { Route as AuthenticatedDepensesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCoursOrRouteImport } from './routes/_authenticated/cours-or'
 import { Route as AuthenticatedClientsRouteImport } from './routes/_authenticated/clients'
+import { Route as AuthenticatedBoutiqueRouteImport } from './routes/_authenticated/boutique'
 import { Route as AuthenticatedProduitIdRouteImport } from './routes/_authenticated/produit.$id'
 import { Route as AuthenticatedClientsIdRouteImport } from './routes/_authenticated/clients_.$id'
 import { Route as ApiPublicHooksUpdateGoldPricesRouteImport } from './routes/api/public/hooks/update-gold-prices'
@@ -93,6 +94,11 @@ const AuthenticatedClientsRoute = AuthenticatedClientsRouteImport.update({
   path: '/clients',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedBoutiqueRoute = AuthenticatedBoutiqueRouteImport.update({
+  id: '/boutique',
+  path: '/boutique',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedProduitIdRoute = AuthenticatedProduitIdRouteImport.update({
   id: '/produit/$id',
   path: '/produit/$id',
@@ -113,6 +119,7 @@ const ApiPublicHooksUpdateGoldPricesRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/boutique': typeof AuthenticatedBoutiqueRoute
   '/clients': typeof AuthenticatedClientsRoute
   '/cours-or': typeof AuthenticatedCoursOrRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/boutique': typeof AuthenticatedBoutiqueRoute
   '/clients': typeof AuthenticatedClientsRoute
   '/cours-or': typeof AuthenticatedCoursOrRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/boutique': typeof AuthenticatedBoutiqueRoute
   '/_authenticated/clients': typeof AuthenticatedClientsRoute
   '/_authenticated/cours-or': typeof AuthenticatedCoursOrRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -168,6 +177,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/boutique'
     | '/clients'
     | '/cours-or'
     | '/dashboard'
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/boutique'
     | '/clients'
     | '/cours-or'
     | '/dashboard'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/boutique'
     | '/_authenticated/clients'
     | '/_authenticated/cours-or'
     | '/_authenticated/dashboard'
@@ -318,6 +330,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClientsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/boutique': {
+      id: '/_authenticated/boutique'
+      path: '/boutique'
+      fullPath: '/boutique'
+      preLoaderRoute: typeof AuthenticatedBoutiqueRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/produit/$id': {
       id: '/_authenticated/produit/$id'
       path: '/produit/$id'
@@ -343,6 +362,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedBoutiqueRoute: typeof AuthenticatedBoutiqueRoute
   AuthenticatedClientsRoute: typeof AuthenticatedClientsRoute
   AuthenticatedCoursOrRoute: typeof AuthenticatedCoursOrRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -358,6 +378,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedBoutiqueRoute: AuthenticatedBoutiqueRoute,
   AuthenticatedClientsRoute: AuthenticatedClientsRoute,
   AuthenticatedCoursOrRoute: AuthenticatedCoursOrRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,

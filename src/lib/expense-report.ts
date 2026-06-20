@@ -1,5 +1,6 @@
 import { formatDZD, formatDateTime, formatDate, paymentLabel } from "@/lib/format";
-import { STORE_INFO } from "@/lib/invoice";
+import { getStoreInfo } from "@/lib/invoice";
+
 
 export interface ExpenseRow {
   id: string;
@@ -46,19 +47,27 @@ const STYLE = `
 `;
 
 function shell(pageTitle: string, headHtml: string, innerHtml: string): string {
+  const store = getStoreInfo();
+  const contact = [store.phone, store.email].filter(Boolean).map(esc).join(" · ");
+  const logoHtml = store.logo
+    ? `<img src="${esc(store.logo)}" alt="${esc(store.name)}" style="width:60px;height:60px;object-fit:contain;border-radius:10px;" />`
+    : "";
   return `<!doctype html><html lang="fr"><head><meta charset="utf-8" />
 <title>${esc(pageTitle)}</title>
 <style>${STYLE}</style></head><body><div class="sheet">
   <div class="top">
-    <div>
-      <div class="store">${esc(STORE_INFO.name)}</div>
-      <div class="sub">${esc(STORE_INFO.tagline)}</div>
-      <div class="company">${esc(STORE_INFO.address)}<br/>${esc(STORE_INFO.phone)} · ${esc(STORE_INFO.email)}</div>
+    <div style="display:flex;gap:12px;align-items:center;">
+      ${logoHtml}
+      <div>
+        <div class="store">${esc(store.name)}</div>
+        <div class="sub">${esc(store.tagline)}</div>
+        <div class="company">${esc(store.address)}${contact ? `<br/>${contact}` : ""}</div>
+      </div>
     </div>
     <div class="doc">${headHtml}</div>
   </div>
   ${innerHtml}
-  <div class="foot">${esc(STORE_INFO.name)} · ${esc(STORE_INFO.phone)}</div>
+  <div class="foot">${esc(store.name)}${store.phone ? ` · ${esc(store.phone)}` : ""}</div>
 </div></body></html>`;
 }
 

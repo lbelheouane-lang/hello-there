@@ -1,4 +1,6 @@
 import { formatDZD, formatDateTime, paymentLabel } from "@/lib/format";
+import { getStoreInfo } from "@/lib/invoice";
+import { getStoreSettings } from "@/lib/store-settings";
 
 export interface ReceiptData {
   storeName: string;
@@ -26,6 +28,12 @@ function row(label: string, value: string, strong = false): string {
 
 /** Build a self-contained HTML document for a payment voucher. */
 export function buildReceiptHtml(d: ReceiptData): string {
+  const store = getStoreInfo();
+  const s = getStoreSettings();
+  const name = store.name || d.storeName;
+  const logoHtml = store.logo
+    ? `<img class="logo-img" src="${esc(store.logo)}" alt="${esc(name)}" />`
+    : "";
   return `<!doctype html><html lang="fr"><head><meta charset="utf-8" />
 <title>Reçu ${esc(d.receiptNumber)}</title>
 <style>
@@ -44,12 +52,15 @@ export function buildReceiptHtml(d: ReceiptData): string {
   .sign { display: flex; justify-content: space-between; gap: 16px; margin-top: 36px; }
   .sign div { flex: 1; text-align: center; font-size: 10px; color: #666; border-top: 1px solid #999; padding-top: 4px; }
   .foot { text-align: center; font-size: 10px; color: #999; margin-top: 16px; }
+  .logo-img { width: 52px; height: 52px; object-fit: contain; margin: 0 auto 6px; display: block; }
 </style></head><body>
   <div class="head">
-    <div class="store">${esc(d.storeName)}</div>
-    <div class="sub">Bijouterie · Or & Joaillerie</div>
+    ${logoHtml}
+    <div class="store">${esc(name)}</div>
+    <div class="sub">${esc(store.tagline || "Bijouterie · Or & Joaillerie")}</div>
   </div>
   <div class="title">REÇU DE PAIEMENT — VERSEMENT</div>
+
   ${row("Reçu n°", d.receiptNumber)}
   ${row("Date & heure", formatDateTime(d.paidAt))}
   ${row("Facture n°", d.invoiceNumber)}
@@ -67,10 +78,11 @@ export function buildReceiptHtml(d: ReceiptData): string {
   <div class="sep"></div>
   ${row("Encaissé par", d.employeeName)}
   <div class="sign">
-    <div>Signature client</div>
-    <div>Cachet & signature</div>
+    <div>${esc(s.signature_left || "Signature client")}</div>
+    <div>${esc(s.signature_right || "Cachet & signature")}</div>
   </div>
-  <div class="foot">Merci de votre confiance — ${esc(d.storeName)}</div>
+  <div class="foot">${esc(s.thank_you_message || s.invoice_footer || `Merci de votre confiance — ${name}`)}</div>
+
 </body></html>`;
 }
 

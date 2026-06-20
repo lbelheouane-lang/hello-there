@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Gem } from "lucide-react";
+import { useStoreSettings } from "@/lib/store-settings";
 
 const SESSION_KEY = "maisondor:intro-shown";
 
@@ -11,6 +12,10 @@ const SESSION_KEY = "maisondor:intro-shown";
  */
 export function BrandIntro() {
   const [show, setShow] = useState(false);
+  const { data: settings } = useStoreSettings();
+  const storeName = settings?.store_name || "Maison d'Or";
+  const storeTag = settings?.slogan || settings?.tagline || "Gestion de bijouterie";
+
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -75,7 +80,11 @@ export function BrandIntro() {
               animation: "brand-logo-reveal 1s cubic-bezier(0.22,1,0.36,1) forwards",
             }}
           >
-            <Gem className="h-10 w-10" />
+            {settings?.logo_url ? (
+              <img src={settings.logo_url} alt={storeName} className="h-14 w-14 object-contain" />
+            ) : (
+              <Gem className="h-10 w-10" />
+            )}
           </div>
         </div>
 
@@ -98,14 +107,14 @@ export function BrandIntro() {
               animation: "brand-shimmer 2s linear 0.6s 1 forwards",
             }}
           >
-            Maison d'Or
+            {storeName}
           </span>
         </h1>
         <p
           className="text-sm tracking-widest text-muted-foreground uppercase"
           style={{ opacity: 0, animation: "brand-text-rise 0.9s ease-out 0.7s forwards" }}
         >
-          Gestion de bijouterie
+          {storeTag}
         </p>
       </div>
     </div>

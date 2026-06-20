@@ -1,12 +1,29 @@
 import { formatDZD, formatDateTime, formatGrams, paymentLabel } from "@/lib/format";
+import { getStoreSettings } from "@/lib/store-settings";
 
+/** Live store identity derived from configurable settings (with fallbacks). */
+export function getStoreInfo() {
+  const s = getStoreSettings();
+  return {
+    name: s.store_name || "Maison d'Or",
+    tagline: s.slogan || s.tagline || "Bijouterie · Or & Joaillerie",
+    address: s.address || "",
+    phone: s.phone || "",
+    email: s.email || "",
+    website: s.website || "",
+    rc: s.tax_id || "",
+    logo: s.logo_url || "",
+  };
+}
+
+/** @deprecated kept for compatibility — prefer getStoreInfo() */
 export const STORE_INFO = {
-  name: "Maison d'Or",
-  tagline: "Bijouterie · Or & Joaillerie",
-  address: "Rue Didouche Mourad, Alger, Algérie",
-  phone: "+213 555 00 00 00",
-  email: "contact@maisondor.dz",
-  rc: "RC 16/00-1234567",
+  get name() { return getStoreInfo().name; },
+  get tagline() { return getStoreInfo().tagline; },
+  get address() { return getStoreInfo().address; },
+  get phone() { return getStoreInfo().phone; },
+  get email() { return getStoreInfo().email; },
+  get rc() { return getStoreInfo().rc; },
 };
 
 export type InvoicePaymentStatus = "paid" | "partial" | "overdue" | "unpaid";
@@ -80,6 +97,13 @@ function purityLabel(inv: InvoiceRecord): string {
 export function buildInvoiceHtml(inv: InvoiceRecord): string {
   const isPayment = inv.invoice_type === "payment";
   const statusColor = STATUS_COLOR[inv.payment_status] ?? "#6b7280";
+  const store = getStoreInfo();
+  const s = getStoreSettings();
+  const logoHtml = store.logo
+    ? `<img class="logo-img" src="${esc(store.logo)}" alt="${esc(store.name)}" />`
+    : `<div class="logo">${esc(store.name.charAt(0).toUpperCase() || "M")}</div>`;
+  const contactLine = [store.phone, store.email].filter(Boolean).map(esc).join(" · ");
+
 
   const productRows = inv.product_name
     ? `<tr>
@@ -104,6 +128,9 @@ export function buildInvoiceHtml(inv: InvoiceRecord): string {
   .top { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #c9a227; padding-bottom: 16px; margin-bottom: 24px; }
   .brand { display: flex; gap: 14px; align-items: center; }
   .logo { width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg,#c9a227,#8a6d10); color: #fff; display: flex; align-items: center; justify-content: center; font-family: Georgia, serif; font-size: 30px; font-weight: 700; }
+  .logo-img { width: 64px; height: 64px; object-fit: contain; border-radius: 12px; }
+  .header-note { font-size: 11px; color: #555; margin: 0 0 16px; white-space: pre-line; }
+  .terms { margin: 18px 0 0; font-size: 10px; color: #777; white-space: pre-line; border-top: 1px dashed #ddd; padding-top: 8px; }
   .store { font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; color: #b8860b; letter-spacing: .5px; }
   .sub { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
   .company { font-size: 11px; color: #555; margin-top: 6px; }
@@ -136,11 +163,11 @@ export function buildInvoiceHtml(inv: InvoiceRecord): string {
   <div class="sheet">
     <div class="top">
       <div class="brand">
-        <div class="logo">M</div>
+        ${logoHtml}
         <div>
-          <div class="store">${esc(STORE_INFO.name)}</div>
-          <div class="sub">${esc(STORE_INFO.tagline)}</div>
-          <div class="company">${esc(STORE_INFO.address)}<br/>${esc(STORE_INFO.phone)} · ${esc(STORE_INFO.email)}<br/>${esc(STORE_INFO.rc)}</div>
+          <div class="store">${esc(store.name)}</div>
+          <div class="sub">${esc(store.tagline)}</div>
+          <div class="company">${esc(store.address)}${contactLine ? `<br/>${contactLine}` : ""}${store.website ? `<br/>${esc(store.website)}` : ""}${store.rc ? `<br/>${esc(store.rc)}` : ""}</div>
         </div>
       </div>
       <div class="doc">
@@ -151,6 +178,9 @@ export function buildInvoiceHtml(inv: InvoiceRecord): string {
         <div class="badge" style="background:${statusColor}">${esc(invoiceStatusLabel(inv.payment_status))}</div>
       </div>
     </div>
+
+    ${s.invoice_header ? `<div class="header-note">${esc(s.invoice_header)}</div>` : ""}
+
 
     <div class="parties">
       <div class="card">
@@ -185,15 +215,20 @@ export function buildInvoiceHtml(inv: InvoiceRecord): string {
 
     ${inv.notes ? `<div class="notes">${esc(inv.notes)}</div>` : ""}
 
+    ${s.thank_you_message ? `<div class="notes">${esc(s.thank_you_message)}</div>` : ""}
+
     <div class="sign">
-      <div>Signature du client</div>
-      <div>Cachet & signature du représentant</div>
+      <div>${esc(s.signature_left || "Signature du client")}</div>
+      <div>${esc(s.signature_right || "Cachet & signature du représentant")}</div>
     </div>
 
-    <div class="foot">Merci de votre confiance — ${esc(STORE_INFO.name)} · ${esc(STORE_INFO.phone)}</div>
+    ${s.terms ? `<div class="terms">${esc(s.terms)}</div>` : ""}
+
+    <div class="foot">${esc(s.invoice_footer || `Merci de votre confiance — ${store.name}`)}${store.phone ? ` · ${esc(store.phone)}` : ""}</div>
   </div>
 </body></html>`;
 }
+
 
 /** Open the invoice in a new window and trigger the print / save-as-PDF dialog. */
 export function printInvoice(inv: InvoiceRecord): void {
