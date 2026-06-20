@@ -12,6 +12,7 @@ import {
   METAL_TYPES, formatGrams, formatDZD, statusLabel,
 } from "@/lib/format";
 import { LabelDialog, type LabelProduct } from "@/components/LabelDialog";
+import { productImage } from "@/lib/product-image";
 
 export const Route = createFileRoute("/_authenticated/produit/$id")({
   component: ProductDetailPage,
