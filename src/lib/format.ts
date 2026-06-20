@@ -1,11 +1,13 @@
-export const KARATS = [24, 22, 21, 18] as const;
+export const KARATS = [24, 22, 21, 18, 14] as const;
 export type Karat = (typeof KARATS)[number];
 
+/** Facteur de pureté (titre) appliqué au cours de l'or pur (24K = 100%). */
 export const KARAT_PURITY: Record<number, number> = {
-  24: 0.999,
+  24: 1.0,
   22: 0.916,
   21: 0.875,
   18: 0.75,
+  14: 0.585,
 };
 
 export const PRODUCT_STATUSES = [
@@ -51,6 +53,22 @@ export function formatGrams(value: number | null | undefined): string {
 export function formatDate(value: string | Date | null | undefined): string {
   if (!value) return "—";
   return new Intl.DateTimeFormat("fr-DZ", { dateStyle: "medium" }).format(new Date(value));
+}
+
+export function formatDateTime(value: string | Date | null | undefined): string {
+  if (!value) return "—";
+  return new Intl.DateTimeFormat("fr-DZ", { dateStyle: "short", timeStyle: "short" }).format(new Date(value));
+}
+
+export function formatRelativeTime(value: string | Date | null | undefined): string {
+  if (!value) return "jamais";
+  const diffMs = Date.now() - new Date(value).getTime();
+  const min = Math.floor(diffMs / 60000);
+  if (min < 1) return "à l'instant";
+  if (min < 60) return `il y a ${min} min`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return `il y a ${h} h`;
+  return formatDateTime(value);
 }
 
 export function statusLabel(value: string): string {

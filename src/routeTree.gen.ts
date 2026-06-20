@@ -16,6 +16,7 @@ import { Route as AuthenticatedStockRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedFournisseursRouteImport } from './routes/_authenticated/fournisseurs'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCoursOrRouteImport } from './routes/_authenticated/cours-or'
+import { Route as ApiPublicHooksUpdateGoldPricesRouteImport } from './routes/api/public/hooks/update-gold-prices'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -52,6 +53,12 @@ const AuthenticatedCoursOrRoute = AuthenticatedCoursOrRouteImport.update({
   path: '/cours-or',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicHooksUpdateGoldPricesRoute =
+  ApiPublicHooksUpdateGoldPricesRouteImport.update({
+    id: '/api/public/hooks/update-gold-prices',
+    path: '/api/public/hooks/update-gold-prices',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -60,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fournisseurs': typeof AuthenticatedFournisseursRoute
   '/stock': typeof AuthenticatedStockRoute
+  '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -68,6 +76,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fournisseurs': typeof AuthenticatedFournisseursRoute
   '/stock': typeof AuthenticatedStockRoute
+  '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -78,6 +87,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/fournisseurs': typeof AuthenticatedFournisseursRoute
   '/_authenticated/stock': typeof AuthenticatedStockRoute
+  '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -88,8 +98,16 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/fournisseurs'
     | '/stock'
+    | '/api/public/hooks/update-gold-prices'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/cours-or' | '/dashboard' | '/fournisseurs' | '/stock'
+  to:
+    | '/'
+    | '/auth'
+    | '/cours-or'
+    | '/dashboard'
+    | '/fournisseurs'
+    | '/stock'
+    | '/api/public/hooks/update-gold-prices'
   id:
     | '__root__'
     | '/'
@@ -99,12 +117,14 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/fournisseurs'
     | '/_authenticated/stock'
+    | '/api/public/hooks/update-gold-prices'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiPublicHooksUpdateGoldPricesRoute: typeof ApiPublicHooksUpdateGoldPricesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -158,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCoursOrRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/hooks/update-gold-prices': {
+      id: '/api/public/hooks/update-gold-prices'
+      path: '/api/public/hooks/update-gold-prices'
+      fullPath: '/api/public/hooks/update-gold-prices'
+      preLoaderRoute: typeof ApiPublicHooksUpdateGoldPricesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -182,6 +209,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiPublicHooksUpdateGoldPricesRoute: ApiPublicHooksUpdateGoldPricesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

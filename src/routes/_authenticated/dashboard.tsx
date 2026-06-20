@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLatestGoldPrices } from "@/hooks/use-gold-prices";
+import { useAuth } from "@/hooks/use-auth";
+import { GoldPriceWidget } from "@/components/GoldPriceWidget";
 import { formatDZD, formatGrams, KARATS } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -74,6 +76,7 @@ function StatCard({ icon: Icon, label, value, hint }: { icon: typeof Package; la
 function DashboardPage() {
   const { data: prices } = useLatestGoldPrices();
   const { data: stats } = useDashboardStats();
+  const { role } = useAuth();
 
   return (
     <AppShell title="Tableau de bord">
@@ -83,6 +86,11 @@ function DashboardPage() {
         <StatCard icon={Package} label="Stock total" value={formatGrams(stats?.stockGrams ?? 0)} hint={`${stats?.stockCount ?? 0} pièces en stock`} />
         <StatCard icon={Coins} label="Cours 18K (gramme)" value={prices?.[18] ? formatDZD(prices[18].price_per_gram) : "—"} hint="Dernier cours connu" />
       </div>
+
+      <div className="mt-6">
+        <GoldPriceWidget canRefresh={role === "admin"} />
+      </div>
+
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
