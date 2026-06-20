@@ -207,11 +207,7 @@ function StockPage() {
     setKaratFilter("all"); setSupplierFilter("all"); setMinWeight(""); setMaxWeight("");
   }
 
-  // Subcategories available for the form's selected category
-  const formSubs = useMemo(() => {
-    const cat = (subcategories ?? []).map((s) => s).filter(Boolean);
-    return cat;
-  }, [subcategories]);
+
 
   function openNew() {
     setEditing(null);
