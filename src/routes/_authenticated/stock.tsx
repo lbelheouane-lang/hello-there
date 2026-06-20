@@ -624,6 +624,27 @@ function StockPage() {
                 </Select>
               </div>
               <div className="space-y-1">
+                <Label className="text-xs">Origine</Label>
+                <Select value={originFilter} onValueChange={setOriginFilter}>
+                  <SelectTrigger className="h-9 w-32"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes</SelectItem>
+                    {METAL_ORIGINS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Pays d'origine</Label>
+                <Select value={countryFilter} onValueChange={setCountryFilter} disabled={countries.length === 0}>
+                  <SelectTrigger className="h-9 w-44"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous</SelectItem>
+                    {countries.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1">
                 <Label className="text-xs">Poids min (g)</Label>
                 <Input type="number" min={0} step="0.001" className="h-9 w-24" value={minWeight} onChange={(e) => setMinWeight(e.target.value)} />
               </div>
