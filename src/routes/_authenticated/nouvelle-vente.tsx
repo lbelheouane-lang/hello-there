@@ -51,6 +51,8 @@ function NewSalePage() {
   const [amountPaid, setAmountPaid] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<string>(PAYMENT_METHODS[0].value);
   const [notes, setNotes] = useState("");
+  const [saleType, setSaleType] = useState<"full" | "installment">("full");
+  const [dueDate, setDueDate] = useState("");
 
   // Quick add customer
   const [newCustomerName, setNewCustomerName] = useState("");
