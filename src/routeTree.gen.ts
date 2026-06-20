@@ -18,6 +18,7 @@ import { Route as AuthenticatedFournisseursRouteImport } from './routes/_authent
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCoursOrRouteImport } from './routes/_authenticated/cours-or'
 import { Route as AuthenticatedClientsRouteImport } from './routes/_authenticated/clients'
+import { Route as AuthenticatedProduitIdRouteImport } from './routes/_authenticated/produit.$id'
 import { Route as ApiPublicHooksUpdateGoldPricesRouteImport } from './routes/api/public/hooks/update-gold-prices'
 
 const AuthRoute = AuthRouteImport.update({
@@ -66,6 +67,11 @@ const AuthenticatedClientsRoute = AuthenticatedClientsRouteImport.update({
   path: '/clients',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProduitIdRoute = AuthenticatedProduitIdRouteImport.update({
+  id: '/produit/$id',
+  path: '/produit/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ApiPublicHooksUpdateGoldPricesRoute =
   ApiPublicHooksUpdateGoldPricesRouteImport.update({
     id: '/api/public/hooks/update-gold-prices',
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/fournisseurs': typeof AuthenticatedFournisseursRoute
   '/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
   '/stock': typeof AuthenticatedStockRoute
+  '/produit/$id': typeof AuthenticatedProduitIdRoute
   '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
 }
 export interface FileRoutesByTo {
@@ -93,6 +100,7 @@ export interface FileRoutesByTo {
   '/fournisseurs': typeof AuthenticatedFournisseursRoute
   '/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
   '/stock': typeof AuthenticatedStockRoute
+  '/produit/$id': typeof AuthenticatedProduitIdRoute
   '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
 }
 export interface FileRoutesById {
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/_authenticated/fournisseurs': typeof AuthenticatedFournisseursRoute
   '/_authenticated/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
   '/_authenticated/stock': typeof AuthenticatedStockRoute
+  '/_authenticated/produit/$id': typeof AuthenticatedProduitIdRoute
   '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
 }
 export interface FileRouteTypes {
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/fournisseurs'
     | '/nouvelle-vente'
     | '/stock'
+    | '/produit/$id'
     | '/api/public/hooks/update-gold-prices'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/fournisseurs'
     | '/nouvelle-vente'
     | '/stock'
+    | '/produit/$id'
     | '/api/public/hooks/update-gold-prices'
   id:
     | '__root__'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/_authenticated/fournisseurs'
     | '/_authenticated/nouvelle-vente'
     | '/_authenticated/stock'
+    | '/_authenticated/produit/$id'
     | '/api/public/hooks/update-gold-prices'
   fileRoutesById: FileRoutesById
 }
@@ -217,6 +229,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClientsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/produit/$id': {
+      id: '/_authenticated/produit/$id'
+      path: '/produit/$id'
+      fullPath: '/produit/$id'
+      preLoaderRoute: typeof AuthenticatedProduitIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/hooks/update-gold-prices': {
       id: '/api/public/hooks/update-gold-prices'
       path: '/api/public/hooks/update-gold-prices'
@@ -234,6 +253,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFournisseursRoute: typeof AuthenticatedFournisseursRoute
   AuthenticatedNouvelleVenteRoute: typeof AuthenticatedNouvelleVenteRoute
   AuthenticatedStockRoute: typeof AuthenticatedStockRoute
+  AuthenticatedProduitIdRoute: typeof AuthenticatedProduitIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -243,6 +263,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFournisseursRoute: AuthenticatedFournisseursRoute,
   AuthenticatedNouvelleVenteRoute: AuthenticatedNouvelleVenteRoute,
   AuthenticatedStockRoute: AuthenticatedStockRoute,
+  AuthenticatedProduitIdRoute: AuthenticatedProduitIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
