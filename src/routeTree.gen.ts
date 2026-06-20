@@ -16,6 +16,7 @@ import { Route as AuthenticatedStockRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedFournisseursRouteImport } from './routes/_authenticated/fournisseurs'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCoursOrRouteImport } from './routes/_authenticated/cours-or'
+import { Route as AuthenticatedClientsRouteImport } from './routes/_authenticated/clients'
 import { Route as ApiPublicHooksUpdateGoldPricesRouteImport } from './routes/api/public/hooks/update-gold-prices'
 
 const AuthRoute = AuthRouteImport.update({
@@ -53,6 +54,11 @@ const AuthenticatedCoursOrRoute = AuthenticatedCoursOrRouteImport.update({
   path: '/cours-or',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedClientsRoute = AuthenticatedClientsRouteImport.update({
+  id: '/clients',
+  path: '/clients',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ApiPublicHooksUpdateGoldPricesRoute =
   ApiPublicHooksUpdateGoldPricesRouteImport.update({
     id: '/api/public/hooks/update-gold-prices',
@@ -63,6 +69,7 @@ const ApiPublicHooksUpdateGoldPricesRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/clients': typeof AuthenticatedClientsRoute
   '/cours-or': typeof AuthenticatedCoursOrRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fournisseurs': typeof AuthenticatedFournisseursRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/clients': typeof AuthenticatedClientsRoute
   '/cours-or': typeof AuthenticatedCoursOrRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fournisseurs': typeof AuthenticatedFournisseursRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/clients': typeof AuthenticatedClientsRoute
   '/_authenticated/cours-or': typeof AuthenticatedCoursOrRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/fournisseurs': typeof AuthenticatedFournisseursRoute
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/clients'
     | '/cours-or'
     | '/dashboard'
     | '/fournisseurs'
@@ -103,6 +113,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/clients'
     | '/cours-or'
     | '/dashboard'
     | '/fournisseurs'
@@ -113,6 +124,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/clients'
     | '/_authenticated/cours-or'
     | '/_authenticated/dashboard'
     | '/_authenticated/fournisseurs'
@@ -178,6 +190,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCoursOrRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/clients': {
+      id: '/_authenticated/clients'
+      path: '/clients'
+      fullPath: '/clients'
+      preLoaderRoute: typeof AuthenticatedClientsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/hooks/update-gold-prices': {
       id: '/api/public/hooks/update-gold-prices'
       path: '/api/public/hooks/update-gold-prices'
@@ -189,6 +208,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedClientsRoute: typeof AuthenticatedClientsRoute
   AuthenticatedCoursOrRoute: typeof AuthenticatedCoursOrRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFournisseursRoute: typeof AuthenticatedFournisseursRoute
@@ -196,6 +216,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedClientsRoute: AuthenticatedClientsRoute,
   AuthenticatedCoursOrRoute: AuthenticatedCoursOrRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFournisseursRoute: AuthenticatedFournisseursRoute,
