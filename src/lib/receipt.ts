@@ -28,6 +28,12 @@ function row(label: string, value: string, strong = false): string {
 
 /** Build a self-contained HTML document for a payment voucher. */
 export function buildReceiptHtml(d: ReceiptData): string {
+  const store = getStoreInfo();
+  const s = getStoreSettings();
+  const name = store.name || d.storeName;
+  const logoHtml = store.logo
+    ? `<img class="logo-img" src="${esc(store.logo)}" alt="${esc(name)}" />`
+    : "";
   return `<!doctype html><html lang="fr"><head><meta charset="utf-8" />
 <title>Reçu ${esc(d.receiptNumber)}</title>
 <style>
