@@ -62,9 +62,75 @@ function SettingsPage() {
 
   const busy = genMut.isPending || delMut.isPending;
 
+  const cats = useCategories();
+  const [newCat, setNewCat] = useState("");
+  const addCat = useMutation({
+    mutationFn: async () => {
+      const name = newCat.trim();
+      if (!name) throw new Error("Nom de catégorie requis.");
+      const { error } = await supabase.from("product_categories").insert({ name, is_default: false });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Catégorie ajoutée.");
+      setNewCat("");
+      qc.invalidateQueries({ queryKey: ["product_categories"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const delCat = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("product_categories").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Catégorie supprimée.");
+      qc.invalidateQueries({ queryKey: ["product_categories"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   return (
     <AppShell title="Paramètres" allow={["admin"]}>
       <div className="mx-auto max-w-2xl space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Tags className="h-5 w-5 text-primary" />
+              Catégories de bijoux
+            </CardTitle>
+            <CardDescription>
+              Organisez votre inventaire par type de bijou. Les catégories par défaut sont
+              prédéfinies ; vous pouvez en ajouter des personnalisées.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-wrap gap-2">
+              {(cats.data ?? []).map((c) => (
+                <Badge key={c.id} variant={c.is_default ? "secondary" : "outline"} className="gap-1 py-1">
+                  {c.name}
+                  {!c.is_default && (
+                    <button onClick={() => delCat.mutate(c.id)} className="ml-1 text-destructive" title="Supprimer">
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  )}
+                </Badge>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Nouvelle catégorie personnalisée…"
+                value={newCat}
+                onChange={(e) => setNewCat(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") addCat.mutate(); }}
+              />
+              <Button onClick={() => addCat.mutate()} disabled={addCat.isPending}>
+                <Plus className="mr-2 h-4 w-4" /> Ajouter
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
