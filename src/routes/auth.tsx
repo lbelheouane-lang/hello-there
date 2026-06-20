@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Gem, Shield, ShoppingCart, Delete, Loader2, ArrowLeft, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { pinLogin } from "@/lib/pin-auth.functions";
+import { useStoreSettings } from "@/lib/store-settings";
 
 export const Route = createFileRoute("/auth")({
   beforeLoad: async () => {
