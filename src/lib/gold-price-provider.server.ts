@@ -323,10 +323,12 @@ export async function runGoldPriceUpdate(): Promise<UpdateResult> {
 }
 
 /**
- * Recalcule le prix de vente de chaque produit en or, en EUR (devise de base).
- * Prix EUR = (Poids × Cours EUR/g × Pureté) + Façon + Pierres + Main d'œuvre
+ * Recalcule le prix de vente de chaque produit en or. La valeur du métal est
+ * calculée à partir du cours EUR puis convertie en DZD via le taux configuré.
+ * Prix DZD = (Poids × Cours EUR/g × Pureté × Taux EUR→DZD) + Façon + Pierres + Main d'œuvre
+ * (les coûts façon/pierres/main d'œuvre sont déjà stockés en DZD).
  */
-async function recalcProducts(baseEurPerGram: number): Promise<number> {
+async function recalcProducts(baseEurPerGram: number, eurToDzd: number): Promise<number> {
   const { data: products } = await supabaseAdmin
     .from("products")
     .select("id, metal_type, gold_karat, weight_grams, making_charge, stone_cost, labor_cost, selling_price")
@@ -342,14 +344,14 @@ async function recalcProducts(baseEurPerGram: number): Promise<number> {
   for (const p of products as any[]) {
     const purity = PURITY[p.gold_karat as number] ?? 0;
     if (!purity) continue;
-    const metalValueEur = Number(p.weight_grams) * baseEurPerGram * purity;
+    const metalValueDzd = Number(p.weight_grams) * baseEurPerGram * purity * eurToDzd;
     const selling =
       Math.round(
-        (metalValueEur +
+        metalValueDzd +
           Number(p.making_charge ?? 0) +
           Number(p.stone_cost ?? 0) +
-          Number(p.labor_cost ?? 0)) * 100,
-      ) / 100;
+          Number(p.labor_cost ?? 0),
+      );
 
     valuationBefore += Number(p.selling_price ?? 0);
     valuationAfter += selling;
