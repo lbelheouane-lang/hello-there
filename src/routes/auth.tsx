@@ -101,17 +101,20 @@ function AuthPage() {
   );
 
   const pushDigit = (d: string) => {
-    if (busy || pin.length >= 4) return;
+    if (busy || pin.length >= 8) return;
     setError(false);
-    const next = pin + d;
-    setPin(next);
-    if (next.length === 4) submitPin(next);
+    setPin((p) => p + d);
   };
 
   const popDigit = () => {
     if (busy) return;
     setError(false);
     setPin((p) => p.slice(0, -1));
+  };
+
+  const validate = () => {
+    if (busy || pin.length < 4) return;
+    submitPin(pin);
   };
 
   return (
