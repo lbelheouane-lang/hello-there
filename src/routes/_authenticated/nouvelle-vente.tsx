@@ -17,7 +17,6 @@ import {
   PAYMENT_METHODS, METAL_TYPES, formatDZD, formatGrams, metalValue,
 } from "@/lib/format";
 import { dzdFromUsd, formatUSD } from "@/lib/currency";
-import _CURRENCY_PLACEHOLDER from "@/lib/currency";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
 
 export const Route = createFileRoute("/_authenticated/nouvelle-vente")({
