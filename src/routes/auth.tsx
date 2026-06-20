@@ -1,14 +1,9 @@
 import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
-import { useState } from "react";
-import { toast } from "sonner";
-import { Gem } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { Gem, Shield, ShoppingCart, Delete, Loader2, ArrowLeft, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { pinLogin } from "@/lib/pin-auth.functions";
 
 export const Route = createFileRoute("/auth")({
   beforeLoad: async () => {
@@ -18,129 +13,373 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Connexion — Maison d'Or" },
-      { name: "description", content: "Accédez à votre espace de gestion de bijouterie." },
+      { name: "description", content: "Accédez à votre espace de gestion de bijouterie par code PIN." },
     ],
   }),
   component: AuthPage,
 });
 
+type Phase = "intro" | "profiles" | "pin" | "success";
+type Profile = "admin" | "employe";
+
+const PROFILES: { key: Profile; label: string; desc: string; icon: typeof Shield }[] = [
+  { key: "admin", label: "Administrateur", desc: "Accès complet à la boutique", icon: Shield },
+  { key: "employe", label: "Employé", desc: "Ventes et clients", icon: ShoppingCart },
+];
+
 function AuthPage() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
+  const login = useServerFn(pinLogin);
 
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) return toast.error(error.message);
-    toast.success("Connexion réussie");
-    navigate({ to: "/dashboard" });
-  }
+  const [phase, setPhase] = useState<Phase>("intro");
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [pin, setPin] = useState("");
+  const [error, setError] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const submittingRef = useRef(false);
 
-  async function handleSignup(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: window.location.origin,
-        data: { full_name: fullName },
-      },
-    });
-    setLoading(false);
-    if (error) return toast.error(error.message);
-    toast.success("Compte créé. Vous pouvez vous connecter.");
-    navigate({ to: "/dashboard" });
-  }
+  // Startup animation — data/session checks happen behind it.
+  useEffect(() => {
+    const t = setTimeout(() => setPhase("profiles"), 2600);
+    return () => clearTimeout(t);
+  }, []);
 
-  async function handleGoogle() {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) return toast.error("Connexion Google impossible");
-    if (result.redirected) return;
-    navigate({ to: "/dashboard" });
-  }
+  const selectProfile = (p: Profile) => {
+    setProfile(p);
+    setPin("");
+    setError(false);
+    setPhase("pin");
+  };
+
+  const submitPin = useCallback(
+    async (value: string) => {
+      if (submittingRef.current) return;
+      submittingRef.current = true;
+      setBusy(true);
+      setError(false);
+      try {
+        const res = await login({ data: { pin: value } });
+        if (!res.ok) {
+          setError(true);
+          setPin("");
+          setBusy(false);
+          submittingRef.current = false;
+          return;
+        }
+        // Profile mismatch (e.g. employee PIN under admin card) — guide the user.
+        if (profile && res.role !== profile) {
+          setError(true);
+          setPin("");
+          setBusy(false);
+          submittingRef.current = false;
+          return;
+        }
+        const { error: sessErr } = await supabase.auth.setSession({
+          access_token: res.access_token,
+          refresh_token: res.refresh_token,
+        });
+        if (sessErr) {
+          setError(true);
+          setPin("");
+          setBusy(false);
+          submittingRef.current = false;
+          return;
+        }
+        setPhase("success");
+        setTimeout(() => {
+          navigate({ to: res.role === "admin" ? "/dashboard" : "/nouvelle-vente" });
+        }, 1300);
+      } catch {
+        setError(true);
+        setPin("");
+        setBusy(false);
+        submittingRef.current = false;
+      }
+    },
+    [login, navigate, profile],
+  );
+
+  const pushDigit = (d: string) => {
+    if (busy || pin.length >= 4) return;
+    setError(false);
+    const next = pin + d;
+    setPin(next);
+    if (next.length === 4) submitPin(next);
+  };
+
+  const popDigit = () => {
+    if (busy) return;
+    setError(false);
+    setPin((p) => p.slice(0, -1));
+  };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-secondary to-accent px-4 py-10">
-      <div className="w-full max-w-md">
-        <div className="mb-8 flex flex-col items-center text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg">
-            <Gem className="h-7 w-7" />
-          </div>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight">Maison d'Or</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Gestion professionnelle de bijouterie</p>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-background via-secondary to-accent px-4 py-10">
+      <AmbientGlow />
+
+      {phase === "intro" && <Intro />}
+
+      {phase === "profiles" && (
+        <ProfileSelect onSelect={selectProfile} />
+      )}
+
+      {phase === "pin" && profile && (
+        <PinEntry
+          profile={PROFILES.find((p) => p.key === profile)!}
+          pin={pin}
+          error={error}
+          busy={busy}
+          onDigit={pushDigit}
+          onBackspace={popDigit}
+          onBack={() => setPhase("profiles")}
+        />
+      )}
+
+      {phase === "success" && <SuccessTransition />}
+    </div>
+  );
+}
+
+function AmbientGlow() {
+  return (
+    <div className="pointer-events-none absolute inset-0" aria-hidden>
+      <div
+        className="absolute left-1/2 top-1/3 h-[28rem] w-[28rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/20 blur-3xl"
+        style={{ animation: "auth-glow 6s ease-in-out infinite" }}
+      />
+    </div>
+  );
+}
+
+function Brand({ subtitle }: { subtitle?: string }) {
+  return (
+    <div className="flex flex-col items-center text-center">
+      <div className="relative">
+        <span
+          className="absolute inset-0 -z-10 rounded-3xl bg-primary/30 blur-xl"
+          style={{ animation: "auth-glow 4s ease-in-out infinite" }}
+          aria-hidden
+        />
+        <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-primary text-primary-foreground shadow-lg">
+          <Gem className="h-8 w-8" />
         </div>
+      </div>
+      <h1 className="mt-5 font-serif text-3xl font-semibold tracking-tight">Maison d'Or</h1>
+      {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
+    </div>
+  );
+}
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Bienvenue</CardTitle>
-            <CardDescription>Connectez-vous pour accéder à votre boutique</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="login">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="login">Connexion</TabsTrigger>
-                <TabsTrigger value="signup">Inscription</TabsTrigger>
-              </TabsList>
+function Intro() {
+  return (
+    <div className="brand-intro relative flex flex-col items-center text-center">
+      {/* expanding rings */}
+      {[0, 0.4, 0.8].map((delay, i) => (
+        <span
+          key={i}
+          className="absolute top-8 h-16 w-16 rounded-full border border-primary/40"
+          style={{ animation: `brand-ring 2.4s ease-out ${delay}s infinite` }}
+          aria-hidden
+        />
+      ))}
+      {/* floating particles */}
+      {Array.from({ length: 8 }).map((_, i) => (
+        <span
+          key={i}
+          className="absolute h-1.5 w-1.5 rounded-full bg-primary/70"
+          style={{
+            left: `${12 + i * 10}%`,
+            bottom: "20%",
+            animation: `brand-float ${2.6 + (i % 4) * 0.4}s ease-in ${i * 0.25}s infinite`,
+          }}
+          aria-hidden
+        />
+      ))}
+      <div
+        className="flex h-20 w-20 items-center justify-center rounded-3xl bg-primary text-primary-foreground shadow-2xl"
+        style={{ animation: "brand-logo-reveal 1.1s cubic-bezier(0.22,1,0.36,1) both" }}
+      >
+        <Gem className="h-10 w-10" />
+      </div>
+      <h1
+        className="mt-6 bg-gradient-to-r from-foreground via-primary to-foreground bg-[length:200%_100%] bg-clip-text font-serif text-4xl font-semibold text-transparent"
+        style={{ animation: "brand-text-rise 1s ease-out 0.3s both, brand-shimmer 2.5s linear 0.3s infinite" }}
+      >
+        Maison d'Or
+      </h1>
+      <p
+        className="mt-2 text-sm tracking-wide text-muted-foreground"
+        style={{ animation: "auth-rise 0.8s ease-out 0.7s both" }}
+      >
+        Gestion de bijouterie d'exception
+      </p>
+    </div>
+  );
+}
 
-              <TabsContent value="login">
-                <form onSubmit={handleLogin} className="space-y-4 pt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="login-email">Email</Label>
-                    <Input id="login-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="login-password">Mot de passe</Label>
-                    <Input id="login-password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Connexion…" : "Se connecter"}
-                  </Button>
-                </form>
-              </TabsContent>
-
-              <TabsContent value="signup">
-                <form onSubmit={handleSignup} className="space-y-4 pt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="su-name">Nom complet</Label>
-                    <Input id="su-name" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="su-email">Email</Label>
-                    <Input id="su-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="su-password">Mot de passe</Label>
-                    <Input id="su-password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Création…" : "Créer mon compte"}
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
-
-            <div className="my-4 flex items-center gap-3">
-              <span className="h-px flex-1 bg-border" />
-              <span className="text-xs text-muted-foreground">ou</span>
-              <span className="h-px flex-1 bg-border" />
+function ProfileSelect({ onSelect }: { onSelect: (p: Profile) => void }) {
+  return (
+    <div className="relative w-full max-w-2xl">
+      <div style={{ animation: "auth-rise 0.5s ease-out both" }}>
+        <Brand subtitle="Choisissez votre profil" />
+      </div>
+      <div className="mt-10 grid gap-5 sm:grid-cols-2">
+        {PROFILES.map((p, i) => (
+          <button
+            key={p.key}
+            type="button"
+            onClick={() => onSelect(p.key)}
+            className="group relative overflow-hidden rounded-2xl border border-border bg-card/80 p-8 text-left shadow-sm backdrop-blur transition-all hover:-translate-y-1 hover:border-primary/60 hover:shadow-xl"
+            style={{ animation: `auth-card-in 0.6s cubic-bezier(0.22,1,0.36,1) ${0.15 + i * 0.12}s both` }}
+          >
+            <span className="absolute inset-x-0 top-0 h-1 origin-left scale-x-0 bg-gradient-to-r from-primary to-primary/40 transition-transform duration-300 group-hover:scale-x-100" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+              <p.icon className="h-7 w-7" />
             </div>
+            <h2 className="mt-5 font-serif text-2xl font-semibold">{p.label}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{p.desc}</p>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
-            <Button variant="outline" className="w-full" onClick={handleGoogle}>
-              Continuer avec Google
-            </Button>
-          </CardContent>
-        </Card>
-        <p className="mt-6 text-center text-xs text-muted-foreground">
-          Le premier compte créé devient administrateur de la boutique.
-        </p>
+function PinEntry({
+  profile,
+  pin,
+  error,
+  busy,
+  onDigit,
+  onBackspace,
+  onBack,
+}: {
+  profile: { key: Profile; label: string; icon: typeof Shield };
+  pin: string;
+  error: boolean;
+  busy: boolean;
+  onDigit: (d: string) => void;
+  onBackspace: () => void;
+  onBack: () => void;
+}) {
+  // Hardware keyboard support
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key >= "0" && e.key <= "9") onDigit(e.key);
+      else if (e.key === "Backspace") onBackspace();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onDigit, onBackspace]);
+
+  return (
+    <div
+      className="relative w-full max-w-sm rounded-3xl border border-border bg-card/85 p-8 shadow-xl backdrop-blur"
+      style={{ animation: "auth-card-in 0.45s cubic-bezier(0.22,1,0.36,1) both" }}
+    >
+      <button
+        type="button"
+        onClick={onBack}
+        className="absolute left-5 top-5 inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ArrowLeft className="h-3.5 w-3.5" /> Retour
+      </button>
+
+      <div className="flex flex-col items-center text-center">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <profile.icon className="h-7 w-7" />
+        </div>
+        <h2 className="mt-4 font-serif text-xl font-semibold">{profile.label}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Saisissez votre code PIN</p>
+      </div>
+
+      <div className={`mt-7 flex justify-center gap-3 ${error ? "animate-auth-shake" : ""}`}>
+        {Array.from({ length: 4 }).map((_, i) => {
+          const filled = i < pin.length;
+          return (
+            <span
+              key={i}
+              className={`h-4 w-4 rounded-full border transition-colors ${
+                error
+                  ? "border-destructive bg-destructive"
+                  : filled
+                    ? "border-primary bg-primary"
+                    : "border-muted-foreground/40"
+              } ${filled ? "animate-auth-pin" : ""}`}
+            />
+          );
+        })}
+      </div>
+
+      {error && (
+        <p className="mt-3 text-center text-xs text-destructive">Code incorrect. Réessayez.</p>
+      )}
+
+      <div className="mt-7 grid grid-cols-3 gap-3">
+        {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((d) => (
+          <PinKey key={d} disabled={busy} onClick={() => onDigit(d)}>
+            {d}
+          </PinKey>
+        ))}
+        <div />
+        <PinKey disabled={busy} onClick={() => onDigit("0")}>
+          0
+        </PinKey>
+        <PinKey disabled={busy} onClick={onBackspace} aria-label="Effacer">
+          <Delete className="h-5 w-5" />
+        </PinKey>
+      </div>
+
+      {busy && (
+        <div className="mt-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" /> Vérification…
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PinKey({
+  children,
+  onClick,
+  disabled,
+  ...rest
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+  "aria-label"?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="flex h-16 items-center justify-center rounded-2xl border border-border bg-background/60 font-serif text-xl font-medium transition-all hover:border-primary/60 hover:bg-primary/5 active:scale-95 disabled:opacity-50"
+      {...rest}
+    >
+      {children}
+    </button>
+  );
+}
+
+function SuccessTransition() {
+  return (
+    <div className="flex flex-col items-center text-center" style={{ animation: "auth-rise 0.4s ease-out both" }}>
+      <div className="relative">
+        <span
+          className="absolute inset-0 -z-10 rounded-full bg-primary/30 blur-xl"
+          style={{ animation: "auth-glow 2s ease-in-out infinite" }}
+          aria-hidden
+        />
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl">
+          <Check className="h-10 w-10" style={{ animation: "auth-pin-pop 0.4s cubic-bezier(0.22,1,0.36,1)" }} />
+        </div>
+      </div>
+      <h2 className="mt-6 font-serif text-2xl font-semibold">Bienvenue</h2>
+      <p className="mt-1 text-sm text-muted-foreground">Ouverture de votre espace…</p>
+      <div className="mt-6 h-1 w-48 overflow-hidden rounded-full bg-muted">
+        <div className="h-full rounded-full bg-primary" style={{ animation: "auth-progress 1.2s ease-out both" }} />
       </div>
     </div>
   );
