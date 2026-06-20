@@ -136,7 +136,8 @@ function StockPage() {
       name: p.name, category: p.category, metal_type: p.metal_type,
       gold_karat: p.gold_karat ? String(p.gold_karat) : "",
       weight_grams: String(p.weight_grams), metal_purchase_price: String(p.metal_purchase_price),
-      labor_cost: String(p.labor_cost), supplier_id: p.supplier_id ?? "", status: p.status,
+      labor_cost: String(p.labor_cost), supplier_id: p.supplier_id ?? "",
+      origin: p.origin ?? "", status: p.status,
     });
     setOpen(true);
   }
