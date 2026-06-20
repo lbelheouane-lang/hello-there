@@ -15,6 +15,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDZD, formatDateTime } from "@/lib/format";
 import {
   type InvoiceRecord, buildInvoiceHtml, printInvoice,
@@ -33,6 +34,7 @@ const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "
 };
 
 function InvoicesPage() {
+  const [tab, setTab] = useState("all");
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -54,6 +56,19 @@ function InvoicesPage() {
 
   const filtered = useMemo(() => {
     let list = invoices ?? [];
+    // Tab scope
+    if (tab === "documents") {
+      // all documents: sale invoices + payment vouchers
+    } else if (tab === "full") {
+      list = list.filter((i) => i.invoice_type === "sale" && i.sale_type !== "installment");
+    } else if (tab === "installment") {
+      list = list.filter((i) => i.invoice_type === "sale" && i.sale_type === "installment");
+    } else if (tab === "pending") {
+      list = list.filter((i) => i.invoice_type === "sale" && Number(i.balance) > 0);
+    } else {
+      // all sales
+      list = list.filter((i) => i.invoice_type === "sale");
+    }
     const q = search.toLowerCase().trim();
     if (q) {
       list = list.filter((i) =>
@@ -69,17 +84,18 @@ function InvoicesPage() {
     if (fromDate) list = list.filter((i) => i.issued_at >= fromDate);
     if (toDate) list = list.filter((i) => i.issued_at <= `${toDate}T23:59:59`);
     return list;
-  }, [invoices, search, typeFilter, statusFilter, fromDate, toDate]);
+  }, [invoices, tab, search, typeFilter, statusFilter, fromDate, toDate]);
+
 
   const totalBilled = filtered.reduce((s, i) => s + (i.invoice_type === "sale" ? Number(i.total_amount) : 0), 0);
   const totalCollected = filtered.reduce((s, i) => s + Number(i.amount_this_tx), 0);
 
   return (
-    <AppShell title="Factures">
+    <AppShell title="Ventes">
       <div className="space-y-6">
         <div className="grid gap-4 sm:grid-cols-3">
           <Card><CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">Factures</p>
+            <p className="text-xs text-muted-foreground">Documents</p>
             <p className="font-serif text-2xl font-semibold">{filtered.length}</p>
           </CardContent></Card>
           <Card><CardContent className="p-4">
@@ -92,9 +108,20 @@ function InvoicesPage() {
           </CardContent></Card>
         </div>
 
+        <Tabs value={tab} onValueChange={setTab}>
+          <TabsList className="flex flex-wrap">
+            <TabsTrigger value="all">Toutes les ventes</TabsTrigger>
+            <TabsTrigger value="full">Payées intégralement</TabsTrigger>
+            <TabsTrigger value="installment">Ventes échelonnées</TabsTrigger>
+            <TabsTrigger value="pending">Paiements en attente</TabsTrigger>
+            <TabsTrigger value="documents">Documents (factures & reçus)</TabsTrigger>
+          </TabsList>
+        </Tabs>
+
         <Card>
           <CardContent className="space-y-4 p-4">
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-5">
+
               <div className="relative lg:col-span-2">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input className="pl-9" placeholder="N° facture, client, téléphone, produit…" value={search} onChange={(e) => setSearch(e.target.value)} />
