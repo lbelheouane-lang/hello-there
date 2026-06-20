@@ -125,7 +125,7 @@ function ParuresPage() {
     },
   });
 
-  const { data: setItems } = useQuery({
+  const { data: setProducts } = useQuery({
     queryKey: ["set_items"],
     queryFn: async () => {
       const { data, error } = await supabase.from("products").select("*").not("set_id", "is", null);
@@ -145,7 +145,7 @@ function ParuresPage() {
 
   const itemsBySet = useMemo(() => {
     const m = new Map<string, SetItem[]>();
-    (setItems ?? []).forEach((it) => {
+    (setProducts ?? []).forEach((it) => {
       if (!it.set_id) return;
       const arr = m.get(it.set_id) ?? [];
       arr.push(it);
