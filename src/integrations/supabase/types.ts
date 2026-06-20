@@ -394,6 +394,74 @@ export type Database = {
           },
         ]
       }
+      jewelry_set_events: {
+        Row: {
+          created_at: string
+          detail: string | null
+          event_type: string
+          id: string
+          product_id: string | null
+          set_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          event_type: string
+          id?: string
+          product_id?: string | null
+          set_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          event_type?: string
+          id?: string
+          product_id?: string | null
+          set_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jewelry_set_events_set_id_fkey"
+            columns: ["set_id"]
+            isOneToOne: false
+            referencedRelation: "jewelry_sets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jewelry_sets: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          is_demo: boolean
+          name: string
+          notes: string | null
+          reference: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_demo?: boolean
+          name: string
+          notes?: string | null
+          reference: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_demo?: boolean
+          name?: string
+          notes?: string | null
+          reference?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
@@ -444,6 +512,30 @@ export type Database = {
           },
         ]
       }
+      product_categories: {
+        Row: {
+          created_at: string
+          id: string
+          is_default: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category: string
@@ -460,6 +552,7 @@ export type Database = {
           name: string
           origin: string | null
           selling_price: number
+          set_id: string | null
           status: string
           stone_cost: number
           supplier_id: string | null
@@ -481,6 +574,7 @@ export type Database = {
           name: string
           origin?: string | null
           selling_price?: number
+          set_id?: string | null
           status?: string
           stone_cost?: number
           supplier_id?: string | null
@@ -502,6 +596,7 @@ export type Database = {
           name?: string
           origin?: string | null
           selling_price?: number
+          set_id?: string | null
           status?: string
           stone_cost?: number
           supplier_id?: string | null
@@ -509,6 +604,13 @@ export type Database = {
           weight_grams?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "products_set_id_fkey"
+            columns: ["set_id"]
+            isOneToOne: false
+            referencedRelation: "jewelry_sets"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "products_supplier_id_fkey"
             columns: ["supplier_id"]
@@ -1056,6 +1158,7 @@ export type Database = {
       next_invoice_number: { Args: { _prefix?: string }; Returns: string }
       next_purchase_number: { Args: never; Returns: string }
       next_repair_number: { Args: never; Returns: string }
+      next_set_number: { Args: never; Returns: string }
       seed_demo_data: { Args: never; Returns: undefined }
     }
     Enums: {
