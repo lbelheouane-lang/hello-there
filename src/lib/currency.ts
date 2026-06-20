@@ -12,7 +12,7 @@ export const BASE_CURRENCY = "EUR";
 export const SUPPORTED_CURRENCIES = ["EUR", "DZD", "USD"] as const;
 export type Currency = (typeof SUPPORTED_CURRENCIES)[number];
 
-const DEFAULT_EUR_TO_DZD = 145;
+const DEFAULT_EUR_TO_DZD = 280;
 
 /** Configured EUR → DZD exchange rate (from store settings, with a safe fallback). */
 export function eurToDzdRate(): number {

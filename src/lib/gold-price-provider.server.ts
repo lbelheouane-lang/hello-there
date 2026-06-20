@@ -5,7 +5,7 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const OUNCE_TO_GRAM = 31.1034768;
-const DEFAULT_EUR_TO_DZD = 145;
+const DEFAULT_EUR_TO_DZD = 280;
 const DEFAULT_THRESHOLD_PCT = 2;
 
 /** Facteurs de pureté par titre (24K = or pur). */

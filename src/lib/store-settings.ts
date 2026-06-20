@@ -52,7 +52,7 @@ export const DEFAULT_SETTINGS: StoreSettings = {
   terms: null,
   signature_left: "Signature du client",
   signature_right: "Cachet & signature du représentant",
-  eur_to_dzd: 145,
+  eur_to_dzd: 280,
   gold_auto_sync: true,
   gold_manual_override: false,
   gold_manual_price_eur: null,
