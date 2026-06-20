@@ -153,6 +153,8 @@ function AmbientGlow() {
 }
 
 function Brand({ subtitle }: { subtitle?: string }) {
+  const { data: settings } = useStoreSettings();
+  const storeName = settings?.store_name || "Maison d'Or";
   return (
     <div className="flex flex-col items-center text-center">
       <div className="relative">
@@ -161,11 +163,15 @@ function Brand({ subtitle }: { subtitle?: string }) {
           style={{ animation: "auth-glow 4s ease-in-out infinite" }}
           aria-hidden
         />
-        <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-primary text-primary-foreground shadow-lg">
-          <Gem className="h-8 w-8" />
+        <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-3xl bg-primary text-primary-foreground shadow-lg">
+          {settings?.logo_url ? (
+            <img src={settings.logo_url} alt={storeName} className="h-full w-full object-contain" />
+          ) : (
+            <Gem className="h-8 w-8" />
+          )}
         </div>
       </div>
-      <h1 className="mt-5 font-serif text-3xl font-semibold tracking-tight">Maison d'Or</h1>
+      <h1 className="mt-5 font-serif text-3xl font-semibold tracking-tight">{storeName}</h1>
       {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
     </div>
   );
