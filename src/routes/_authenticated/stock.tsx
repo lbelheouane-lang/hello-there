@@ -286,7 +286,16 @@ function StockPage() {
                     </TableCell>
                     <TableCell>{p.gold_karat ? `${p.gold_karat}K` : METAL_TYPES.find((m) => m.value === p.metal_type)?.label}</TableCell>
                     <TableCell>{formatGrams(Number(p.weight_grams))}</TableCell>
-                    <TableCell>{ppg ? formatDZD(value) : <span className="text-muted-foreground">cours manquant</span>}</TableCell>
+                    <TableCell>
+                      {ppg ? (
+                        <div>
+                          <div>{formatUSD(value)}</div>
+                          <div className="text-xs text-muted-foreground">≈ {formatFromUSD(value, "DZD")}</div>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">cours manquant</span>
+                      )}
+                    </TableCell>
                     <TableCell><Badge variant={statusVariant(p.status)}>{statusLabel(p.status)}</Badge></TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="icon" title="Étiquette" onClick={() => setLabelProduct(p)}>
