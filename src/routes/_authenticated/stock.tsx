@@ -286,7 +286,7 @@ function StockPage() {
                   </Select>
                 </div>
               </div>
-              <div class="space-y-2" className="space-y-2">
+              <div className="space-y-2">
                 <Label>Origine du produit</Label>
                 <Input
                   placeholder="Ex. Italie, Dubaï, fabrication locale…"
