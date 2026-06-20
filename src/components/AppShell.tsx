@@ -101,8 +101,16 @@ function AppSidebar() {
   );
 }
 
-export function AppShell({ title, children }: { title: string; children: ReactNode }) {
-  return (
+export function AppShell({
+  title,
+  children,
+  allow,
+}: {
+  title: string;
+  children: ReactNode;
+  allow?: AppRole[];
+}) {
+  const inner = (
     <SidebarProvider>
       <BrandIntro />
       <AppSidebar />
@@ -120,4 +128,9 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
       </SidebarInset>
     </SidebarProvider>
   );
+
+  if (allow) {
+    return <RequireRole allow={allow}>{inner}</RequireRole>;
+  }
+  return inner;
 }
