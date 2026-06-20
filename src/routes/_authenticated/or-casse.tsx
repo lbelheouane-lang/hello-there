@@ -29,8 +29,21 @@ import {
 import { formatDZD, formatGrams, formatDate, formatDateTime } from "@/lib/format";
 import {
   SCRAP_KARATS, SCRAP_STATUSES, scrapStatusDef, scrapStatusLabel,
-  scrapEventLabel, SCRAP_EVENT_ICON,
+  scrapEventLabel, SCRAP_EVENT_ICON, printScrapInvoice,
 } from "@/lib/scrap-gold";
+
+function invoiceFromScrap(s: Scrap) {
+  return {
+    reference: s.reference,
+    purchasedAt: s.purchased_at,
+    customerName: s.customer_name,
+    weightGrams: Number(s.weight_grams),
+    goldKarat: s.gold_karat,
+    pricePerGram: Number(s.price_per_gram),
+    totalAmount: Number(s.total_amount),
+    notes: s.notes,
+  };
+}
 
 export const Route = createFileRoute("/_authenticated/or-casse")({
   component: ScrapGoldPage,
