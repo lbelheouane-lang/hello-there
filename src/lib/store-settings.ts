@@ -23,6 +23,11 @@ export interface StoreSettings {
   terms: string | null;
   signature_left: string | null;
   signature_right: string | null;
+  eur_to_dzd: number;
+  gold_auto_sync: boolean;
+  gold_manual_override: boolean;
+  gold_manual_price_eur: number | null;
+  gold_discrepancy_threshold_pct: number;
 }
 
 export const DEFAULT_SETTINGS: StoreSettings = {
