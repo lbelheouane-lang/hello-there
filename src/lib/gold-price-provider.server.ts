@@ -261,8 +261,9 @@ export async function runGoldPriceUpdate(): Promise<UpdateResult> {
   }));
   await supabaseAdmin.from("gold_prices").upsert(rows, { onConflict: "karat,price_date" });
 
-  // 6) Recalcul des produits (en EUR).
-  const productsRecalculated = await recalcProducts(basePerGram);
+  // 6) Recalcul des produits : le métal (calculé en EUR) est converti en DZD,
+  //    puis additionné aux coûts (déjà en DZD). Le prix de vente est stocké en DZD.
+  const productsRecalculated = await recalcProducts(basePerGram, cfg.eurToDzd);
 
   // 7) Journalisation.
   await logSync({
