@@ -113,10 +113,6 @@ function AuthPage() {
                     <Input id="su-name" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="su-phone">Téléphone</Label>
-                    <Input id="su-phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
                     <Label htmlFor="su-email">Email</Label>
                     <Input id="su-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
                   </div>
