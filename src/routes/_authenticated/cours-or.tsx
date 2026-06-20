@@ -122,7 +122,7 @@ function GoldPricePage() {
   // ---- Gold config (exchange rate, override, threshold, auto-sync) ----
   const saveConfig = useMutation({
     mutationFn: async (patch: Record<string, unknown>) => {
-      const { error } = await supabase.from("store_settings").update(patch).eq("singleton", true);
+      const { error } = await supabase.from("store_settings").update(patch as never).eq("singleton", true);
       if (error) throw error;
     },
     onSuccess: () => {
