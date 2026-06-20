@@ -7,10 +7,13 @@ import {
   Truck,
   Coins,
   LogOut,
+  ShoppingCart,
+  Users,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BrandIntro } from "@/components/BrandIntro";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth, type AppRole } from "@/hooks/use-auth";
+import { RequireRole } from "@/components/RequireRole";
 import { Button } from "@/components/ui/button";
 import {
   Sidebar,
@@ -28,12 +31,19 @@ import {
   SidebarInset,
 } from "@/components/ui/sidebar";
 
-const NAV = [
-  { to: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
-  { to: "/stock", label: "Stock", icon: Package },
-  { to: "/fournisseurs", label: "Fournisseurs", icon: Truck },
-  { to: "/cours-or", label: "Cours de l'or", icon: Coins },
-] as const;
+const NAV: readonly {
+  to: string;
+  label: string;
+  icon: typeof Gem;
+  roles: readonly AppRole[];
+}[] = [
+  { to: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard, roles: ["admin"] },
+  { to: "/nouvelle-vente", label: "Nouvelle vente", icon: ShoppingCart, roles: ["admin", "employe"] },
+  { to: "/clients", label: "Clients", icon: Users, roles: ["admin", "employe"] },
+  { to: "/stock", label: "Stock", icon: Package, roles: ["admin"] },
+  { to: "/fournisseurs", label: "Fournisseurs", icon: Truck, roles: ["admin"] },
+  { to: "/cours-or", label: "Cours de l'or", icon: Coins, roles: ["admin"] },
+];
 
 function AppSidebar() {
   const navigate = useNavigate();
@@ -63,7 +73,7 @@ function AppSidebar() {
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {NAV.map((item) => (
+              {NAV.filter((item) => role != null && item.roles.includes(role)).map((item) => (
                 <SidebarMenuItem key={item.to}>
                   <SidebarMenuButton asChild isActive={pathname === item.to}>
                     <Link to={item.to}>
@@ -92,8 +102,16 @@ function AppSidebar() {
   );
 }
 
-export function AppShell({ title, children }: { title: string; children: ReactNode }) {
-  return (
+export function AppShell({
+  title,
+  children,
+  allow,
+}: {
+  title: string;
+  children: ReactNode;
+  allow?: AppRole[];
+}) {
+  const inner = (
     <SidebarProvider>
       <BrandIntro />
       <AppSidebar />
@@ -111,4 +129,9 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
       </SidebarInset>
     </SidebarProvider>
   );
+
+  if (allow) {
+    return <RequireRole allow={allow}>{inner}</RequireRole>;
+  }
+  return inner;
 }

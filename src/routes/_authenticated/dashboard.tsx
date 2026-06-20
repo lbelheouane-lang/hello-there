@@ -79,7 +79,7 @@ function DashboardPage() {
   const { role } = useAuth();
 
   return (
-    <AppShell title="Tableau de bord">
+    <AppShell title="Tableau de bord" allow={["admin"]}>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <StatCard icon={Scale} label="Poids vendu (mois)" value={formatGrams(stats?.soldGramsMonth ?? 0)} hint={`Aujourd'hui : ${formatGrams(stats?.soldGramsDay ?? 0)}`} />
         <StatCard icon={ShoppingBag} label="Ventes du mois" value={String(stats?.salesMonth ?? 0)} hint={`Total : ${stats?.salesTotal ?? 0}`} />

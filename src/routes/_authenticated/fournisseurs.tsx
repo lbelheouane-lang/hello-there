@@ -98,7 +98,7 @@ function SuppliersPage() {
   });
 
   return (
-    <AppShell title="Fournisseurs">
+    <AppShell title="Fournisseurs" allow={["admin"]}>
       <div className="mb-4 flex justify-end">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
