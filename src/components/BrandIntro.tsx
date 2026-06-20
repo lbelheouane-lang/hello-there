@@ -107,14 +107,14 @@ export function BrandIntro() {
               animation: "brand-shimmer 2s linear 0.6s 1 forwards",
             }}
           >
-            Maison d'Or
+            {storeName}
           </span>
         </h1>
         <p
           className="text-sm tracking-widest text-muted-foreground uppercase"
           style={{ opacity: 0, animation: "brand-text-rise 0.9s ease-out 0.7s forwards" }}
         >
-          Gestion de bijouterie
+          {storeTag}
         </p>
       </div>
     </div>
