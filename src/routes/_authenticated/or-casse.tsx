@@ -555,6 +555,7 @@ function ScrapDetailDialog({ scrap, onClose, onEdit }: { scrap: Scrap | null; on
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose}><X className="mr-2 h-4 w-4" /> Fermer</Button>
+          <Button variant="outline" onClick={() => printScrapInvoice(invoiceFromScrap(scrap))}><FileText className="mr-2 h-4 w-4" /> Bon d'achat</Button>
           <Button onClick={() => onEdit(scrap)}><Pencil className="mr-2 h-4 w-4" /> Modifier</Button>
         </DialogFooter>
       </DialogContent>
