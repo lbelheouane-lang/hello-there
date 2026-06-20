@@ -431,6 +431,46 @@ function StockPage() {
             </div>
           )}
 
+          {/* Origin reporting (in-stock) */}
+          {(originStats.local.weight > 0 || originStats.imported.weight > 0) && (
+            <Card>
+              <CardContent className="space-y-3 p-4">
+                <p className="text-sm font-medium">Rapport par origine du métal (en stock)</p>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <div className="rounded-lg border p-3">
+                    <p className="text-xs text-muted-foreground">Poids or local</p>
+                    <p className="text-lg font-semibold">{formatGrams(originStats.local.weight)}</p>
+                  </div>
+                  <div className="rounded-lg border p-3">
+                    <p className="text-xs text-muted-foreground">Valeur or local</p>
+                    <p className="text-lg font-semibold">{formatFromEUR(originStats.local.value, "DZD")}</p>
+                  </div>
+                  <div className="rounded-lg border p-3">
+                    <p className="text-xs text-muted-foreground">Poids or importé</p>
+                    <p className="text-lg font-semibold">{formatGrams(originStats.imported.weight)}</p>
+                  </div>
+                  <div className="rounded-lg border p-3">
+                    <p className="text-xs text-muted-foreground">Valeur or importé</p>
+                    <p className="text-lg font-semibold">{formatFromEUR(originStats.imported.value, "DZD")}</p>
+                  </div>
+                </div>
+                {originStats.byCountry.length > 0 && (
+                  <div>
+                    <p className="mb-1 text-xs text-muted-foreground">Répartition par pays d'origine</p>
+                    <div className="flex flex-wrap gap-2">
+                      {originStats.byCountry.map(([country, e]) => (
+                        <Badge key={country} variant="outline" className="gap-1">
+                          {country} · {formatGrams(e.weight)} · {formatFromEUR(e.value, "DZD")}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="relative w-full max-w-xs">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
