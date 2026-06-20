@@ -268,7 +268,7 @@ function StockPage() {
                 <TableHead>Bijou</TableHead>
                 <TableHead>Titre</TableHead>
                 <TableHead>Poids</TableHead>
-                <TableHead>Valeur métal</TableHead>
+                <TableHead>Valeur métal (USD)</TableHead>
                 <TableHead>Statut</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
