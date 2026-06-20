@@ -143,6 +143,10 @@ function NewSalePage() {
         product_id: selectedProduct.id,
         product_name: selectedProduct.name,
         weight_grams: Number(selectedProduct.weight_grams),
+        purchase_price_per_gram:
+          Number(selectedProduct.weight_grams) > 0 && selectedProduct.metal_purchase_price != null
+            ? Number(selectedProduct.metal_purchase_price) / Number(selectedProduct.weight_grams)
+            : null,
         total_amount: total,
         amount_paid: paid,
         payment_method: paymentMethod,
