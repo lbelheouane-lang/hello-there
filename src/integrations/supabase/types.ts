@@ -574,6 +574,87 @@ export type Database = {
           },
         ]
       }
+      store_settings: {
+        Row: {
+          address: string | null
+          created_at: string
+          currency: string
+          email: string | null
+          id: string
+          invoice_footer: string | null
+          invoice_header: string | null
+          invoice_prefix: string
+          language: string
+          logo_url: string | null
+          phone: string | null
+          receipt_prefix: string
+          signature_left: string | null
+          signature_right: string | null
+          singleton: boolean
+          slogan: string | null
+          social: Json
+          store_name: string
+          tagline: string | null
+          tax_id: string | null
+          terms: string | null
+          thank_you_message: string | null
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          currency?: string
+          email?: string | null
+          id?: string
+          invoice_footer?: string | null
+          invoice_header?: string | null
+          invoice_prefix?: string
+          language?: string
+          logo_url?: string | null
+          phone?: string | null
+          receipt_prefix?: string
+          signature_left?: string | null
+          signature_right?: string | null
+          singleton?: boolean
+          slogan?: string | null
+          social?: Json
+          store_name?: string
+          tagline?: string | null
+          tax_id?: string | null
+          terms?: string | null
+          thank_you_message?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          currency?: string
+          email?: string | null
+          id?: string
+          invoice_footer?: string | null
+          invoice_header?: string | null
+          invoice_prefix?: string
+          language?: string
+          logo_url?: string | null
+          phone?: string | null
+          receipt_prefix?: string
+          signature_left?: string | null
+          signature_right?: string | null
+          singleton?: boolean
+          slogan?: string | null
+          social?: Json
+          store_name?: string
+          tagline?: string | null
+          tax_id?: string | null
+          terms?: string | null
+          thank_you_message?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       suppliers: {
         Row: {
           address: string | null
