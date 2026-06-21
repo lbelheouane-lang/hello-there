@@ -66,7 +66,7 @@ function NewSalePage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("id, internal_code, name, category, metal_type, gold_karat, weight_grams, metal_purchase_price")
+        .select("id, internal_code, name, category, metal_type, gold_karat, weight_grams, metal_purchase_price, quantity")
         .eq("status", "en_stock")
         .order("created_at", { ascending: false });
       if (error) throw error;
