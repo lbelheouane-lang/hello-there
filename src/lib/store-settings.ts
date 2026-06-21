@@ -28,6 +28,11 @@ export interface StoreSettings {
   gold_manual_override: boolean;
   gold_manual_price_eur: number | null;
   gold_discrepancy_threshold_pct: number;
+  default_theme: string;
+  default_mode: string;
+  login_logo_url: string | null;
+  login_background_url: string | null;
+  favicon_url: string | null;
 }
 
 export const DEFAULT_SETTINGS: StoreSettings = {
