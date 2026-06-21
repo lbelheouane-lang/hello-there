@@ -193,8 +193,8 @@ function Brand({ subtitle }: { subtitle?: string }) {
           aria-hidden
         />
         <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-3xl bg-primary text-primary-foreground shadow-lg">
-          {settings?.logo_url ? (
-            <img src={settings.logo_url} alt={storeName} className="h-full w-full object-contain" />
+          {(settings?.login_logo_url || settings?.logo_url) ? (
+            <img src={settings.login_logo_url || settings.logo_url || ""} alt={storeName} className="h-full w-full object-contain" />
           ) : (
             <Gem className="h-8 w-8" />
           )}
