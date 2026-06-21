@@ -130,6 +130,17 @@ function StockPage() {
 
   const { data: categories } = useCategories();
 
+  // Total pieces sold (across all sales)
+  const { data: piecesSold } = useQuery({
+    queryKey: ["sales", "pieces-sold"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("sales").select("quantity");
+      if (error) throw error;
+      return (data as { quantity: number | null }[]).reduce((s, r) => s + (Number(r.quantity) || 0), 0);
+    },
+  });
+
+
   // Map category name -> list of its subcategory names
   const subsByCatName = useMemo(() => {
     const idToName = new Map<string, string>();
