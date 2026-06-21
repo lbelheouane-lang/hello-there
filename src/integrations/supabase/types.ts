@@ -1337,8 +1337,11 @@ export type Database = {
           address: string | null
           created_at: string
           currency: string
+          default_mode: string
+          default_theme: string
           email: string | null
           eur_to_dzd: number
+          favicon_url: string | null
           gold_auto_sync: boolean
           gold_discrepancy_threshold_pct: number
           gold_manual_override: boolean
@@ -1348,6 +1351,8 @@ export type Database = {
           invoice_header: string | null
           invoice_prefix: string
           language: string
+          login_background_url: string | null
+          login_logo_url: string | null
           logo_url: string | null
           phone: string | null
           receipt_prefix: string
@@ -1368,8 +1373,11 @@ export type Database = {
           address?: string | null
           created_at?: string
           currency?: string
+          default_mode?: string
+          default_theme?: string
           email?: string | null
           eur_to_dzd?: number
+          favicon_url?: string | null
           gold_auto_sync?: boolean
           gold_discrepancy_threshold_pct?: number
           gold_manual_override?: boolean
@@ -1379,6 +1387,8 @@ export type Database = {
           invoice_header?: string | null
           invoice_prefix?: string
           language?: string
+          login_background_url?: string | null
+          login_logo_url?: string | null
           logo_url?: string | null
           phone?: string | null
           receipt_prefix?: string
@@ -1399,8 +1409,11 @@ export type Database = {
           address?: string | null
           created_at?: string
           currency?: string
+          default_mode?: string
+          default_theme?: string
           email?: string | null
           eur_to_dzd?: number
+          favicon_url?: string | null
           gold_auto_sync?: boolean
           gold_discrepancy_threshold_pct?: number
           gold_manual_override?: boolean
@@ -1410,6 +1423,8 @@ export type Database = {
           invoice_header?: string | null
           invoice_prefix?: string
           language?: string
+          login_background_url?: string | null
+          login_logo_url?: string | null
           logo_url?: string | null
           phone?: string | null
           receipt_prefix?: string
@@ -1464,6 +1479,63 @@ export type Database = {
           notes?: string | null
           phone?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      user_preferences: {
+        Row: {
+          accent_color: string | null
+          created_at: string
+          density: string
+          header_color: string | null
+          hidden_widgets: string[]
+          landing_page: string
+          menu_order: string[] | null
+          mode: string
+          primary_color: string | null
+          secondary_color: string | null
+          sidebar_color: string | null
+          sidebar_default: string
+          theme: string
+          updated_at: string
+          user_id: string
+          widget_order: string[] | null
+        }
+        Insert: {
+          accent_color?: string | null
+          created_at?: string
+          density?: string
+          header_color?: string | null
+          hidden_widgets?: string[]
+          landing_page?: string
+          menu_order?: string[] | null
+          mode?: string
+          primary_color?: string | null
+          secondary_color?: string | null
+          sidebar_color?: string | null
+          sidebar_default?: string
+          theme?: string
+          updated_at?: string
+          user_id: string
+          widget_order?: string[] | null
+        }
+        Update: {
+          accent_color?: string | null
+          created_at?: string
+          density?: string
+          header_color?: string | null
+          hidden_widgets?: string[]
+          landing_page?: string
+          menu_order?: string[] | null
+          mode?: string
+          primary_color?: string | null
+          secondary_color?: string | null
+          sidebar_color?: string | null
+          sidebar_default?: string
+          theme?: string
+          updated_at?: string
+          user_id?: string
+          widget_order?: string[] | null
         }
         Relationships: []
       }
