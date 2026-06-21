@@ -896,6 +896,7 @@ export type Database = {
         Row: {
           created_at: string
           employee_name: string | null
+          expense_id: string | null
           gold_karat: number | null
           id: string
           is_demo: boolean
@@ -922,6 +923,7 @@ export type Database = {
         Insert: {
           created_at?: string
           employee_name?: string | null
+          expense_id?: string | null
           gold_karat?: number | null
           id?: string
           is_demo?: boolean
@@ -948,6 +950,7 @@ export type Database = {
         Update: {
           created_at?: string
           employee_name?: string | null
+          expense_id?: string | null
           gold_karat?: number | null
           id?: string
           is_demo?: boolean
@@ -972,6 +975,13 @@ export type Database = {
           weight_grams?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "purchases_expense_id_fkey"
+            columns: ["expense_id"]
+            isOneToOne: false
+            referencedRelation: "expenses"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "purchases_product_id_fkey"
             columns: ["product_id"]

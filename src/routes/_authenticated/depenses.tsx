@@ -56,7 +56,12 @@ interface ExpenseForm {
   supplier_id: string;
   notes: string;
   spent_at: string;
+  purchase_reference: string;
+  quantity: string;
+  weight_grams: string;
 }
+
+const STOCK_CATEGORY = "Achat de stock";
 
 const emptyForm: ExpenseForm = {
   category: "",
@@ -66,6 +71,9 @@ const emptyForm: ExpenseForm = {
   supplier_id: "",
   notes: "",
   spent_at: new Date().toISOString().slice(0, 16),
+  purchase_reference: "",
+  quantity: "",
+  weight_grams: "",
 };
 
 function startOfToday() { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }
@@ -106,6 +114,16 @@ function ExpensesPage() {
       const { data, error } = await supabase.from("suppliers").select("id, name").order("name");
       if (error) throw error;
       return data as { id: string; name: string }[];
+    },
+  });
+
+  const { data: profile } = useQuery({
+    queryKey: ["my-profile", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("profiles").select("full_name").eq("id", user!.id).maybeSingle();
+      if (error) throw error;
+      return data as { full_name: string | null } | null;
     },
   });
 
@@ -165,8 +183,23 @@ function ExpensesPage() {
     setDialogOpen(true);
   }
 
-  function openEdit(e: Expense) {
+  async function openEdit(e: Expense) {
     setEditing(e);
+    let purchase_reference = "";
+    let quantity = "";
+    let weight_grams = "";
+    if (e.category === STOCK_CATEGORY) {
+      const { data: linked } = await supabase
+        .from("purchases")
+        .select("reference, quantity, weight_grams")
+        .eq("expense_id", e.id)
+        .maybeSingle();
+      if (linked) {
+        purchase_reference = linked.reference ?? "";
+        quantity = linked.quantity ? String(linked.quantity) : "";
+        weight_grams = Number(linked.weight_grams) ? String(linked.weight_grams) : "";
+      }
+    }
     setForm({
       category: e.category,
       description: e.description,
@@ -175,6 +208,9 @@ function ExpensesPage() {
       supplier_id: e.supplier_id ?? "",
       notes: e.notes ?? "",
       spent_at: new Date(e.spent_at).toISOString().slice(0, 16),
+      purchase_reference,
+      quantity,
+      weight_grams,
     });
     setFile(null);
     setDialogOpen(true);
@@ -186,6 +222,11 @@ function ExpensesPage() {
       if (!form.description.trim()) throw new Error("Ajoutez une description.");
       const amount = Number(form.amount);
       if (!amount || amount <= 0) throw new Error("Indiquez un montant valide.");
+
+      const isStock = form.category === STOCK_CATEGORY;
+      if (isStock && !form.supplier_id) {
+        throw new Error("Sélectionnez un fournisseur pour un achat de stock.");
+      }
 
       let attachment_path = editing?.attachment_path ?? null;
       if (file) {
@@ -207,18 +248,74 @@ function ExpensesPage() {
         attachment_path,
       };
 
+      let expenseId: string;
       if (editing) {
         const { error } = await supabase.from("expenses").update(payload).eq("id", editing.id);
         if (error) throw error;
+        expenseId = editing.id;
       } else {
-        const { error } = await supabase.from("expenses").insert({ ...payload, recorded_by: user!.id });
+        const { data: inserted, error } = await supabase
+          .from("expenses")
+          .insert({ ...payload, recorded_by: user!.id })
+          .select("id")
+          .single();
         if (error) throw error;
+        expenseId = inserted.id;
+      }
+
+      // Automatic supplier purchase integration for stock purchases
+      if (isStock && form.supplier_id) {
+        const supplier_name = supplierName(form.supplier_id);
+        const qty = form.quantity ? Math.max(parseInt(form.quantity, 10) || 0, 1) : 1;
+        const weight = form.weight_grams ? Number(form.weight_grams) || 0 : 0;
+        const employee_name = profile?.full_name ?? null;
+
+        const { data: existing } = await supabase
+          .from("purchases")
+          .select("id, reference")
+          .eq("expense_id", expenseId)
+          .maybeSingle();
+
+        let reference = form.purchase_reference.trim();
+        const purchaseFields = {
+          supplier_id: form.supplier_id,
+          supplier_name,
+          quantity: qty,
+          weight_grams: weight,
+          metal_purchase_price: amount,
+          unit_cost: qty > 0 ? amount / qty : amount,
+          total_cost: amount,
+          notes: form.notes.trim() || null,
+          purchased_at: new Date(form.spent_at).toISOString(),
+        };
+
+        if (existing) {
+          const { error } = await supabase
+            .from("purchases")
+            .update({ ...purchaseFields, reference: reference || existing.reference })
+            .eq("id", existing.id);
+          if (error) throw error;
+        } else {
+          if (!reference) {
+            const { data: gen } = await supabase.rpc("next_purchase_number");
+            reference = (gen as string) ?? `ACH-${Date.now()}`;
+          }
+          const { error } = await supabase.from("purchases").insert({
+            ...purchaseFields,
+            reference,
+            expense_id: expenseId,
+            recorded_by: user!.id,
+            employee_name,
+          });
+          if (error) throw error;
+        }
       }
     },
     onSuccess: () => {
       toast.success(editing ? "Dépense mise à jour" : "Dépense enregistrée");
       setDialogOpen(false);
       qc.invalidateQueries({ queryKey: ["expenses"] });
+      qc.invalidateQueries({ queryKey: ["supplier-purchases"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -476,7 +573,7 @@ function ExpensesPage() {
             </div>
 
             <div className="space-y-2">
-              <Label>Fournisseur (optionnel)</Label>
+              <Label>Fournisseur {form.category === STOCK_CATEGORY ? "*" : "(optionnel)"}</Label>
               <Select value={form.supplier_id || "none"} onValueChange={(v) => setForm((f) => ({ ...f, supplier_id: v === "none" ? "" : v }))}>
                 <SelectTrigger><SelectValue placeholder="Aucun" /></SelectTrigger>
                 <SelectContent>
@@ -485,6 +582,33 @@ function ExpensesPage() {
                 </SelectContent>
               </Select>
             </div>
+
+            {form.category === STOCK_CATEGORY && (
+              <div className="space-y-4 rounded-xl border border-primary/30 bg-primary/5 p-4">
+                <p className="text-sm font-medium text-primary">Détails de l'achat de stock</p>
+                <div className="space-y-2">
+                  <Label>Numéro de référence (optionnel)</Label>
+                  <Input
+                    placeholder="Généré automatiquement si vide"
+                    value={form.purchase_reference}
+                    onChange={(e) => setForm((f) => ({ ...f, purchase_reference: e.target.value }))}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label>Nombre d'articles (optionnel)</Label>
+                    <Input type="number" min={1} value={form.quantity} onChange={(e) => setForm((f) => ({ ...f, quantity: e.target.value }))} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Poids total (g, optionnel)</Label>
+                    <Input type="number" min={0} step="0.001" value={form.weight_grams} onChange={(e) => setForm((f) => ({ ...f, weight_grams: e.target.value }))} />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Un achat fournisseur sera créé automatiquement et ajouté à l'historique du fournisseur.
+                </p>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label>Notes</Label>
