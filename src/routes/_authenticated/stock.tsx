@@ -588,6 +588,27 @@ function StockPage() {
                       <Input type="number" min={0} step="0.001" value={form.weight_grams} onChange={(e) => setForm({ ...form, weight_grams: e.target.value })} />
                     </div>
                     <div className="space-y-2">
+                      <Label>Quantité (pièces)</Label>
+                      <Input type="number" min={0} step="1" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
+                    </div>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label>Prix d'achat du métal (DZD)</Label>
+                      <Input type="number" min={0} step="0.01" value={form.metal_purchase_price} onChange={(e) => setForm({ ...form, metal_purchase_price: e.target.value })} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Coût main-d'œuvre (DZD)</Label>
+                      <Input type="number" min={0} step="0.01" value={form.labor_cost} onChange={(e) => setForm({ ...form, labor_cost: e.target.value })} />
+                    </div>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label>Prix d'achat du métal (DZD)</Label>
+                      <Input type="number" min={0} step="0.01" value={form.metal_purchase_price} onChange={(e) => setForm({ ...form, metal_purchase_price: e.target.value })} />
+                    </div>
+
+                    <div className="space-y-2">
                       <Label>Prix d'achat du métal (DZD)</Label>
                       <Input type="number" min={0} step="0.01" value={form.metal_purchase_price} onChange={(e) => setForm({ ...form, metal_purchase_price: e.target.value })} />
                     </div>
