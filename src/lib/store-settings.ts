@@ -62,6 +62,11 @@ export const DEFAULT_SETTINGS: StoreSettings = {
   gold_manual_override: false,
   gold_manual_price_eur: null,
   gold_discrepancy_threshold_pct: 2,
+  default_theme: "gold",
+  default_mode: "light",
+  login_logo_url: null,
+  login_background_url: null,
+  favicon_url: null,
 };
 
 export const STORE_SETTINGS_QUERY_KEY = ["store-settings"] as const;
