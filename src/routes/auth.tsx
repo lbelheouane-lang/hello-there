@@ -98,7 +98,7 @@ function AuthPage() {
           }
         }
         setTimeout(() => {
-          navigate({ to: dest });
+          navigate({ to: dest as "/dashboard" });
         }, 1300);
       } catch {
         setError(true);
