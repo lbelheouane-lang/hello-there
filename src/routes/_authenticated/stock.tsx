@@ -303,7 +303,7 @@ function StockPage() {
       gold_karat: p.gold_karat ? String(p.gold_karat) : "",
       weight_grams: String(p.weight_grams), metal_purchase_price: String(p.metal_purchase_price),
       labor_cost: String(p.labor_cost), supplier_id: p.supplier_id ?? "",
-      origin: p.origin ?? "", status: p.status,
+      origin: p.origin ?? "", status: p.status, quantity: String(p.quantity),
       metal_origin: p.metal_origin ?? "",
       country_select: country ? (known && country !== "Autre" ? country : "Autre") : "",
       country_custom: country && (!known || country === "Autre") ? country : "",
