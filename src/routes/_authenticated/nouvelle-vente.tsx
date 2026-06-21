@@ -40,6 +40,7 @@ interface SaleProduct {
   weight_grams: number;
   metal_purchase_price: number | null;
   quantity: number;
+  status?: string;
 }
 
 interface CustomerOption {
