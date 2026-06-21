@@ -5,6 +5,7 @@ import { Gem, Shield, ShoppingCart, Delete, Loader2, ArrowLeft, Check } from "lu
 import { supabase } from "@/integrations/supabase/client";
 import { pinLogin } from "@/lib/pin-auth.functions";
 import { useStoreSettings } from "@/lib/store-settings";
+import { fetchUserPreferences } from "@/lib/user-preferences";
 
 export const Route = createFileRoute("/auth")({
   beforeLoad: async () => {
