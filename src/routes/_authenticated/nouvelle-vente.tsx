@@ -2,22 +2,29 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ShoppingCart, Search, Check, UserPlus } from "lucide-react";
+import { ShoppingCart, Search, Check, UserPlus, ScanLine, Layers, Package } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+} from "@/components/ui/dialog";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  PAYMENT_METHODS, METAL_TYPES, formatDZD, formatGrams, metalValue,
+  PAYMENT_METHODS, METAL_TYPES, formatDZD, formatGrams, metalValue, statusLabel,
 } from "@/lib/format";
 import { dzdFromEur } from "@/lib/currency";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
+import { QrScanDialog } from "@/components/QrScanDialog";
+import { useBarcodeScanner } from "@/hooks/use-barcode-scanner";
+import { parseScannedCode } from "@/lib/scan";
 
 export const Route = createFileRoute("/_authenticated/nouvelle-vente")({
   component: NewSalePage,
@@ -33,6 +40,7 @@ interface SaleProduct {
   weight_grams: number;
   metal_purchase_price: number | null;
   quantity: number;
+  status?: string;
 }
 
 interface CustomerOption {
@@ -60,6 +68,14 @@ function NewSalePage() {
   // Quick add customer
   const [newCustomerName, setNewCustomerName] = useState("");
   const [newCustomerPhone, setNewCustomerPhone] = useState("");
+
+  // Scanning (USB barcode + camera QR)
+  const [scanOpen, setScanOpen] = useState(false);
+  const [setDialog, setSetDialog] = useState<{
+    reference: string;
+    name: string;
+    items: SaleProduct[];
+  } | null>(null);
 
   const { data: products } = useQuery({
     queryKey: ["products", "for-sale"],
@@ -101,6 +117,81 @@ function NewSalePage() {
         selectedProduct.metal_type === "or" ? priceForKarat(prices, selectedProduct.gold_karat) : null,
       ))
     : 0;
+
+  // Select a product into the sale form, pre-filling quantity and the
+  // suggested total from its metal value.
+  function selectProduct(p: SaleProduct) {
+    setProductId(p.id);
+    setQuantity("1");
+    const ppg = p.metal_type === "or" ? priceForKarat(prices, p.gold_karat) : null;
+    const valueDzd = dzdFromEur(metalValue(Number(p.weight_grams), ppg));
+    if (valueDzd) setTotalAmount(String(Math.round(valueDzd)));
+  }
+
+  // Resolve a scanned barcode / QR code to a product or a jewelry set.
+  async function handleScan(raw: string) {
+    const parsed = parseScannedCode(raw);
+
+    // Jewelry set QR → open the set with its pieces
+    if (parsed.setId) {
+      const { data: set } = await supabase
+        .from("jewelry_sets")
+        .select("id, reference, name")
+        .eq("id", parsed.setId)
+        .maybeSingle();
+      if (!set) {
+        toast.error("Parure introuvable pour ce code.");
+        return;
+      }
+      const { data: items } = await supabase
+        .from("products")
+        .select("id, internal_code, name, category, metal_type, gold_karat, weight_grams, metal_purchase_price, quantity, status")
+        .eq("set_id", set.id)
+        .order("name");
+      setSetDialog({
+        reference: set.reference,
+        name: set.name,
+        items: (items ?? []) as unknown as SaleProduct[],
+      });
+      return;
+    }
+
+    // Otherwise look up a single product by id or SKU (internal code)
+    let query = supabase
+      .from("products")
+      .select("id, internal_code, name, category, metal_type, gold_karat, weight_grams, metal_purchase_price, quantity, status");
+    if (parsed.productId) query = query.eq("id", parsed.productId);
+    else if (parsed.sku) query = query.ilike("internal_code", parsed.sku);
+    else {
+      toast.error("Code non reconnu.");
+      return;
+    }
+    const { data: prod } = await query.maybeSingle();
+    if (!prod) {
+      toast.error("Aucun bijou trouvé pour ce code.");
+      return;
+    }
+    if (prod.status !== "en_stock" || Number(prod.quantity) <= 0) {
+      toast.error(`« ${prod.name} » n'est pas disponible à la vente.`);
+      return;
+    }
+    selectProduct(prod as unknown as SaleProduct);
+    toast.success(`« ${prod.name} » ajouté à la vente.`);
+  }
+
+  // USB barcode scanner (keyboard-wedge mode)
+  useBarcodeScanner((code) => { void handleScan(code); });
+
+  // Add a piece from the scanned set into the sale
+  function addSetItem(p: SaleProduct) {
+    if (p.status !== "en_stock" || Number(p.quantity) <= 0) {
+      toast.error(`« ${p.name} » n'est pas disponible.`);
+      return;
+    }
+    selectProduct(p);
+    setSetDialog(null);
+    toast.success(`« ${p.name} » ajouté à la vente.`);
+  }
 
   const addCustomer = useMutation({
     mutationFn: async () => {
@@ -195,10 +286,18 @@ function NewSalePage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input className="pl-9" placeholder="Rechercher par nom ou code…" value={productSearch} onChange={(e) => setProductSearch(e.target.value)} />
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input className="pl-9" placeholder="Rechercher par nom, code ou SKU…" value={productSearch} onChange={(e) => setProductSearch(e.target.value)} />
+              </div>
+              <Button type="button" variant="outline" className="shrink-0" onClick={() => setScanOpen(true)}>
+                <ScanLine className="mr-2 h-4 w-4" /> Scanner QR
+              </Button>
             </div>
+            <p className="text-xs text-muted-foreground">
+              Recherche manuelle, scanner USB (douchette) ou caméra du téléphone — le bijou est ajouté automatiquement à la vente.
+            </p>
             <div className="max-h-80 space-y-2 overflow-y-auto">
               {filteredProducts.map((p) => {
                 const ppg = p.metal_type === "or" ? priceForKarat(prices, p.gold_karat) : null;
@@ -208,11 +307,7 @@ function NewSalePage() {
                   <button
                     key={p.id}
                     type="button"
-                    onClick={() => {
-                      setProductId(p.id);
-                      setQuantity("1");
-                      if (valueDzd) setTotalAmount(String(Math.round(valueDzd)));
-                    }}
+                    onClick={() => selectProduct(p)}
                     className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-colors ${active ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`}
                   >
                     <div>
@@ -357,6 +452,61 @@ function NewSalePage() {
           </Card>
         </div>
       </div>
+
+      {/* Camera QR / barcode scanner */}
+      <QrScanDialog open={scanOpen} onOpenChange={setScanOpen} onScan={(t) => { void handleScan(t); }} />
+
+      {/* Jewelry set details after scanning a set QR */}
+      <Dialog open={!!setDialog} onOpenChange={(o) => !o && setSetDialog(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Layers className="h-5 w-5 text-primary" /> Parure {setDialog?.name}
+            </DialogTitle>
+            <DialogDescription>
+              <span className="font-mono">{setDialog?.reference}</span> — choisissez une pièce à vendre ou la parure entière.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            {setDialog?.items.map((p) => {
+              const available = p.status === "en_stock" && Number(p.quantity) > 0;
+              return (
+                <div key={p.id} className="flex items-center justify-between rounded-xl border p-3">
+                  <div>
+                    <p className="font-medium flex items-center gap-2">
+                      {p.name}
+                      {!available && <Badge variant="secondary">{statusLabel(p.status ?? "")}</Badge>}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      <span className="font-mono">{p.internal_code}</span>
+                      {" · "}{p.category}
+                      {" · "}{formatGrams(Number(p.weight_grams))}
+                      {" · "}{p.quantity} pc
+                    </p>
+                  </div>
+                  <Button size="sm" variant="outline" disabled={!available} onClick={() => addSetItem(p)}>
+                    <Package className="mr-1.5 h-4 w-4" /> Ajouter
+                  </Button>
+                </div>
+              );
+            })}
+            {setDialog && setDialog.items.length === 0 && (
+              <p className="py-6 text-center text-sm text-muted-foreground">Aucune pièce dans cette parure.</p>
+            )}
+            {setDialog && setDialog.items.some((p) => p.status === "en_stock" && Number(p.quantity) > 0) && (
+              <Button
+                className="w-full"
+                onClick={() => {
+                  const first = setDialog.items.find((p) => p.status === "en_stock" && Number(p.quantity) > 0);
+                  if (first) addSetItem(first);
+                }}
+              >
+                Vendre une pièce de la parure
+              </Button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
