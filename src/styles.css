@@ -236,6 +236,26 @@
   }
 }
 
+/* ============ Mode compact (densité) ============ */
+.density-compact {
+  --radius: 0.45rem;
+}
+.density-compact main {
+  padding: 0.75rem !important;
+}
+@media (min-width: 768px) {
+  .density-compact main {
+    padding: 1rem !important;
+  }
+}
+.density-compact .text-2xl {
+  font-size: 1.35rem;
+  line-height: 1.8rem;
+}
+.density-compact [data-slot="card"] {
+  --card-padding: 0.85rem;
+}
+
 /* ============ Impression des étiquettes / QR codes ============ */
 @media print {
   body * {

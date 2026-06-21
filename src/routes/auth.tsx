@@ -5,6 +5,7 @@ import { Gem, Shield, ShoppingCart, Delete, Loader2, ArrowLeft, Check } from "lu
 import { supabase } from "@/integrations/supabase/client";
 import { pinLogin } from "@/lib/pin-auth.functions";
 import { useStoreSettings } from "@/lib/store-settings";
+import { fetchUserPreferences } from "@/lib/user-preferences";
 
 export const Route = createFileRoute("/auth")({
   beforeLoad: async () => {
@@ -87,8 +88,17 @@ function AuthPage() {
           return;
         }
         setPhase("success");
+        let dest = res.role === "admin" ? "/dashboard" : "/nouvelle-vente";
+        if (res.role === "admin") {
+          try {
+            const prefs = await fetchUserPreferences();
+            if (prefs.landing_page) dest = prefs.landing_page;
+          } catch {
+            /* fall back to default landing page */
+          }
+        }
         setTimeout(() => {
-          navigate({ to: res.role === "admin" ? "/dashboard" : "/nouvelle-vente" });
+          navigate({ to: dest as "/dashboard" });
         }, 1300);
       } catch {
         setError(true);
@@ -117,8 +127,23 @@ function AuthPage() {
     submitPin(pin);
   };
 
+  const { data: storeSettings } = useStoreSettings();
+  const bgStyle = storeSettings?.login_background_url
+    ? {
+        backgroundImage: `url(${storeSettings.login_background_url})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }
+    : undefined;
+
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-background via-secondary to-accent px-4 py-10">
+    <div
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-background via-secondary to-accent px-4 py-10"
+      style={bgStyle}
+    >
+      {storeSettings?.login_background_url && (
+        <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" aria-hidden />
+      )}
       <AmbientGlow />
 
       {phase === "intro" && <Intro />}
@@ -168,8 +193,8 @@ function Brand({ subtitle }: { subtitle?: string }) {
           aria-hidden
         />
         <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-3xl bg-primary text-primary-foreground shadow-lg">
-          {settings?.logo_url ? (
-            <img src={settings.logo_url} alt={storeName} className="h-full w-full object-contain" />
+          {(settings?.login_logo_url || settings?.logo_url) ? (
+            <img src={settings.login_logo_url || settings.logo_url || ""} alt={storeName} className="h-full w-full object-contain" />
           ) : (
             <Gem className="h-8 w-8" />
           )}

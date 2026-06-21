@@ -28,6 +28,11 @@ export interface StoreSettings {
   gold_manual_override: boolean;
   gold_manual_price_eur: number | null;
   gold_discrepancy_threshold_pct: number;
+  default_theme: string;
+  default_mode: string;
+  login_logo_url: string | null;
+  login_background_url: string | null;
+  favicon_url: string | null;
 }
 
 export const DEFAULT_SETTINGS: StoreSettings = {
@@ -57,6 +62,11 @@ export const DEFAULT_SETTINGS: StoreSettings = {
   gold_manual_override: false,
   gold_manual_price_eur: null,
   gold_discrepancy_threshold_pct: 2,
+  default_theme: "gold",
+  default_mode: "light",
+  login_logo_url: null,
+  login_background_url: null,
+  favicon_url: null,
 };
 
 export const STORE_SETTINGS_QUERY_KEY = ["store-settings"] as const;

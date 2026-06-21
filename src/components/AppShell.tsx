@@ -23,6 +23,7 @@ import { BrandIntro } from "@/components/BrandIntro";
 import { useAuth, type AppRole } from "@/hooks/use-auth";
 import type { PermissionKey } from "@/lib/permissions";
 import { useStoreSettings } from "@/lib/store-settings";
+import { useUserPreferences } from "@/lib/user-preferences";
 import { RequireRole } from "@/components/RequireRole";
 import { Button } from "@/components/ui/button";
 import {
@@ -80,10 +81,22 @@ function AppSidebar() {
   const navigate = useNavigate();
   const { user, role, permissions } = useAuth();
   const { data: settings } = useStoreSettings();
+  const { data: prefs } = useUserPreferences();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const storeName = settings?.store_name || "Maison d'Or";
   const storeTag = settings?.slogan || settings?.tagline || "Gestion bijouterie";
+
+  const orderedNav = (() => {
+    const items = NAV.filter((item) => canAccess(item, role, permissions));
+    const order = prefs?.menu_order;
+    if (!order || order.length === 0) return items;
+    return [...items].sort(
+      (a, b) =>
+        (order.indexOf(a.to) === -1 ? 999 : order.indexOf(a.to)) -
+        (order.indexOf(b.to) === -1 ? 999 : order.indexOf(b.to)),
+    );
+  })();
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -112,7 +125,7 @@ function AppSidebar() {
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {NAV.filter((item) => canAccess(item, role, permissions)).map((item) => (
+              {orderedNav.map((item) => (
                 <SidebarMenuItem key={item.to}>
                   <SidebarMenuButton asChild isActive={pathname === item.to}>
                     <Link to={item.to}>
@@ -167,12 +180,20 @@ export function AppShell({
   children: ReactNode;
   allow?: AppRole[];
 }) {
+  const { data: prefs } = useUserPreferences();
+  const headerStyle = prefs?.header_color
+    ? { backgroundColor: prefs.header_color }
+    : undefined;
+
   const inner = (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={prefs?.sidebar_default !== "collapsed"}>
       <BrandIntro />
       <AppSidebar />
       <SidebarInset>
-        <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur">
+        <header
+          className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur"
+          style={headerStyle}
+        >
           <SidebarTrigger />
           <h1 className="font-serif text-xl font-semibold">{title}</h1>
         </header>
