@@ -103,45 +103,49 @@ function DashboardPage() {
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         {show("gold_grid") && (
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Coins className="h-5 w-5 text-primary" /> Cours de l'or au gramme (EUR)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {KARATS.map((k) => (
-                <div key={k} className="rounded-xl border bg-card p-4">
-                  <p className="text-sm text-muted-foreground">{k}K</p>
-                  <p className="mt-1 text-xl font-semibold">{prices?.[k] ? formatEUR(prices[k].price_per_gram) : "—"}</p>
-                  <p className="text-xs text-muted-foreground">{prices?.[k] ? `≈ ${formatFromEUR(prices[k].price_per_gram, "DZD")}` : ""}</p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <TrendingUp className="h-5 w-5 text-primary" /> Catégories les plus vendues
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {stats && stats.topCategories.length > 0 ? (
-              <ul className="space-y-2">
-                {stats.topCategories.map(([cat, count]) => (
-                  <li key={cat} className="flex items-center justify-between text-sm">
-                    <span>{cat}</span>
-                    <span className="font-medium">{count}</span>
-                  </li>
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Coins className="h-5 w-5 text-primary" /> Cours de l'or au gramme (EUR)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {KARATS.map((k) => (
+                  <div key={k} className="rounded-xl border bg-card p-4">
+                    <p className="text-sm text-muted-foreground">{k}K</p>
+                    <p className="mt-1 text-xl font-semibold">{prices?.[k] ? formatEUR(prices[k].price_per_gram) : "—"}</p>
+                    <p className="text-xs text-muted-foreground">{prices?.[k] ? `≈ ${formatFromEUR(prices[k].price_per_gram, "DZD")}` : ""}</p>
+                  </div>
                 ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-muted-foreground">Aucune vente enregistrée.</p>
-            )}
-          </CardContent>
-        </Card>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {show("top_categories") && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <TrendingUp className="h-5 w-5 text-primary" /> Catégories les plus vendues
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {stats && stats.topCategories.length > 0 ? (
+                <ul className="space-y-2">
+                  {stats.topCategories.map(([cat, count]) => (
+                    <li key={cat} className="flex items-center justify-between text-sm">
+                      <span>{cat}</span>
+                      <span className="font-medium">{count}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-muted-foreground">Aucune vente enregistrée.</p>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
     </AppShell>
   );
