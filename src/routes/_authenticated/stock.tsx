@@ -322,6 +322,12 @@ function StockPage() {
         if (!c) throw new Error("Le pays d'origine est obligatoire pour un métal importé.");
         countryOfOrigin = c;
       }
+      const qty = Math.floor(Number(form.quantity));
+      if (Number.isNaN(qty) || qty < 0) throw new Error("La quantité doit être un nombre entier positif ou nul.");
+      // Statut cohérent avec la quantité : rupture de stock => vendu.
+      let status = form.status;
+      if (qty === 0 && status === "en_stock") status = "vendu";
+      else if (qty > 0 && status === "vendu") status = "en_stock";
       const payload = {
         name: form.name.trim(),
         category: form.category,
@@ -335,7 +341,8 @@ function StockPage() {
         origin: form.origin.trim() || null,
         metal_origin: form.metal_origin || null,
         country_of_origin: countryOfOrigin,
-        status: form.status,
+        quantity: qty,
+        status,
       };
       if (editing) {
         const { error } = await supabase.from("products").update(payload).eq("id", editing.id);
