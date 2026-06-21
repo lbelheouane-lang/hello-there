@@ -344,7 +344,7 @@ function SystemDefaultsCard() {
     mutationFn: async (patch: Record<string, unknown>) => {
       const { error } = await supabase
         .from("store_settings")
-        .update(patch)
+        .update(patch as never)
         .eq("singleton", true);
       if (error) throw error;
     },
