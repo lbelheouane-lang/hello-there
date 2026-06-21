@@ -79,23 +79,30 @@ function DashboardPage() {
   const { data: prices } = useLatestGoldPrices();
   const { data: stats } = useDashboardStats();
   const { role } = useAuth();
+  const { data: prefs } = useUserPreferences();
+  const hidden = prefs?.hidden_widgets ?? [];
+  const show = (key: string) => !hidden.includes(key);
 
   return (
     <AppShell title="Tableau de bord" allow={["admin"]}>
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <StatCard icon={Scale} label="Poids vendu (mois)" value={formatGrams(stats?.soldGramsMonth ?? 0)} hint={`Aujourd'hui : ${formatGrams(stats?.soldGramsDay ?? 0)}`} />
-        <StatCard icon={ShoppingBag} label="Ventes du mois" value={String(stats?.salesMonth ?? 0)} hint={`Total : ${stats?.salesTotal ?? 0}`} />
-        <StatCard icon={Package} label="Stock total" value={formatGrams(stats?.stockGrams ?? 0)} hint={`${stats?.stockCount ?? 0} pièces en stock`} />
-        <StatCard icon={Coins} label="Cours 18K (gramme)" value={prices?.[18] ? formatEUR(prices[18].price_per_gram) : "—"} hint={prices?.[18] ? `≈ ${formatFromEUR(prices[18].price_per_gram, "DZD")}` : "Dernier cours connu"} />
-      </div>
+      {show("stats") && (
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <StatCard icon={Scale} label="Poids vendu (mois)" value={formatGrams(stats?.soldGramsMonth ?? 0)} hint={`Aujourd'hui : ${formatGrams(stats?.soldGramsDay ?? 0)}`} />
+          <StatCard icon={ShoppingBag} label="Ventes du mois" value={String(stats?.salesMonth ?? 0)} hint={`Total : ${stats?.salesTotal ?? 0}`} />
+          <StatCard icon={Package} label="Stock total" value={formatGrams(stats?.stockGrams ?? 0)} hint={`${stats?.stockCount ?? 0} pièces en stock`} />
+          <StatCard icon={Coins} label="Cours 18K (gramme)" value={prices?.[18] ? formatEUR(prices[18].price_per_gram) : "—"} hint={prices?.[18] ? `≈ ${formatFromEUR(prices[18].price_per_gram, "DZD")}` : "Dernier cours connu"} />
+        </div>
+      )}
 
-      <div className="mt-6">
-        <GoldPriceWidget canRefresh={role === "admin"} />
-      </div>
+      {show("gold_widget") && (
+        <div className="mt-6">
+          <GoldPriceWidget canRefresh={role === "admin"} />
+        </div>
+      )}
 
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+        {show("gold_grid") && (
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <Coins className="h-5 w-5 text-primary" /> Cours de l'or au gramme (EUR)
