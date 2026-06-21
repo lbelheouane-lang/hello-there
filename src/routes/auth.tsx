@@ -127,8 +127,23 @@ function AuthPage() {
     submitPin(pin);
   };
 
+  const { data: storeSettings } = useStoreSettings();
+  const bgStyle = storeSettings?.login_background_url
+    ? {
+        backgroundImage: `url(${storeSettings.login_background_url})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }
+    : undefined;
+
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-background via-secondary to-accent px-4 py-10">
+    <div
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-background via-secondary to-accent px-4 py-10"
+      style={bgStyle}
+    >
+      {storeSettings?.login_background_url && (
+        <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" aria-hidden />
+      )}
       <AmbientGlow />
 
       {phase === "intro" && <Intro />}
