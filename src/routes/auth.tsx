@@ -87,8 +87,17 @@ function AuthPage() {
           return;
         }
         setPhase("success");
+        let dest = res.role === "admin" ? "/dashboard" : "/nouvelle-vente";
+        if (res.role === "admin") {
+          try {
+            const prefs = await fetchUserPreferences();
+            if (prefs.landing_page) dest = prefs.landing_page;
+          } catch {
+            /* fall back to default landing page */
+          }
+        }
         setTimeout(() => {
-          navigate({ to: res.role === "admin" ? "/dashboard" : "/nouvelle-vente" });
+          navigate({ to: dest });
         }, 1300);
       } catch {
         setError(true);
