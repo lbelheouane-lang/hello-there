@@ -210,6 +210,7 @@ function NewSalePage() {
                     type="button"
                     onClick={() => {
                       setProductId(p.id);
+                      setQuantity("1");
                       if (valueDzd) setTotalAmount(String(Math.round(valueDzd)));
                     }}
                     className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-colors ${active ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`}
@@ -220,6 +221,7 @@ function NewSalePage() {
                         <span className="font-mono">{p.internal_code}</span>
                         {" · "}{p.gold_karat ? `${p.gold_karat}K` : METAL_TYPES.find((m) => m.value === p.metal_type)?.label}
                         {" · "}{formatGrams(Number(p.weight_grams))}
+                        {" · "}{p.quantity} pc
                       </p>
                     </div>
                     <div className="flex flex-col items-end gap-0.5">
