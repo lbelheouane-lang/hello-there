@@ -159,6 +159,14 @@ function ProductDetailPage() {
               <Row label="Catégorie" value={product.category} />
               <Row label="Métal" value={metal} />
               <Row label="Poids" value={formatGrams(Number(product.weight_grams))} />
+              <Row
+                label="Quantité"
+                value={
+                  Number(product.quantity) === 0
+                    ? <Badge variant="destructive">Rupture de stock</Badge>
+                    : `${product.quantity} pièce(s)`
+                }
+              />
               <Row label="Fournisseur" value={product.suppliers?.name ?? "—"} />
               <Row label="Origine du métal" value={metalOriginLabel(product.metal_origin)} />
               {product.metal_origin === "imported" && (
