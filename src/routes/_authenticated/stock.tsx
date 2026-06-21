@@ -603,10 +603,7 @@ function StockPage() {
                     </div>
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label>Coût main-d'œuvre (DZD)</Label>
-                      <Input type="number" min={0} step="0.01" value={form.labor_cost} onChange={(e) => setForm({ ...form, labor_cost: e.target.value })} />
-                    </div>
+
                     <div className="space-y-2">
                       <Label>Fournisseur</Label>
                       <Select value={form.supplier_id || "none"} onValueChange={(v) => setForm({ ...form, supplier_id: v === "none" ? "" : v })}>
