@@ -699,6 +699,47 @@ export type Database = {
           },
         ]
       }
+      product_quantity_events: {
+        Row: {
+          changed_by: string | null
+          created_at: string
+          detail: string | null
+          event_type: string
+          id: string
+          product_id: string
+          quantity_after: number
+          quantity_change: number | null
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string
+          detail?: string | null
+          event_type: string
+          id?: string
+          product_id: string
+          quantity_after: number
+          quantity_change?: number | null
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string
+          detail?: string | null
+          event_type?: string
+          id?: string
+          product_id?: string
+          quantity_after?: number
+          quantity_change?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_quantity_events_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_subcategories: {
         Row: {
           category_id: string
@@ -748,6 +789,7 @@ export type Database = {
           metal_type: string
           name: string
           origin: string | null
+          quantity: number
           selling_price: number
           set_id: string | null
           status: string
@@ -773,6 +815,7 @@ export type Database = {
           metal_type?: string
           name: string
           origin?: string | null
+          quantity?: number
           selling_price?: number
           set_id?: string | null
           status?: string
@@ -798,6 +841,7 @@ export type Database = {
           metal_type?: string
           name?: string
           origin?: string | null
+          quantity?: number
           selling_price?: number
           set_id?: string | null
           status?: string
@@ -1075,6 +1119,7 @@ export type Database = {
           product_id: string | null
           product_name: string | null
           purchase_price_per_gram: number | null
+          quantity: number
           sale_number: string
           sale_type: string
           sold_by: string | null
@@ -1094,6 +1139,7 @@ export type Database = {
           product_id?: string | null
           product_name?: string | null
           purchase_price_per_gram?: number | null
+          quantity?: number
           sale_number: string
           sale_type?: string
           sold_by?: string | null
@@ -1113,6 +1159,7 @@ export type Database = {
           product_id?: string | null
           product_name?: string | null
           purchase_price_per_gram?: number | null
+          quantity?: number
           sale_number?: string
           sale_type?: string
           sold_by?: string | null

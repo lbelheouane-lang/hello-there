@@ -31,6 +31,7 @@ interface ProductRow {
   origin: string | null;
   metal_origin: string | null;
   country_of_origin: string | null;
+  quantity: number;
   status: string;
   created_at: string;
   supplier_id: string | null;
@@ -42,6 +43,15 @@ interface OriginEvent {
   id: string;
   event_type: string;
   detail: string | null;
+  created_at: string;
+  changed_by: string | null;
+}
+
+interface QuantityEvent {
+  id: string;
+  event_type: string;
+  detail: string | null;
+  quantity_after: number;
   created_at: string;
   changed_by: string | null;
 }
@@ -84,6 +94,19 @@ function ProductDetailPage() {
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data as OriginEvent[];
+    },
+  });
+
+  const { data: quantityEvents } = useQuery({
+    queryKey: ["product-quantity-events", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_quantity_events")
+        .select("id, event_type, detail, quantity_after, created_at, changed_by")
+        .eq("product_id", id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as QuantityEvent[];
     },
   });
 
@@ -136,6 +159,14 @@ function ProductDetailPage() {
               <Row label="Catégorie" value={product.category} />
               <Row label="Métal" value={metal} />
               <Row label="Poids" value={formatGrams(Number(product.weight_grams))} />
+              <Row
+                label="Quantité"
+                value={
+                  Number(product.quantity) === 0
+                    ? <Badge variant="destructive">Rupture de stock</Badge>
+                    : `${product.quantity} pièce(s)`
+                }
+              />
               <Row label="Fournisseur" value={product.suppliers?.name ?? "—"} />
               <Row label="Origine du métal" value={metalOriginLabel(product.metal_origin)} />
               {product.metal_origin === "imported" && (
@@ -170,6 +201,29 @@ function ProductDetailPage() {
               </CardContent>
             </Card>
           )}
+
+          {quantityEvents && quantityEvents.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Historique des quantités</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {quantityEvents.map((e) => (
+                  <div key={e.id} className="flex items-start gap-3 border-b border-border/60 pb-3 last:border-0 last:pb-0">
+                    <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
+                    <div className="min-w-0">
+                      <p className="text-sm">{e.detail ?? e.event_type}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatDateTime(e.created_at)} · reste {e.quantity_after} pièce(s)
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+
 
 
 

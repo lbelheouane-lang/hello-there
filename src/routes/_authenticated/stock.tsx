@@ -59,6 +59,7 @@ interface Product {
   origin: string | null;
   metal_origin: string | null;
   country_of_origin: string | null;
+  quantity: number;
   created_at: string;
   status: string;
   is_demo: boolean;
@@ -67,7 +68,7 @@ interface Product {
 const empty: Record<string, string> = {
   name: "", category: CATEGORIES[0], subcategory: "", metal_type: "or", gold_karat: "21",
   weight_grams: "", metal_purchase_price: "", labor_cost: "", supplier_id: "",
-  origin: "", status: "en_stock",
+  origin: "", status: "en_stock", quantity: "1",
   metal_origin: "", country_select: "", country_custom: "",
 };
 
@@ -99,6 +100,8 @@ function StockPage() {
   const [countryFilter, setCountryFilter] = useState("all");
   const [minWeight, setMinWeight] = useState("");
   const [maxWeight, setMaxWeight] = useState("");
+  const [qtyFilter, setQtyFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("recent");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   const { data: products } = useQuery({
@@ -126,6 +129,17 @@ function StockPage() {
   }, [suppliers]);
 
   const { data: categories } = useCategories();
+
+  // Total pieces sold (across all sales)
+  const { data: piecesSold } = useQuery({
+    queryKey: ["sales", "pieces-sold"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("sales").select("quantity");
+      if (error) throw error;
+      return (data as { quantity: number | null }[]).reduce((s, r) => s + (Number(r.quantity) || 0), 0);
+    },
+  });
+
 
   // Map category name -> list of its subcategory names
   const subsByCatName = useMemo(() => {
@@ -164,20 +178,35 @@ function StockPage() {
     setLabelProducts(items);
   }
 
-  // Per-category statistics (count, weight, value, low-stock)
+  // Per-category statistics (count, pieces, weight, value, low-stock)
   const stats = useMemo(() => {
     const ppg = (p: Product) => (p.metal_type === "or" ? priceForKarat(prices, p.gold_karat) : null);
     const inStock = (products ?? []).filter((p) => p.status === "en_stock");
-    const byCat = new Map<string, { count: number; weight: number; value: number }>();
+    const byCat = new Map<string, { count: number; pieces: number; weight: number; value: number }>();
     for (const p of inStock) {
-      const e = byCat.get(p.category) ?? { count: 0, weight: 0, value: 0 };
+      const e = byCat.get(p.category) ?? { count: 0, pieces: 0, weight: 0, value: 0 };
       e.count += 1;
+      e.pieces += Number(p.quantity) || 0;
       e.weight += Number(p.weight_grams) || 0;
       e.value += metalValue(Number(p.weight_grams), ppg(p));
       byCat.set(p.category, e);
     }
     return byCat;
   }, [products, prices]);
+
+  // Global quantity reporting (pieces in stock, low stock, out of stock)
+  const qtyStats = useMemo(() => {
+    const all = products ?? [];
+    let inStockPieces = 0, lowStock = 0, outOfStock = 0;
+    for (const p of all) {
+      const q = Number(p.quantity) || 0;
+      if (q === 0) { outOfStock += 1; continue; }
+      inStockPieces += q;
+      if (q <= LOW_STOCK_THRESHOLD) lowStock += 1;
+    }
+    return { inStockPieces, lowStock, outOfStock };
+  }, [products]);
+
 
   // Origin reporting: local vs imported totals + breakdown by country
   const originStats = useMemo(() => {
@@ -210,7 +239,7 @@ function StockPage() {
     const q = search.toLowerCase().trim();
     const min = minWeight ? Number(minWeight) : null;
     const max = maxWeight ? Number(maxWeight) : null;
-    return products.filter((p) => {
+    const rows = products.filter((p) => {
       if (catFilter && p.category !== catFilter) return false;
       if (subFilter && p.subcategory !== subFilter) return false;
       if (metalFilter !== "all" && p.metal_type !== metalFilter) return false;
@@ -220,6 +249,9 @@ function StockPage() {
       if (countryFilter !== "all" && (p.country_of_origin ?? "") !== countryFilter) return false;
       if (min != null && Number(p.weight_grams) < min) return false;
       if (max != null && Number(p.weight_grams) > max) return false;
+      if (qtyFilter === "in" && Number(p.quantity) <= 0) return false;
+      if (qtyFilter === "low" && !(Number(p.quantity) > 0 && Number(p.quantity) <= LOW_STOCK_THRESHOLD)) return false;
+      if (qtyFilter === "out" && Number(p.quantity) !== 0) return false;
       if (q && !(
         p.name.toLowerCase().includes(q) ||
         p.internal_code.toLowerCase().includes(q) ||
@@ -228,7 +260,11 @@ function StockPage() {
       )) return false;
       return true;
     });
-  }, [products, search, catFilter, subFilter, metalFilter, karatFilter, supplierFilter, originFilter, countryFilter, minWeight, maxWeight]);
+    const sorted = [...rows];
+    if (sortBy === "qty_asc") sorted.sort((a, b) => Number(a.quantity) - Number(b.quantity));
+    else if (sortBy === "qty_desc") sorted.sort((a, b) => Number(b.quantity) - Number(a.quantity));
+    return sorted;
+  }, [products, search, catFilter, subFilter, metalFilter, karatFilter, supplierFilter, originFilter, countryFilter, minWeight, maxWeight, qtyFilter, sortBy]);
 
   // Distinct countries of origin present in the inventory
   const countries = useMemo(() => {
@@ -241,12 +277,13 @@ function StockPage() {
     (catFilter ? 1 : 0) + (subFilter ? 1 : 0) +
     (metalFilter !== "all" ? 1 : 0) + (karatFilter !== "all" ? 1 : 0) +
     (supplierFilter !== "all" ? 1 : 0) + (originFilter !== "all" ? 1 : 0) +
-    (countryFilter !== "all" ? 1 : 0) + (minWeight ? 1 : 0) + (maxWeight ? 1 : 0);
+    (countryFilter !== "all" ? 1 : 0) + (minWeight ? 1 : 0) + (maxWeight ? 1 : 0) +
+    (qtyFilter !== "all" ? 1 : 0);
 
   function clearFilters() {
     setCatFilter(null); setSubFilter(null); setMetalFilter("all");
     setKaratFilter("all"); setSupplierFilter("all"); setOriginFilter("all");
-    setCountryFilter("all"); setMinWeight(""); setMaxWeight("");
+    setCountryFilter("all"); setMinWeight(""); setMaxWeight(""); setQtyFilter("all");
   }
 
 
@@ -266,7 +303,7 @@ function StockPage() {
       gold_karat: p.gold_karat ? String(p.gold_karat) : "",
       weight_grams: String(p.weight_grams), metal_purchase_price: String(p.metal_purchase_price),
       labor_cost: String(p.labor_cost), supplier_id: p.supplier_id ?? "",
-      origin: p.origin ?? "", status: p.status,
+      origin: p.origin ?? "", status: p.status, quantity: String(p.quantity),
       metal_origin: p.metal_origin ?? "",
       country_select: country ? (known && country !== "Autre" ? country : "Autre") : "",
       country_custom: country && (!known || country === "Autre") ? country : "",
@@ -285,6 +322,12 @@ function StockPage() {
         if (!c) throw new Error("Le pays d'origine est obligatoire pour un métal importé.");
         countryOfOrigin = c;
       }
+      const qty = Math.floor(Number(form.quantity));
+      if (Number.isNaN(qty) || qty < 0) throw new Error("La quantité doit être un nombre entier positif ou nul.");
+      // Statut cohérent avec la quantité : rupture de stock => vendu.
+      let status = form.status;
+      if (qty === 0 && status === "en_stock") status = "vendu";
+      else if (qty > 0 && status === "vendu") status = "en_stock";
       const payload = {
         name: form.name.trim(),
         category: form.category,
@@ -298,7 +341,8 @@ function StockPage() {
         origin: form.origin.trim() || null,
         metal_origin: form.metal_origin || null,
         country_of_origin: countryOfOrigin,
-        status: form.status,
+        quantity: qty,
+        status,
       };
       if (editing) {
         const { error } = await supabase.from("products").update(payload).eq("id", editing.id);
@@ -413,12 +457,36 @@ function StockPage() {
 
         {/* Main content */}
         <div className="min-w-0 space-y-4">
+          {/* Global quantity reporting */}
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <Card><CardContent className="p-4">
+              <p className="text-xs text-muted-foreground">Pièces en stock</p>
+              <p className="text-2xl font-semibold">{qtyStats.inStockPieces}</p>
+            </CardContent></Card>
+            <Card><CardContent className="p-4">
+              <p className="text-xs text-muted-foreground">Pièces vendues</p>
+              <p className="text-2xl font-semibold">{piecesSold ?? 0}</p>
+            </CardContent></Card>
+            <Card><CardContent className="p-4">
+              <p className="text-xs text-muted-foreground">Stock faible (≤ {LOW_STOCK_THRESHOLD})</p>
+              <p className="text-2xl font-semibold text-destructive">{qtyStats.lowStock}</p>
+            </CardContent></Card>
+            <Card><CardContent className="p-4">
+              <p className="text-xs text-muted-foreground">En rupture</p>
+              <p className="text-2xl font-semibold text-destructive">{qtyStats.outOfStock}</p>
+            </CardContent></Card>
+          </div>
+
           {/* Stats for current category selection */}
           {catFilter && stats.get(catFilter) && (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               <Card><CardContent className="p-4">
                 <p className="text-xs text-muted-foreground">Articles en stock</p>
                 <p className="text-2xl font-semibold">{stats.get(catFilter)!.count}</p>
+              </CardContent></Card>
+              <Card><CardContent className="p-4">
+                <p className="text-xs text-muted-foreground">Pièces en stock</p>
+                <p className="text-2xl font-semibold">{stats.get(catFilter)!.pieces}</p>
               </CardContent></Card>
               <Card><CardContent className="p-4">
                 <p className="text-xs text-muted-foreground">Poids total</p>
@@ -544,15 +612,22 @@ function StockPage() {
                       <Input type="number" min={0} step="0.001" value={form.weight_grams} onChange={(e) => setForm({ ...form, weight_grams: e.target.value })} />
                     </div>
                     <div className="space-y-2">
-                      <Label>Prix d'achat du métal (DZD)</Label>
-                      <Input type="number" min={0} step="0.01" value={form.metal_purchase_price} onChange={(e) => setForm({ ...form, metal_purchase_price: e.target.value })} />
+                      <Label>Quantité (pièces)</Label>
+                      <Input type="number" min={0} step="1" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
                     </div>
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
+                      <Label>Prix d'achat du métal (DZD)</Label>
+                      <Input type="number" min={0} step="0.01" value={form.metal_purchase_price} onChange={(e) => setForm({ ...form, metal_purchase_price: e.target.value })} />
+                    </div>
+                    <div className="space-y-2">
                       <Label>Coût main-d'œuvre (DZD)</Label>
                       <Input type="number" min={0} step="0.01" value={form.labor_cost} onChange={(e) => setForm({ ...form, labor_cost: e.target.value })} />
                     </div>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+
                     <div className="space-y-2">
                       <Label>Fournisseur</Label>
                       <Select value={form.supplier_id || "none"} onValueChange={(v) => setForm({ ...form, supplier_id: v === "none" ? "" : v })}>
@@ -692,6 +767,31 @@ function StockPage() {
                 <Label className="text-xs">Poids max (g)</Label>
                 <Input type="number" min={0} step="0.001" className="h-9 w-24" value={maxWeight} onChange={(e) => setMaxWeight(e.target.value)} />
               </div>
+              <div className="space-y-1">
+
+                <Label className="text-xs">Quantité</Label>
+                <Select value={qtyFilter} onValueChange={setQtyFilter}>
+                  <SelectTrigger className="h-9 w-36"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes</SelectItem>
+                    <SelectItem value="in">En stock</SelectItem>
+                    <SelectItem value="low">Stock faible</SelectItem>
+                    <SelectItem value="out">En rupture</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Trier par</Label>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="h-9 w-40"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="recent">Plus récents</SelectItem>
+                    <SelectItem value="qty_desc">Quantité (décroissant)</SelectItem>
+                    <SelectItem value="qty_asc">Quantité (croissant)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               {activeFilters > 0 && (
                 <Button variant="ghost" size="sm" onClick={clearFilters}>
                   <X className="mr-1 h-4 w-4" /> Réinitialiser ({activeFilters})
@@ -729,6 +829,7 @@ function StockPage() {
                     <TableHead>Code</TableHead>
                     <TableHead>Bijou</TableHead>
                     <TableHead>Titre</TableHead>
+                    <TableHead>Quantité</TableHead>
                     <TableHead>Poids</TableHead>
                     <TableHead>Valeur métal (DZD)</TableHead>
                     <TableHead>Origine</TableHead>
@@ -770,6 +871,15 @@ function StockPage() {
                           </div>
                         </TableCell>
                         <TableCell>{p.gold_karat ? `${p.gold_karat}K` : METAL_TYPES.find((m) => m.value === p.metal_type)?.label}</TableCell>
+                        <TableCell>
+                          {Number(p.quantity) === 0 ? (
+                            <Badge variant="destructive">Rupture</Badge>
+                          ) : (
+                            <span className={cn("font-medium", Number(p.quantity) <= LOW_STOCK_THRESHOLD && "text-destructive")}>
+                              {p.quantity} pc
+                            </span>
+                          )}
+                        </TableCell>
                         <TableCell>{formatGrams(Number(p.weight_grams))}</TableCell>
                         <TableCell>
                           {ppg ? (
@@ -814,7 +924,7 @@ function StockPage() {
                   })}
                   {filtered.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={9} className="py-10 text-center text-muted-foreground">
+                      <TableCell colSpan={10} className="py-10 text-center text-muted-foreground">
                         <Package className="mx-auto mb-2 h-8 w-8 opacity-40" />
                         Aucun bijou ne correspond.
                       </TableCell>

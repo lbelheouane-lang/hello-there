@@ -32,6 +32,7 @@ interface SaleProduct {
   gold_karat: number | null;
   weight_grams: number;
   metal_purchase_price: number | null;
+  quantity: number;
 }
 
 interface CustomerOption {
@@ -48,6 +49,7 @@ function NewSalePage() {
   const [productSearch, setProductSearch] = useState("");
   const [productId, setProductId] = useState<string>("");
   const [customerId, setCustomerId] = useState<string>("");
+  const [quantity, setQuantity] = useState("1");
   const [totalAmount, setTotalAmount] = useState("");
   const [amountPaid, setAmountPaid] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<string>(PAYMENT_METHODS[0].value);
@@ -64,7 +66,7 @@ function NewSalePage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("id, internal_code, name, category, metal_type, gold_karat, weight_grams, metal_purchase_price")
+        .select("id, internal_code, name, category, metal_type, gold_karat, weight_grams, metal_purchase_price, quantity")
         .eq("status", "en_stock")
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -129,6 +131,10 @@ function NewSalePage() {
   const register = useMutation({
     mutationFn: async () => {
       if (!selectedProduct) throw new Error("Sélectionnez un bijou à vendre.");
+      const qty = Math.floor(Number(quantity));
+      if (!qty || qty <= 0) throw new Error("La quantité doit être un nombre entier positif.");
+      if (qty > Number(selectedProduct.quantity))
+        throw new Error(`Stock insuffisant : ${selectedProduct.quantity} pièce(s) disponible(s).`);
       const total = Number(totalAmount);
       if (!total || total <= 0) throw new Error("Indiquez le montant total de la vente.");
       const isInstallment = saleType === "installment";
@@ -137,12 +143,15 @@ function NewSalePage() {
         throw new Error("Pour un paiement échelonné, l'acompte doit être inférieur au total.");
       const { data: u } = await supabase.auth.getUser();
       const saleNumber = `V-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+      // L'inventaire (quantité + statut) est mis à jour automatiquement par le
+      // trigger apply_sale_to_inventory côté base de données.
       const { error } = await supabase.from("sales").insert({
         sale_number: saleNumber,
         customer_id: customerId || null,
         product_id: selectedProduct.id,
         product_name: selectedProduct.name,
         weight_grams: Number(selectedProduct.weight_grams),
+        quantity: qty,
         purchase_price_per_gram:
           Number(selectedProduct.weight_grams) > 0 && selectedProduct.metal_purchase_price != null
             ? Number(selectedProduct.metal_purchase_price) / Number(selectedProduct.weight_grams)
@@ -156,14 +165,13 @@ function NewSalePage() {
         sold_by: u.user?.id,
       });
       if (error) throw error;
-      const { error: upErr } = await supabase.from("products").update({ status: "vendu" }).eq("id", selectedProduct.id);
-      if (upErr) throw upErr;
       return saleNumber;
     },
     onSuccess: (saleNumber) => {
       toast.success(`Vente ${saleNumber} enregistrée`);
       setProductId("");
       setCustomerId("");
+      setQuantity("1");
       setTotalAmount("");
       setAmountPaid("");
       setNotes("");
@@ -202,6 +210,7 @@ function NewSalePage() {
                     type="button"
                     onClick={() => {
                       setProductId(p.id);
+                      setQuantity("1");
                       if (valueDzd) setTotalAmount(String(Math.round(valueDzd)));
                     }}
                     className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-colors ${active ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`}
@@ -212,6 +221,7 @@ function NewSalePage() {
                         <span className="font-mono">{p.internal_code}</span>
                         {" · "}{p.gold_karat ? `${p.gold_karat}K` : METAL_TYPES.find((m) => m.value === p.metal_type)?.label}
                         {" · "}{formatGrams(Number(p.weight_grams))}
+                        {" · "}{p.quantity} pc
                       </p>
                     </div>
                     <div className="flex flex-col items-end gap-0.5">
@@ -249,6 +259,23 @@ function NewSalePage() {
                   </SelectContent>
                 </Select>
               </div>
+
+              {selectedProduct && (
+                <div className="space-y-2">
+                  <Label>Quantité (pièces) *</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    step="1"
+                    max={selectedProduct.quantity}
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {selectedProduct.quantity} pièce(s) en stock
+                  </p>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label>Montant total (DZD) *</Label>
