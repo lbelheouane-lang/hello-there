@@ -59,6 +59,7 @@ interface Product {
   origin: string | null;
   metal_origin: string | null;
   country_of_origin: string | null;
+  quantity: number;
   created_at: string;
   status: string;
   is_demo: boolean;
