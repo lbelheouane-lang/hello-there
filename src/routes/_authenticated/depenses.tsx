@@ -56,7 +56,12 @@ interface ExpenseForm {
   supplier_id: string;
   notes: string;
   spent_at: string;
+  purchase_reference: string;
+  quantity: string;
+  weight_grams: string;
 }
+
+const STOCK_CATEGORY = "Achat de stock";
 
 const emptyForm: ExpenseForm = {
   category: "",
@@ -66,6 +71,9 @@ const emptyForm: ExpenseForm = {
   supplier_id: "",
   notes: "",
   spent_at: new Date().toISOString().slice(0, 16),
+  purchase_reference: "",
+  quantity: "",
+  weight_grams: "",
 };
 
 function startOfToday() { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }
