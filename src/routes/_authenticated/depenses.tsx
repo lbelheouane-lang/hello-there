@@ -183,8 +183,23 @@ function ExpensesPage() {
     setDialogOpen(true);
   }
 
-  function openEdit(e: Expense) {
+  async function openEdit(e: Expense) {
     setEditing(e);
+    let purchase_reference = "";
+    let quantity = "";
+    let weight_grams = "";
+    if (e.category === STOCK_CATEGORY) {
+      const { data: linked } = await supabase
+        .from("purchases")
+        .select("reference, quantity, weight_grams")
+        .eq("expense_id", e.id)
+        .maybeSingle();
+      if (linked) {
+        purchase_reference = linked.reference ?? "";
+        quantity = linked.quantity ? String(linked.quantity) : "";
+        weight_grams = Number(linked.weight_grams) ? String(linked.weight_grams) : "";
+      }
+    }
     setForm({
       category: e.category,
       description: e.description,
@@ -193,6 +208,9 @@ function ExpensesPage() {
       supplier_id: e.supplier_id ?? "",
       notes: e.notes ?? "",
       spent_at: new Date(e.spent_at).toISOString().slice(0, 16),
+      purchase_reference,
+      quantity,
+      weight_grams,
     });
     setFile(null);
     setDialogOpen(true);
@@ -204,6 +222,11 @@ function ExpensesPage() {
       if (!form.description.trim()) throw new Error("Ajoutez une description.");
       const amount = Number(form.amount);
       if (!amount || amount <= 0) throw new Error("Indiquez un montant valide.");
+
+      const isStock = form.category === STOCK_CATEGORY;
+      if (isStock && !form.supplier_id) {
+        throw new Error("Sélectionnez un fournisseur pour un achat de stock.");
+      }
 
       let attachment_path = editing?.attachment_path ?? null;
       if (file) {
@@ -225,12 +248,67 @@ function ExpensesPage() {
         attachment_path,
       };
 
+      let expenseId: string;
       if (editing) {
         const { error } = await supabase.from("expenses").update(payload).eq("id", editing.id);
         if (error) throw error;
+        expenseId = editing.id;
       } else {
-        const { error } = await supabase.from("expenses").insert({ ...payload, recorded_by: user!.id });
+        const { data: inserted, error } = await supabase
+          .from("expenses")
+          .insert({ ...payload, recorded_by: user!.id })
+          .select("id")
+          .single();
         if (error) throw error;
+        expenseId = inserted.id;
+      }
+
+      // Automatic supplier purchase integration for stock purchases
+      if (isStock && form.supplier_id) {
+        const supplier_name = supplierName(form.supplier_id);
+        const qty = form.quantity ? Math.max(parseInt(form.quantity, 10) || 0, 1) : 1;
+        const weight = form.weight_grams ? Number(form.weight_grams) || 0 : 0;
+        const employee_name = profile?.full_name ?? null;
+
+        const { data: existing } = await supabase
+          .from("purchases")
+          .select("id, reference")
+          .eq("expense_id", expenseId)
+          .maybeSingle();
+
+        let reference = form.purchase_reference.trim();
+        const purchaseFields = {
+          supplier_id: form.supplier_id,
+          supplier_name,
+          quantity: qty,
+          weight_grams: weight,
+          metal_purchase_price: amount,
+          unit_cost: qty > 0 ? amount / qty : amount,
+          total_cost: amount,
+          notes: form.notes.trim() || null,
+          purchased_at: new Date(form.spent_at).toISOString(),
+        };
+
+        if (existing) {
+          const { error } = await supabase
+            .from("purchases")
+            .update({ ...purchaseFields, reference: reference || existing.reference })
+            .eq("id", existing.id);
+          if (error) throw error;
+        } else {
+          if (!reference) {
+            const { data: gen } = await supabase.rpc("next_purchase_number");
+            reference = (gen as string) ?? `ACH-${Date.now()}`;
+          }
+          const { error } = await supabase.from("purchases").insert({
+            ...purchaseFields,
+            reference,
+            expense_id: expenseId,
+            recorded_by: user!.id,
+            employee_name,
+          });
+          if (error) throw error;
+        }
       }
     },
     onSuccess: () => {
