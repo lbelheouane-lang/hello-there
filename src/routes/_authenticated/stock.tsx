@@ -100,6 +100,8 @@ function StockPage() {
   const [countryFilter, setCountryFilter] = useState("all");
   const [minWeight, setMinWeight] = useState("");
   const [maxWeight, setMaxWeight] = useState("");
+  const [qtyFilter, setQtyFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("recent");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   const { data: products } = useQuery({
