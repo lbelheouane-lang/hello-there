@@ -286,10 +286,18 @@ function NewSalePage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input className="pl-9" placeholder="Rechercher par nom ou code…" value={productSearch} onChange={(e) => setProductSearch(e.target.value)} />
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input className="pl-9" placeholder="Rechercher par nom, code ou SKU…" value={productSearch} onChange={(e) => setProductSearch(e.target.value)} />
+              </div>
+              <Button type="button" variant="outline" className="shrink-0" onClick={() => setScanOpen(true)}>
+                <ScanLine className="mr-2 h-4 w-4" /> Scanner QR
+              </Button>
             </div>
+            <p className="text-xs text-muted-foreground">
+              Recherche manuelle, scanner USB (douchette) ou caméra du téléphone — le bijou est ajouté automatiquement à la vente.
+            </p>
             <div className="max-h-80 space-y-2 overflow-y-auto">
               {filteredProducts.map((p) => {
                 const ppg = p.metal_type === "or" ? priceForKarat(prices, p.gold_karat) : null;
@@ -299,11 +307,7 @@ function NewSalePage() {
                   <button
                     key={p.id}
                     type="button"
-                    onClick={() => {
-                      setProductId(p.id);
-                      setQuantity("1");
-                      if (valueDzd) setTotalAmount(String(Math.round(valueDzd)));
-                    }}
+                    onClick={() => selectProduct(p)}
                     className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-colors ${active ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`}
                   >
                     <div>
