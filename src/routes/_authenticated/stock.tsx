@@ -457,12 +457,36 @@ function StockPage() {
 
         {/* Main content */}
         <div className="min-w-0 space-y-4">
+          {/* Global quantity reporting */}
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <Card><CardContent className="p-4">
+              <p className="text-xs text-muted-foreground">Pièces en stock</p>
+              <p className="text-2xl font-semibold">{qtyStats.inStockPieces}</p>
+            </CardContent></Card>
+            <Card><CardContent className="p-4">
+              <p className="text-xs text-muted-foreground">Pièces vendues</p>
+              <p className="text-2xl font-semibold">{piecesSold ?? 0}</p>
+            </CardContent></Card>
+            <Card><CardContent className="p-4">
+              <p className="text-xs text-muted-foreground">Stock faible (≤ {LOW_STOCK_THRESHOLD})</p>
+              <p className="text-2xl font-semibold text-destructive">{qtyStats.lowStock}</p>
+            </CardContent></Card>
+            <Card><CardContent className="p-4">
+              <p className="text-xs text-muted-foreground">En rupture</p>
+              <p className="text-2xl font-semibold text-destructive">{qtyStats.outOfStock}</p>
+            </CardContent></Card>
+          </div>
+
           {/* Stats for current category selection */}
           {catFilter && stats.get(catFilter) && (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               <Card><CardContent className="p-4">
                 <p className="text-xs text-muted-foreground">Articles en stock</p>
                 <p className="text-2xl font-semibold">{stats.get(catFilter)!.count}</p>
+              </CardContent></Card>
+              <Card><CardContent className="p-4">
+                <p className="text-xs text-muted-foreground">Pièces en stock</p>
+                <p className="text-2xl font-semibold">{stats.get(catFilter)!.pieces}</p>
               </CardContent></Card>
               <Card><CardContent className="p-4">
                 <p className="text-xs text-muted-foreground">Poids total</p>
