@@ -260,6 +260,23 @@ function NewSalePage() {
                 </Select>
               </div>
 
+              {selectedProduct && (
+                <div className="space-y-2">
+                  <Label>Quantité (pièces) *</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    step="1"
+                    max={selectedProduct.quantity}
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {selectedProduct.quantity} pièce(s) en stock
+                  </p>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label>Montant total (DZD) *</Label>
                 <Input type="number" min={0} step="1" value={totalAmount} onChange={(e) => setTotalAmount(e.target.value)} />
