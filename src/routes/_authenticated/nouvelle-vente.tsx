@@ -452,6 +452,61 @@ function NewSalePage() {
           </Card>
         </div>
       </div>
+
+      {/* Camera QR / barcode scanner */}
+      <QrScanDialog open={scanOpen} onOpenChange={setScanOpen} onScan={(t) => { void handleScan(t); }} />
+
+      {/* Jewelry set details after scanning a set QR */}
+      <Dialog open={!!setDialog} onOpenChange={(o) => !o && setSetDialog(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Layers className="h-5 w-5 text-primary" /> Parure {setDialog?.name}
+            </DialogTitle>
+            <DialogDescription>
+              <span className="font-mono">{setDialog?.reference}</span> — choisissez une pièce à vendre ou la parure entière.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            {setDialog?.items.map((p) => {
+              const available = p.status === "en_stock" && Number(p.quantity) > 0;
+              return (
+                <div key={p.id} className="flex items-center justify-between rounded-xl border p-3">
+                  <div>
+                    <p className="font-medium flex items-center gap-2">
+                      {p.name}
+                      {!available && <Badge variant="secondary">{statusLabel(p.status ?? "")}</Badge>}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      <span className="font-mono">{p.internal_code}</span>
+                      {" · "}{p.category}
+                      {" · "}{formatGrams(Number(p.weight_grams))}
+                      {" · "}{p.quantity} pc
+                    </p>
+                  </div>
+                  <Button size="sm" variant="outline" disabled={!available} onClick={() => addSetItem(p)}>
+                    <Package className="mr-1.5 h-4 w-4" /> Ajouter
+                  </Button>
+                </div>
+              );
+            })}
+            {setDialog && setDialog.items.length === 0 && (
+              <p className="py-6 text-center text-sm text-muted-foreground">Aucune pièce dans cette parure.</p>
+            )}
+            {setDialog && setDialog.items.some((p) => p.status === "en_stock" && Number(p.quantity) > 0) && (
+              <Button
+                className="w-full"
+                onClick={() => {
+                  const first = setDialog.items.find((p) => p.status === "en_stock" && Number(p.quantity) > 0);
+                  if (first) addSetItem(first);
+                }}
+              >
+                Vendre une pièce de la parure
+              </Button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
