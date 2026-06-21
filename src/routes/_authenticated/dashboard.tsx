@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLatestGoldPrices } from "@/hooks/use-gold-prices";
 import { useAuth } from "@/hooks/use-auth";
+import { useUserPreferences } from "@/lib/user-preferences";
 import { GoldPriceWidget } from "@/components/GoldPriceWidget";
 import { formatGrams, KARATS } from "@/lib/format";
 import { formatEUR, formatFromEUR } from "@/lib/currency";
