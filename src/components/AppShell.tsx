@@ -81,10 +81,22 @@ function AppSidebar() {
   const navigate = useNavigate();
   const { user, role, permissions } = useAuth();
   const { data: settings } = useStoreSettings();
+  const { data: prefs } = useUserPreferences();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const storeName = settings?.store_name || "Maison d'Or";
   const storeTag = settings?.slogan || settings?.tagline || "Gestion bijouterie";
+
+  const orderedNav = (() => {
+    const items = NAV.filter((item) => canAccess(item, role, permissions));
+    const order = prefs?.menu_order;
+    if (!order || order.length === 0) return items;
+    return [...items].sort(
+      (a, b) =>
+        (order.indexOf(a.to) === -1 ? 999 : order.indexOf(a.to)) -
+        (order.indexOf(b.to) === -1 ? 999 : order.indexOf(b.to)),
+    );
+  })();
 
   async function signOut() {
     await supabase.auth.signOut();
