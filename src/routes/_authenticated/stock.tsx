@@ -68,7 +68,7 @@ interface Product {
 const empty: Record<string, string> = {
   name: "", category: CATEGORIES[0], subcategory: "", metal_type: "or", gold_karat: "21",
   weight_grams: "", metal_purchase_price: "", labor_cost: "", supplier_id: "",
-  origin: "", status: "en_stock",
+  origin: "", status: "en_stock", quantity: "1",
   metal_origin: "", country_select: "", country_custom: "",
 };
 
