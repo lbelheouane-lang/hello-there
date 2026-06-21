@@ -117,6 +117,16 @@ function ExpensesPage() {
     },
   });
 
+  const { data: profile } = useQuery({
+    queryKey: ["my-profile", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("profiles").select("full_name").eq("id", user!.id).maybeSingle();
+      if (error) throw error;
+      return data as { full_name: string | null } | null;
+    },
+  });
+
   const { data: expenses, isLoading } = useQuery({
     queryKey: ["expenses"],
     queryFn: async () => {
