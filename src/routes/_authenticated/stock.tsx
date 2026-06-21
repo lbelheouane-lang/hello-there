@@ -764,9 +764,29 @@ function StockPage() {
                 <Input type="number" min={0} step="0.001" className="h-9 w-24" value={minWeight} onChange={(e) => setMinWeight(e.target.value)} />
               </div>
               <div className="space-y-1">
-                <Label className="text-xs">Poids max (g)</Label>
-                <Input type="number" min={0} step="0.001" className="h-9 w-24" value={maxWeight} onChange={(e) => setMaxWeight(e.target.value)} />
+                <Label className="text-xs">Quantité</Label>
+                <Select value={qtyFilter} onValueChange={setQtyFilter}>
+                  <SelectTrigger className="h-9 w-36"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes</SelectItem>
+                    <SelectItem value="in">En stock</SelectItem>
+                    <SelectItem value="low">Stock faible</SelectItem>
+                    <SelectItem value="out">En rupture</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Trier par</Label>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="h-9 w-40"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="recent">Plus récents</SelectItem>
+                    <SelectItem value="qty_desc">Quantité (décroissant)</SelectItem>
+                    <SelectItem value="qty_asc">Quantité (croissant)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               {activeFilters > 0 && (
                 <Button variant="ghost" size="sm" onClick={clearFilters}>
                   <X className="mr-1 h-4 w-4" /> Réinitialiser ({activeFilters})
