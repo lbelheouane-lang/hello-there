@@ -178,20 +178,35 @@ function StockPage() {
     setLabelProducts(items);
   }
 
-  // Per-category statistics (count, weight, value, low-stock)
+  // Per-category statistics (count, pieces, weight, value, low-stock)
   const stats = useMemo(() => {
     const ppg = (p: Product) => (p.metal_type === "or" ? priceForKarat(prices, p.gold_karat) : null);
     const inStock = (products ?? []).filter((p) => p.status === "en_stock");
-    const byCat = new Map<string, { count: number; weight: number; value: number }>();
+    const byCat = new Map<string, { count: number; pieces: number; weight: number; value: number }>();
     for (const p of inStock) {
-      const e = byCat.get(p.category) ?? { count: 0, weight: 0, value: 0 };
+      const e = byCat.get(p.category) ?? { count: 0, pieces: 0, weight: 0, value: 0 };
       e.count += 1;
+      e.pieces += Number(p.quantity) || 0;
       e.weight += Number(p.weight_grams) || 0;
       e.value += metalValue(Number(p.weight_grams), ppg(p));
       byCat.set(p.category, e);
     }
     return byCat;
   }, [products, prices]);
+
+  // Global quantity reporting (pieces in stock, low stock, out of stock)
+  const qtyStats = useMemo(() => {
+    const all = products ?? [];
+    let inStockPieces = 0, lowStock = 0, outOfStock = 0;
+    for (const p of all) {
+      const q = Number(p.quantity) || 0;
+      if (q === 0) { outOfStock += 1; continue; }
+      inStockPieces += q;
+      if (q <= LOW_STOCK_THRESHOLD) lowStock += 1;
+    }
+    return { inStockPieces, lowStock, outOfStock };
+  }, [products]);
+
 
   // Origin reporting: local vs imported totals + breakdown by country
   const originStats = useMemo(() => {
