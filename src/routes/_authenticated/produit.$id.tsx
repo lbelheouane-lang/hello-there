@@ -31,6 +31,7 @@ interface ProductRow {
   origin: string | null;
   metal_origin: string | null;
   country_of_origin: string | null;
+  quantity: number;
   status: string;
   created_at: string;
   supplier_id: string | null;
@@ -42,6 +43,15 @@ interface OriginEvent {
   id: string;
   event_type: string;
   detail: string | null;
+  created_at: string;
+  changed_by: string | null;
+}
+
+interface QuantityEvent {
+  id: string;
+  event_type: string;
+  detail: string | null;
+  quantity_after: number;
   created_at: string;
   changed_by: string | null;
 }
