@@ -192,6 +192,7 @@ function NewSalePage() {
     toast.success(`« ${p.name} » ajouté à la vente.`);
   }
 
+  const addCustomer = useMutation({
     mutationFn: async () => {
       if (!newCustomerName.trim()) throw new Error("Le nom du client est obligatoire.");
       const { data: u } = await supabase.auth.getUser();
