@@ -23,6 +23,7 @@ import { BrandIntro } from "@/components/BrandIntro";
 import { useAuth, type AppRole } from "@/hooks/use-auth";
 import type { PermissionKey } from "@/lib/permissions";
 import { useStoreSettings } from "@/lib/store-settings";
+import { useUserPreferences } from "@/lib/user-preferences";
 import { RequireRole } from "@/components/RequireRole";
 import { Button } from "@/components/ui/button";
 import {
