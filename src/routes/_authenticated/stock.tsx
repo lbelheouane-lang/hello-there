@@ -780,6 +780,7 @@ function StockPage() {
                     <TableHead>Code</TableHead>
                     <TableHead>Bijou</TableHead>
                     <TableHead>Titre</TableHead>
+                    <TableHead>Quantité</TableHead>
                     <TableHead>Poids</TableHead>
                     <TableHead>Valeur métal (DZD)</TableHead>
                     <TableHead>Origine</TableHead>
