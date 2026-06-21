@@ -131,6 +131,10 @@ function NewSalePage() {
   const register = useMutation({
     mutationFn: async () => {
       if (!selectedProduct) throw new Error("Sélectionnez un bijou à vendre.");
+      const qty = Math.floor(Number(quantity));
+      if (!qty || qty <= 0) throw new Error("La quantité doit être un nombre entier positif.");
+      if (qty > Number(selectedProduct.quantity))
+        throw new Error(`Stock insuffisant : ${selectedProduct.quantity} pièce(s) disponible(s).`);
       const total = Number(totalAmount);
       if (!total || total <= 0) throw new Error("Indiquez le montant total de la vente.");
       const isInstallment = saleType === "installment";
@@ -139,12 +143,15 @@ function NewSalePage() {
         throw new Error("Pour un paiement échelonné, l'acompte doit être inférieur au total.");
       const { data: u } = await supabase.auth.getUser();
       const saleNumber = `V-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+      // L'inventaire (quantité + statut) est mis à jour automatiquement par le
+      // trigger apply_sale_to_inventory côté base de données.
       const { error } = await supabase.from("sales").insert({
         sale_number: saleNumber,
         customer_id: customerId || null,
         product_id: selectedProduct.id,
         product_name: selectedProduct.name,
         weight_grams: Number(selectedProduct.weight_grams),
+        quantity: qty,
         purchase_price_per_gram:
           Number(selectedProduct.weight_grams) > 0 && selectedProduct.metal_purchase_price != null
             ? Number(selectedProduct.metal_purchase_price) / Number(selectedProduct.weight_grams)
@@ -158,14 +165,13 @@ function NewSalePage() {
         sold_by: u.user?.id,
       });
       if (error) throw error;
-      const { error: upErr } = await supabase.from("products").update({ status: "vendu" }).eq("id", selectedProduct.id);
-      if (upErr) throw upErr;
       return saleNumber;
     },
     onSuccess: (saleNumber) => {
       toast.success(`Vente ${saleNumber} enregistrée`);
       setProductId("");
       setCustomerId("");
+      setQuantity("1");
       setTotalAmount("");
       setAmountPaid("");
       setNotes("");
