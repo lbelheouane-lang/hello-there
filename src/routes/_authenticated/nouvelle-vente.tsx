@@ -49,6 +49,7 @@ function NewSalePage() {
   const [productSearch, setProductSearch] = useState("");
   const [productId, setProductId] = useState<string>("");
   const [customerId, setCustomerId] = useState<string>("");
+  const [quantity, setQuantity] = useState("1");
   const [totalAmount, setTotalAmount] = useState("");
   const [amountPaid, setAmountPaid] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<string>(PAYMENT_METHODS[0].value);
