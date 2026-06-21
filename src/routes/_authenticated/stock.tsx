@@ -764,6 +764,11 @@ function StockPage() {
                 <Input type="number" min={0} step="0.001" className="h-9 w-24" value={minWeight} onChange={(e) => setMinWeight(e.target.value)} />
               </div>
               <div className="space-y-1">
+                <Label className="text-xs">Poids max (g)</Label>
+                <Input type="number" min={0} step="0.001" className="h-9 w-24" value={maxWeight} onChange={(e) => setMaxWeight(e.target.value)} />
+              </div>
+              <div className="space-y-1">
+
                 <Label className="text-xs">Quantité</Label>
                 <Select value={qtyFilter} onValueChange={setQtyFilter}>
                   <SelectTrigger className="h-9 w-36"><SelectValue /></SelectTrigger>
