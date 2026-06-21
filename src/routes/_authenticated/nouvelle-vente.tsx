@@ -117,7 +117,81 @@ function NewSalePage() {
       ))
     : 0;
 
-  const addCustomer = useMutation({
+  // Select a product into the sale form, pre-filling quantity and the
+  // suggested total from its metal value.
+  function selectProduct(p: SaleProduct) {
+    setProductId(p.id);
+    setQuantity("1");
+    const ppg = p.metal_type === "or" ? priceForKarat(prices, p.gold_karat) : null;
+    const valueDzd = dzdFromEur(metalValue(Number(p.weight_grams), ppg));
+    if (valueDzd) setTotalAmount(String(Math.round(valueDzd)));
+  }
+
+  // Resolve a scanned barcode / QR code to a product or a jewelry set.
+  async function handleScan(raw: string) {
+    const parsed = parseScannedCode(raw);
+
+    // Jewelry set QR → open the set with its pieces
+    if (parsed.setId) {
+      const { data: set } = await supabase
+        .from("jewelry_sets")
+        .select("id, reference, name")
+        .eq("id", parsed.setId)
+        .maybeSingle();
+      if (!set) {
+        toast.error("Parure introuvable pour ce code.");
+        return;
+      }
+      const { data: items } = await supabase
+        .from("products")
+        .select("id, internal_code, name, category, metal_type, gold_karat, weight_grams, metal_purchase_price, quantity, status")
+        .eq("set_id", set.id)
+        .order("name");
+      setSetDialog({
+        reference: set.reference,
+        name: set.name,
+        items: (items ?? []) as unknown as SaleProduct[],
+      });
+      return;
+    }
+
+    // Otherwise look up a single product by id or SKU (internal code)
+    let query = supabase
+      .from("products")
+      .select("id, internal_code, name, category, metal_type, gold_karat, weight_grams, metal_purchase_price, quantity, status");
+    if (parsed.productId) query = query.eq("id", parsed.productId);
+    else if (parsed.sku) query = query.ilike("internal_code", parsed.sku);
+    else {
+      toast.error("Code non reconnu.");
+      return;
+    }
+    const { data: prod } = await query.maybeSingle();
+    if (!prod) {
+      toast.error("Aucun bijou trouvé pour ce code.");
+      return;
+    }
+    if (prod.status !== "en_stock" || Number(prod.quantity) <= 0) {
+      toast.error(`« ${prod.name} » n'est pas disponible à la vente.`);
+      return;
+    }
+    selectProduct(prod as unknown as SaleProduct);
+    toast.success(`« ${prod.name} » ajouté à la vente.`);
+  }
+
+  // USB barcode scanner (keyboard-wedge mode)
+  useBarcodeScanner((code) => { void handleScan(code); });
+
+  // Add a piece from the scanned set into the sale
+  function addSetItem(p: SaleProduct) {
+    if (p.status !== "en_stock" || Number(p.quantity) <= 0) {
+      toast.error(`« ${p.name} » n'est pas disponible.`);
+      return;
+    }
+    selectProduct(p);
+    setSetDialog(null);
+    toast.success(`« ${p.name} » ajouté à la vente.`);
+  }
+
     mutationFn: async () => {
       if (!newCustomerName.trim()) throw new Error("Le nom du client est obligatoire.");
       const { data: u } = await supabase.auth.getUser();
