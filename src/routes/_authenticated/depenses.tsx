@@ -573,7 +573,7 @@ function ExpensesPage() {
             </div>
 
             <div className="space-y-2">
-              <Label>Fournisseur (optionnel)</Label>
+              <Label>Fournisseur {form.category === STOCK_CATEGORY ? "*" : "(optionnel)"}</Label>
               <Select value={form.supplier_id || "none"} onValueChange={(v) => setForm((f) => ({ ...f, supplier_id: v === "none" ? "" : v }))}>
                 <SelectTrigger><SelectValue placeholder="Aucun" /></SelectTrigger>
                 <SelectContent>
@@ -582,6 +582,33 @@ function ExpensesPage() {
                 </SelectContent>
               </Select>
             </div>
+
+            {form.category === STOCK_CATEGORY && (
+              <div className="space-y-4 rounded-xl border border-primary/30 bg-primary/5 p-4">
+                <p className="text-sm font-medium text-primary">Détails de l'achat de stock</p>
+                <div className="space-y-2">
+                  <Label>Numéro de référence (optionnel)</Label>
+                  <Input
+                    placeholder="Généré automatiquement si vide"
+                    value={form.purchase_reference}
+                    onChange={(e) => setForm((f) => ({ ...f, purchase_reference: e.target.value }))}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label>Nombre d'articles (optionnel)</Label>
+                    <Input type="number" min={1} value={form.quantity} onChange={(e) => setForm((f) => ({ ...f, quantity: e.target.value }))} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Poids total (g, optionnel)</Label>
+                    <Input type="number" min={0} step="0.001" value={form.weight_grams} onChange={(e) => setForm((f) => ({ ...f, weight_grams: e.target.value }))} />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Un achat fournisseur sera créé automatiquement et ajouté à l'historique du fournisseur.
+                </p>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label>Notes</Label>
