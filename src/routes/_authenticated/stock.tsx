@@ -239,7 +239,7 @@ function StockPage() {
     const q = search.toLowerCase().trim();
     const min = minWeight ? Number(minWeight) : null;
     const max = maxWeight ? Number(maxWeight) : null;
-    return products.filter((p) => {
+    const rows = products.filter((p) => {
       if (catFilter && p.category !== catFilter) return false;
       if (subFilter && p.subcategory !== subFilter) return false;
       if (metalFilter !== "all" && p.metal_type !== metalFilter) return false;
@@ -249,6 +249,9 @@ function StockPage() {
       if (countryFilter !== "all" && (p.country_of_origin ?? "") !== countryFilter) return false;
       if (min != null && Number(p.weight_grams) < min) return false;
       if (max != null && Number(p.weight_grams) > max) return false;
+      if (qtyFilter === "in" && Number(p.quantity) <= 0) return false;
+      if (qtyFilter === "low" && !(Number(p.quantity) > 0 && Number(p.quantity) <= LOW_STOCK_THRESHOLD)) return false;
+      if (qtyFilter === "out" && Number(p.quantity) !== 0) return false;
       if (q && !(
         p.name.toLowerCase().includes(q) ||
         p.internal_code.toLowerCase().includes(q) ||
@@ -257,7 +260,11 @@ function StockPage() {
       )) return false;
       return true;
     });
-  }, [products, search, catFilter, subFilter, metalFilter, karatFilter, supplierFilter, originFilter, countryFilter, minWeight, maxWeight]);
+    const sorted = [...rows];
+    if (sortBy === "qty_asc") sorted.sort((a, b) => Number(a.quantity) - Number(b.quantity));
+    else if (sortBy === "qty_desc") sorted.sort((a, b) => Number(b.quantity) - Number(a.quantity));
+    return sorted;
+  }, [products, search, catFilter, subFilter, metalFilter, karatFilter, supplierFilter, originFilter, countryFilter, minWeight, maxWeight, qtyFilter, sortBy]);
 
   // Distinct countries of origin present in the inventory
   const countries = useMemo(() => {
@@ -270,12 +277,13 @@ function StockPage() {
     (catFilter ? 1 : 0) + (subFilter ? 1 : 0) +
     (metalFilter !== "all" ? 1 : 0) + (karatFilter !== "all" ? 1 : 0) +
     (supplierFilter !== "all" ? 1 : 0) + (originFilter !== "all" ? 1 : 0) +
-    (countryFilter !== "all" ? 1 : 0) + (minWeight ? 1 : 0) + (maxWeight ? 1 : 0);
+    (countryFilter !== "all" ? 1 : 0) + (minWeight ? 1 : 0) + (maxWeight ? 1 : 0) +
+    (qtyFilter !== "all" ? 1 : 0);
 
   function clearFilters() {
     setCatFilter(null); setSubFilter(null); setMetalFilter("all");
     setKaratFilter("all"); setSupplierFilter("all"); setOriginFilter("all");
-    setCountryFilter("all"); setMinWeight(""); setMaxWeight("");
+    setCountryFilter("all"); setMinWeight(""); setMaxWeight(""); setQtyFilter("all");
   }
 
 
