@@ -822,6 +822,15 @@ function StockPage() {
                           </div>
                         </TableCell>
                         <TableCell>{p.gold_karat ? `${p.gold_karat}K` : METAL_TYPES.find((m) => m.value === p.metal_type)?.label}</TableCell>
+                        <TableCell>
+                          {Number(p.quantity) === 0 ? (
+                            <Badge variant="destructive">Rupture</Badge>
+                          ) : (
+                            <span className={cn("font-medium", Number(p.quantity) <= LOW_STOCK_THRESHOLD && "text-destructive")}>
+                              {p.quantity} pc
+                            </span>
+                          )}
+                        </TableCell>
                         <TableCell>{formatGrams(Number(p.weight_grams))}</TableCell>
                         <TableCell>
                           {ppg ? (
