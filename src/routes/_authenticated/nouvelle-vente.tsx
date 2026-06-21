@@ -2,22 +2,29 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ShoppingCart, Search, Check, UserPlus } from "lucide-react";
+import { ShoppingCart, Search, Check, UserPlus, ScanLine, Layers, Package } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+} from "@/components/ui/dialog";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  PAYMENT_METHODS, METAL_TYPES, formatDZD, formatGrams, metalValue,
+  PAYMENT_METHODS, METAL_TYPES, formatDZD, formatGrams, metalValue, statusLabel,
 } from "@/lib/format";
 import { dzdFromEur } from "@/lib/currency";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
+import { QrScanDialog } from "@/components/QrScanDialog";
+import { useBarcodeScanner } from "@/hooks/use-barcode-scanner";
+import { parseScannedCode } from "@/lib/scan";
 
 export const Route = createFileRoute("/_authenticated/nouvelle-vente")({
   component: NewSalePage,
