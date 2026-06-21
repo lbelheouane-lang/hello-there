@@ -140,6 +140,7 @@ function SettingsPage() {
             <TabsTrigger value="general">Catégories</TabsTrigger>
             <TabsTrigger value="employes">Employés</TabsTrigger>
             <TabsTrigger value="pin">Gestion PIN</TabsTrigger>
+            <TabsTrigger value="apparence">Apparence & Personnalisation</TabsTrigger>
             <TabsTrigger value="logs">Journal système</TabsTrigger>
             <TabsTrigger value="backup">Sauvegarde & démo</TabsTrigger>
           </TabsList>
@@ -147,6 +148,11 @@ function SettingsPage() {
           <TabsContent value="employes" className="space-y-6">
             <EmployeesCard />
           </TabsContent>
+
+          <TabsContent value="apparence" className="space-y-6">
+            <AppearanceCard />
+          </TabsContent>
+
 
           <TabsContent value="pin" className="space-y-6">
             <ChangeOwnPinCard />
