@@ -65,6 +65,24 @@ function normalize(row: Record<string, unknown> | null): UserPreferences {
   } as UserPreferences;
 }
 
+/** Navigation items available for menu-order personalization (admin view). */
+export const MENU_ITEMS = [
+  { to: "/dashboard", label: "Tableau de bord" },
+  { to: "/nouvelle-vente", label: "Nouvelle vente" },
+  { to: "/clients", label: "Clients" },
+  { to: "/paiements-en-attente", label: "Paiements en attente" },
+  { to: "/factures", label: "Ventes" },
+  { to: "/reparations", label: "Réparations" },
+  { to: "/stock", label: "Stock" },
+  { to: "/parures", label: "Parures" },
+  { to: "/or-casse", label: "Or Cassé" },
+  { to: "/fournisseurs", label: "Fournisseurs" },
+  { to: "/depenses", label: "Dépenses" },
+  { to: "/cours-or", label: "Cours de l'or" },
+  { to: "/boutique", label: "Boutique" },
+  { to: "/parametres", label: "Paramètres" },
+];
+
 export async function fetchUserPreferences(): Promise<UserPreferences> {
   const { data: auth } = await supabase.auth.getUser();
   const uid = auth.user?.id;
