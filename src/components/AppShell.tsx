@@ -168,12 +168,20 @@ export function AppShell({
   children: ReactNode;
   allow?: AppRole[];
 }) {
+  const { data: prefs } = useUserPreferences();
+  const headerStyle = prefs?.header_color
+    ? { backgroundColor: prefs.header_color }
+    : undefined;
+
   const inner = (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={prefs?.sidebar_default !== "collapsed"}>
       <BrandIntro />
       <AppSidebar />
       <SidebarInset>
-        <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur">
+        <header
+          className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur"
+          style={headerStyle}
+        >
           <SidebarTrigger />
           <h1 className="font-serif text-xl font-semibold">{title}</h1>
         </header>
