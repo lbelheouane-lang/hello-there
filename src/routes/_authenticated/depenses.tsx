@@ -315,6 +315,7 @@ function ExpensesPage() {
       toast.success(editing ? "Dépense mise à jour" : "Dépense enregistrée");
       setDialogOpen(false);
       qc.invalidateQueries({ queryKey: ["expenses"] });
+      qc.invalidateQueries({ queryKey: ["supplier-purchases"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
