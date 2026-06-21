@@ -68,6 +68,14 @@ function NewSalePage() {
   const [newCustomerName, setNewCustomerName] = useState("");
   const [newCustomerPhone, setNewCustomerPhone] = useState("");
 
+  // Scanning (USB barcode + camera QR)
+  const [scanOpen, setScanOpen] = useState(false);
+  const [setDialog, setSetDialog] = useState<{
+    reference: string;
+    name: string;
+    items: SaleProduct[];
+  } | null>(null);
+
   const { data: products } = useQuery({
     queryKey: ["products", "for-sale"],
     queryFn: async () => {
