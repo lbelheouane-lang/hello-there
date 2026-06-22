@@ -455,7 +455,7 @@ function PendingPaymentsPage() {
               })}
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={9} className="py-12 text-center text-muted-foreground">
+                  <TableCell colSpan={5} className="py-12 text-center text-muted-foreground">
                     <Wallet className="mx-auto mb-2 h-8 w-8 opacity-40" />
                     Aucun paiement en attente. Toutes les factures sont soldées. 🎉
                   </TableCell>
