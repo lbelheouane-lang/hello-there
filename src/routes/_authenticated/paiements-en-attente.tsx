@@ -410,11 +410,7 @@ function PendingPaymentsPage() {
                 <TableHead>Client</TableHead>
                 <TableHead>Facture</TableHead>
                 <TableHead className="text-right">Montant initial</TableHead>
-                <TableHead className="text-right">Payé</TableHead>
-                <TableHead className="w-44">Progression</TableHead>
-                <TableHead className="text-right">Reste</TableHead>
-                <TableHead>Dernier paiement</TableHead>
-                <TableHead>Statut</TableHead>
+                <TableHead className="text-right">Reste à payer</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
