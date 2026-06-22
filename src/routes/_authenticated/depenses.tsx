@@ -309,6 +309,10 @@ function ExpensesPage() {
           });
           if (error) throw error;
         }
+      } else if (editing) {
+        // The expense was changed from a stock purchase to another category:
+        // drop any previously linked supplier purchase to avoid a stale record.
+        await supabase.from("purchases").delete().eq("expense_id", expenseId);
       }
     },
     onSuccess: () => {
@@ -323,6 +327,9 @@ function ExpensesPage() {
   const remove = useMutation({
     mutationFn: async (e: Expense) => {
       if (e.attachment_path) await supabase.storage.from("expense-attachments").remove([e.attachment_path]);
+      // Remove the auto-generated supplier purchase linked to this expense so it
+      // does not linger as an orphan in the supplier's purchase history.
+      await supabase.from("purchases").delete().eq("expense_id", e.id);
       const { error } = await supabase.from("expenses").delete().eq("id", e.id);
       if (error) throw error;
     },
@@ -330,6 +337,7 @@ function ExpensesPage() {
       toast.success("Dépense supprimée");
       setDeleteTarget(null);
       qc.invalidateQueries({ queryKey: ["expenses"] });
+      qc.invalidateQueries({ queryKey: ["supplier-purchases"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
