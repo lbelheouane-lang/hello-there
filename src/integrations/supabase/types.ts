@@ -38,6 +38,45 @@ export type Database = {
         }
         Relationships: []
       }
+      backups: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          created_by_name: string | null
+          file_name: string
+          id: string
+          kind: string
+          record_counts: Json
+          size_bytes: number
+          storage_path: string | null
+          store_name: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          created_by_name?: string | null
+          file_name: string
+          id?: string
+          kind?: string
+          record_counts?: Json
+          size_bytes?: number
+          storage_path?: string | null
+          store_name?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          created_by_name?: string | null
+          file_name?: string
+          id?: string
+          kind?: string
+          record_counts?: Json
+          size_bytes?: number
+          storage_path?: string | null
+          store_name?: string | null
+        }
+        Relationships: []
+      }
       customers: {
         Row: {
           address: string | null
@@ -1371,6 +1410,9 @@ export type Database = {
       store_settings: {
         Row: {
           address: string | null
+          auto_backup_enabled: boolean
+          auto_backup_frequency: string
+          auto_backup_time: string
           created_at: string
           currency: string
           default_mode: string
@@ -1387,6 +1429,7 @@ export type Database = {
           invoice_header: string | null
           invoice_prefix: string
           language: string
+          last_auto_backup_at: string | null
           login_background_url: string | null
           login_logo_url: string | null
           logo_url: string | null
@@ -1407,6 +1450,9 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          auto_backup_enabled?: boolean
+          auto_backup_frequency?: string
+          auto_backup_time?: string
           created_at?: string
           currency?: string
           default_mode?: string
@@ -1423,6 +1469,7 @@ export type Database = {
           invoice_header?: string | null
           invoice_prefix?: string
           language?: string
+          last_auto_backup_at?: string | null
           login_background_url?: string | null
           login_logo_url?: string | null
           logo_url?: string | null
@@ -1443,6 +1490,9 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          auto_backup_enabled?: boolean
+          auto_backup_frequency?: string
+          auto_backup_time?: string
           created_at?: string
           currency?: string
           default_mode?: string
@@ -1459,6 +1509,7 @@ export type Database = {
           invoice_header?: string | null
           invoice_prefix?: string
           language?: string
+          last_auto_backup_at?: string | null
           login_background_url?: string | null
           login_logo_url?: string | null
           logo_url?: string | null
@@ -1598,6 +1649,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      backup_all: { Args: never; Returns: Json }
+      backup_table_list: { Args: never; Returns: string[] }
       delete_demo_data: { Args: never; Returns: undefined }
       get_repair_tracking: {
         Args: { _token: string }
@@ -1635,6 +1688,7 @@ export type Database = {
       next_repair_number: { Args: never; Returns: string }
       next_scrap_number: { Args: never; Returns: string }
       next_set_number: { Args: never; Returns: string }
+      restore_backup: { Args: { payload: Json }; Returns: Json }
       seed_demo_data: { Args: never; Returns: undefined }
     }
     Enums: {
