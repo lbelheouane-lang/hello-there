@@ -552,6 +552,7 @@ function ScrapDetailDialog({ scrap, onClose, onEdit }: { scrap: Scrap | null; on
           <div><span className="text-muted-foreground">Titre : </span>{scrap.gold_karat}K</div>
           <div><span className="text-muted-foreground">Poids : </span>{formatGrams(Number(scrap.weight_grams))}</div>
           <div><span className="text-muted-foreground">Prix / gramme : </span>{formatDZD(Number(scrap.price_per_gram))}</div>
+          <div><span className="text-muted-foreground">Valeur estimée : </span>{formatDZD(Number(scrap.estimated_value))}</div>
           <div><span className="text-muted-foreground">Montant total : </span><span className="font-semibold text-primary">{formatDZD(Number(scrap.total_amount))}</span></div>
           {scrap.notes && <div className="sm:col-span-2"><span className="text-muted-foreground">Notes : </span>{scrap.notes}</div>}
         </div>
