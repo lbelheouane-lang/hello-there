@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { pinLogin } from "@/lib/pin-auth.functions";
 import { useStoreSettings } from "@/lib/store-settings";
 import { fetchUserPreferences } from "@/lib/user-preferences";
-import { getLocalActivation, isDeveloperEmail } from "@/lib/license-activation";
+
 
 export const Route = createFileRoute("/auth")({
   beforeLoad: async () => {
