@@ -350,9 +350,9 @@ function ScrapGoldPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {isLoading && <tr><td colSpan={8} className="px-3 py-6 text-center text-muted-foreground">Chargement…</td></tr>}
+                  {isLoading && <tr><td colSpan={9} className="px-3 py-6 text-center text-muted-foreground">Chargement…</td></tr>}
                   {!isLoading && filtered.length === 0 && (
-                    <tr><td colSpan={8} className="px-3 py-10 text-center text-muted-foreground">
+                    <tr><td colSpan={9} className="px-3 py-10 text-center text-muted-foreground">
                       <Recycle className="mx-auto mb-2 h-8 w-8 opacity-40" />
                       Aucun achat d'or cassé.
                     </td></tr>
