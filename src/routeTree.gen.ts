@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ActivationRouteImport } from './routes/activation'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuiviTokenRouteImport } from './routes/suivi.$token'
@@ -20,6 +21,7 @@ import { Route as AuthenticatedParametresRouteImport } from './routes/_authentic
 import { Route as AuthenticatedPaiementsEnAttenteRouteImport } from './routes/_authenticated/paiements-en-attente'
 import { Route as AuthenticatedOrCasseRouteImport } from './routes/_authenticated/or-casse'
 import { Route as AuthenticatedNouvelleVenteRouteImport } from './routes/_authenticated/nouvelle-vente'
+import { Route as AuthenticatedLicencesRouteImport } from './routes/_authenticated/licences'
 import { Route as AuthenticatedJournalQuotidienRouteImport } from './routes/_authenticated/journal-quotidien'
 import { Route as AuthenticatedFournisseursRouteImport } from './routes/_authenticated/fournisseurs'
 import { Route as AuthenticatedFacturesRouteImport } from './routes/_authenticated/factures'
@@ -36,6 +38,11 @@ import { Route as ApiPublicHooksUpdateGoldPricesRouteImport } from './routes/api
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ActivationRoute = ActivationRouteImport.update({
+  id: '/activation',
+  path: '/activation',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -90,6 +97,11 @@ const AuthenticatedNouvelleVenteRoute =
     path: '/nouvelle-vente',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedLicencesRoute = AuthenticatedLicencesRouteImport.update({
+  id: '/licences',
+  path: '/licences',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedJournalQuotidienRoute =
   AuthenticatedJournalQuotidienRouteImport.update({
     id: '/journal-quotidien',
@@ -157,6 +169,7 @@ const ApiPublicHooksUpdateGoldPricesRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/activation': typeof ActivationRoute
   '/auth': typeof AuthRoute
   '/boutique': typeof AuthenticatedBoutiqueRoute
   '/clients': typeof AuthenticatedClientsRoute
@@ -166,6 +179,7 @@ export interface FileRoutesByFullPath {
   '/factures': typeof AuthenticatedFacturesRoute
   '/fournisseurs': typeof AuthenticatedFournisseursRoute
   '/journal-quotidien': typeof AuthenticatedJournalQuotidienRoute
+  '/licences': typeof AuthenticatedLicencesRoute
   '/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
   '/or-casse': typeof AuthenticatedOrCasseRoute
   '/paiements-en-attente': typeof AuthenticatedPaiementsEnAttenteRoute
@@ -181,6 +195,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/activation': typeof ActivationRoute
   '/auth': typeof AuthRoute
   '/boutique': typeof AuthenticatedBoutiqueRoute
   '/clients': typeof AuthenticatedClientsRoute
@@ -190,6 +205,7 @@ export interface FileRoutesByTo {
   '/factures': typeof AuthenticatedFacturesRoute
   '/fournisseurs': typeof AuthenticatedFournisseursRoute
   '/journal-quotidien': typeof AuthenticatedJournalQuotidienRoute
+  '/licences': typeof AuthenticatedLicencesRoute
   '/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
   '/or-casse': typeof AuthenticatedOrCasseRoute
   '/paiements-en-attente': typeof AuthenticatedPaiementsEnAttenteRoute
@@ -207,6 +223,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/activation': typeof ActivationRoute
   '/auth': typeof AuthRoute
   '/_authenticated/boutique': typeof AuthenticatedBoutiqueRoute
   '/_authenticated/clients': typeof AuthenticatedClientsRoute
@@ -216,6 +233,7 @@ export interface FileRoutesById {
   '/_authenticated/factures': typeof AuthenticatedFacturesRoute
   '/_authenticated/fournisseurs': typeof AuthenticatedFournisseursRoute
   '/_authenticated/journal-quotidien': typeof AuthenticatedJournalQuotidienRoute
+  '/_authenticated/licences': typeof AuthenticatedLicencesRoute
   '/_authenticated/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
   '/_authenticated/or-casse': typeof AuthenticatedOrCasseRoute
   '/_authenticated/paiements-en-attente': typeof AuthenticatedPaiementsEnAttenteRoute
@@ -233,6 +251,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/activation'
     | '/auth'
     | '/boutique'
     | '/clients'
@@ -242,6 +261,7 @@ export interface FileRouteTypes {
     | '/factures'
     | '/fournisseurs'
     | '/journal-quotidien'
+    | '/licences'
     | '/nouvelle-vente'
     | '/or-casse'
     | '/paiements-en-attente'
@@ -257,6 +277,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/activation'
     | '/auth'
     | '/boutique'
     | '/clients'
@@ -266,6 +287,7 @@ export interface FileRouteTypes {
     | '/factures'
     | '/fournisseurs'
     | '/journal-quotidien'
+    | '/licences'
     | '/nouvelle-vente'
     | '/or-casse'
     | '/paiements-en-attente'
@@ -282,6 +304,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/activation'
     | '/auth'
     | '/_authenticated/boutique'
     | '/_authenticated/clients'
@@ -291,6 +314,7 @@ export interface FileRouteTypes {
     | '/_authenticated/factures'
     | '/_authenticated/fournisseurs'
     | '/_authenticated/journal-quotidien'
+    | '/_authenticated/licences'
     | '/_authenticated/nouvelle-vente'
     | '/_authenticated/or-casse'
     | '/_authenticated/paiements-en-attente'
@@ -308,6 +332,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  ActivationRoute: typeof ActivationRoute
   AuthRoute: typeof AuthRoute
   SuiviTokenRoute: typeof SuiviTokenRoute
   ApiPublicHooksUpdateGoldPricesRoute: typeof ApiPublicHooksUpdateGoldPricesRoute
@@ -320,6 +345,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/activation': {
+      id: '/activation'
+      path: '/activation'
+      fullPath: '/activation'
+      preLoaderRoute: typeof ActivationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -390,6 +422,13 @@ declare module '@tanstack/react-router' {
       path: '/nouvelle-vente'
       fullPath: '/nouvelle-vente'
       preLoaderRoute: typeof AuthenticatedNouvelleVenteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/licences': {
+      id: '/_authenticated/licences'
+      path: '/licences'
+      fullPath: '/licences'
+      preLoaderRoute: typeof AuthenticatedLicencesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/journal-quotidien': {
@@ -488,6 +527,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFacturesRoute: typeof AuthenticatedFacturesRoute
   AuthenticatedFournisseursRoute: typeof AuthenticatedFournisseursRoute
   AuthenticatedJournalQuotidienRoute: typeof AuthenticatedJournalQuotidienRoute
+  AuthenticatedLicencesRoute: typeof AuthenticatedLicencesRoute
   AuthenticatedNouvelleVenteRoute: typeof AuthenticatedNouvelleVenteRoute
   AuthenticatedOrCasseRoute: typeof AuthenticatedOrCasseRoute
   AuthenticatedPaiementsEnAttenteRoute: typeof AuthenticatedPaiementsEnAttenteRoute
@@ -509,6 +549,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFacturesRoute: AuthenticatedFacturesRoute,
   AuthenticatedFournisseursRoute: AuthenticatedFournisseursRoute,
   AuthenticatedJournalQuotidienRoute: AuthenticatedJournalQuotidienRoute,
+  AuthenticatedLicencesRoute: AuthenticatedLicencesRoute,
   AuthenticatedNouvelleVenteRoute: AuthenticatedNouvelleVenteRoute,
   AuthenticatedOrCasseRoute: AuthenticatedOrCasseRoute,
   AuthenticatedPaiementsEnAttenteRoute: AuthenticatedPaiementsEnAttenteRoute,
@@ -527,6 +568,7 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  ActivationRoute: ActivationRoute,
   AuthRoute: AuthRoute,
   SuiviTokenRoute: SuiviTokenRoute,
   ApiPublicHooksUpdateGoldPricesRoute: ApiPublicHooksUpdateGoldPricesRoute,
