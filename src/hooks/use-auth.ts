@@ -80,7 +80,7 @@ export function useAuth(): AuthState {
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!active) return;
       setUser(session?.user ?? null);
-      if (session?.user) loadProfile(session.user.id);
+      if (session?.user) loadProfile(session.user.id, session.user.email ?? null);
       else {
         setRole(null);
         setPermissions([]);
