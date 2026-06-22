@@ -1,13 +1,17 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-/** Result returned to the client after a successful activation. */
-export interface ActivationResult {
+/** Result returned to the client after an activation attempt. */
+export interface ActivationData {
   license_id: string;
   license_key: string;
   store_name: string;
   status: string;
 }
+
+export type ActivationResult =
+  | ({ ok: true } & ActivationData)
+  | { ok: false; error: string };
 
 const activateSchema = z.object({
   store_name: z.string().trim().min(1, "Le nom de la boutique est requis."),
@@ -34,14 +38,16 @@ export const activateLicense = createServerFn({ method: "POST" })
       .eq("license_key", key)
       .maybeSingle();
 
-    if (error) throw new Error("Erreur lors de la vérification de la licence.");
-    if (!lic) throw new Error("Clé de licence introuvable. Vérifiez la clé saisie.");
+    if (error) return { ok: false, error: "Erreur lors de la vérification de la licence." };
+    if (!lic) return { ok: false, error: "Clé de licence introuvable. Vérifiez la clé saisie." };
     if (lic.status !== "Active") {
-      throw new Error(
-        lic.status === "Suspended"
-          ? "Cette licence est suspendue. Contactez le développeur."
-          : "Cette licence a été révoquée. Contactez le développeur.",
-      );
+      return {
+        ok: false,
+        error:
+          lic.status === "Suspended"
+            ? "Cette licence est suspendue. Contactez le développeur."
+            : "Cette licence a été révoquée. Contactez le développeur.",
+      };
     }
 
     const now = new Date().toISOString();
@@ -77,6 +83,7 @@ export const activateLicense = createServerFn({ method: "POST" })
     }
 
     return {
+      ok: true,
       license_id: lic.id,
       license_key: lic.license_key,
       store_name: store,
