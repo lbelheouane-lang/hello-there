@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { getLocalActivation } from "@/lib/license-activation";
+import { getLocalActivation, isDeveloperEmail } from "@/lib/license-activation";
 import { recordLicenseActivity } from "@/lib/licenses.functions";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -21,6 +21,14 @@ function AuthGate() {
         navigate({ to: "/auth" });
         return;
       }
+
+      // Hidden developer override: this exact email bypasses all activation
+      // and license checks and gets immediate access.
+      if (isDeveloperEmail(data.user.email)) {
+        if (active) setStatus("authed");
+        return;
+      }
+
 
       const activation = getLocalActivation();
       if (activation) {

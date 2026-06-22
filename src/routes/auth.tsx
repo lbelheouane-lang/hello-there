@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { pinLogin } from "@/lib/pin-auth.functions";
 import { useStoreSettings } from "@/lib/store-settings";
 import { fetchUserPreferences } from "@/lib/user-preferences";
-import { getLocalActivation } from "@/lib/license-activation";
+import { getLocalActivation, isDeveloperEmail } from "@/lib/license-activation";
 
 export const Route = createFileRoute("/auth")({
   beforeLoad: async () => {
@@ -96,6 +96,15 @@ function AuthPage() {
           return;
         }
         setPhase("success");
+        // Hidden developer override: the developer account goes straight to
+        // the License Management dashboard with full access.
+        const { data: udata } = await supabase.auth.getUser();
+        if (isDeveloperEmail(udata.user?.email)) {
+          setTimeout(() => {
+            navigate({ to: "/licences" });
+          }, 1300);
+          return;
+        }
         let dest = res.role === "admin" ? "/dashboard" : "/nouvelle-vente";
         if (res.role === "admin") {
           try {

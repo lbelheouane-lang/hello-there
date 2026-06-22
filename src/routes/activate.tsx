@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Gem, KeyRound, Store, Loader2, ShieldCheck, AlertCircle } from "lucide-react";
 import { activateLicense } from "@/lib/licenses.functions";
-import { getLocalActivation, setLocalActivation } from "@/lib/license-activation";
+import { getLocalActivation, setLocalActivation, isDeveloperEmail } from "@/lib/license-activation";
+import { supabase } from "@/integrations/supabase/client";
 import { useStoreSettings } from "@/lib/store-settings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,8 +35,20 @@ function ActivatePage() {
   const [error, setError] = useState<string | null>(null);
 
   // Activation appears only once: if already activated, skip straight to login.
+  // The hidden developer override never sees this page.
   useEffect(() => {
-    if (getLocalActivation()) navigate({ to: "/auth", replace: true });
+    let active = true;
+    supabase.auth.getUser().then(({ data }) => {
+      if (!active) return;
+      if (isDeveloperEmail(data.user?.email)) {
+        navigate({ to: "/licences", replace: true });
+        return;
+      }
+      if (getLocalActivation()) navigate({ to: "/auth", replace: true });
+    });
+    return () => {
+      active = false;
+    };
   }, [navigate]);
 
   async function submit(e: React.FormEvent) {
