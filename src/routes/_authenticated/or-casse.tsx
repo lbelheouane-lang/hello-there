@@ -343,7 +343,8 @@ function ScrapGoldPage() {
                     <th className="px-3 py-2">Titre</th>
                     <th className="px-3 py-2 text-right">Poids</th>
                     <th className="px-3 py-2 text-right">Prix / g</th>
-                    <th className="px-3 py-2 text-right">Valeur</th>
+                    <th className="px-3 py-2 text-right">Valeur estimée</th>
+                    <th className="px-3 py-2 text-right">Montant total</th>
                     <th className="px-3 py-2">Statut</th>
                     <th className="px-3 py-2 text-right">Actions</th>
                   </tr>
