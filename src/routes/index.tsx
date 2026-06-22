@@ -16,7 +16,7 @@ function LandingRedirect() {
     if (getLocalActivation()) {
       navigate({ to: "/dashboard", replace: true });
     } else {
-      navigate({ to: "/activation", replace: true });
+      navigate({ to: "/activate", replace: true });
     }
   }, [navigate]);
 
