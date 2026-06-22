@@ -453,17 +453,23 @@ function ExpensesPage() {
                       {PAYMENT_METHODS.map((m) => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
                     </SelectContent>
                   </Select>
-                  <div className="flex gap-2">
-                    <div className="flex-1"><Label className="text-[10px] text-muted-foreground">Du</Label>
-                      <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} /></div>
-                    <div className="flex-1"><Label className="text-[10px] text-muted-foreground">Au</Label>
-                      <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} /></div>
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="flex-1"><Label className="text-[10px] text-muted-foreground">Montant min</Label>
-                      <Input type="number" value={minAmount} onChange={(e) => setMinAmount(e.target.value)} /></div>
-                    <div className="flex-1"><Label className="text-[10px] text-muted-foreground">Montant max</Label>
-                      <Input type="number" value={maxAmount} onChange={(e) => setMaxAmount(e.target.value)} /></div>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:col-span-2 lg:grid-cols-4">
+                    <div className="space-y-1">
+                      <Label className="text-[10px] text-muted-foreground">Du</Label>
+                      <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[10px] text-muted-foreground">Au</Label>
+                      <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[10px] text-muted-foreground">Montant min</Label>
+                      <Input type="number" value={minAmount} onChange={(e) => setMinAmount(e.target.value)} />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[10px] text-muted-foreground">Montant max</Label>
+                      <Input type="number" value={maxAmount} onChange={(e) => setMaxAmount(e.target.value)} />
+                    </div>
                   </div>
                 </div>
 
