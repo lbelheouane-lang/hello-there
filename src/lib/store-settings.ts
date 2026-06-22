@@ -71,6 +71,10 @@ export const DEFAULT_SETTINGS: StoreSettings = {
   login_logo_url: null,
   login_background_url: null,
   favicon_url: null,
+  auto_backup_enabled: false,
+  auto_backup_frequency: "weekly",
+  auto_backup_time: "02:00",
+  last_auto_backup_at: null,
 };
 
 export const STORE_SETTINGS_QUERY_KEY = ["store-settings"] as const;
