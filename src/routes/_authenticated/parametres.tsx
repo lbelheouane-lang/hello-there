@@ -143,8 +143,14 @@ function SettingsPage() {
             <TabsTrigger value="pin">Gestion PIN</TabsTrigger>
             <TabsTrigger value="apparence">Apparence & Personnalisation</TabsTrigger>
             <TabsTrigger value="logs">Journal système</TabsTrigger>
-            <TabsTrigger value="backup">Sauvegarde & démo</TabsTrigger>
+            <TabsTrigger value="sauvegarde">Sauvegarde &amp; restauration</TabsTrigger>
+            <TabsTrigger value="backup">Données démo</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="sauvegarde" className="space-y-6">
+            <BackupRestoreCard />
+          </TabsContent>
+
 
           <TabsContent value="employes" className="space-y-6">
             <EmployeesCard />
