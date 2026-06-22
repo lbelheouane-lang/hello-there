@@ -10,6 +10,7 @@ export interface AuthState {
   role: AppRole | null;
   permissions: PermissionKey[];
   isDeveloper: boolean;
+  isSuperAdmin: boolean;
   loading: boolean;
 }
 
@@ -18,6 +19,7 @@ export function useAuth(): AuthState {
   const [role, setRole] = useState<AppRole | null>(null);
   const [permissions, setPermissions] = useState<PermissionKey[]>([]);
   const [isDeveloper, setIsDeveloper] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -40,10 +42,13 @@ export function useAuth(): AuthState {
       ]);
       if (!active) return;
 
-      const roles = (roleRows ?? []).map((r) => r.role as AppRole);
+      const roles = (roleRows ?? []).map((r) => String(r.role));
       const dev = roles.includes("developer");
       setIsDeveloper(dev);
-      const nonDev = roles.filter((r) => r !== "developer");
+      setIsSuperAdmin(roles.includes("super_admin"));
+      const nonDev = roles.filter(
+        (r) => r !== "developer" && r !== "super_admin",
+      ) as AppRole[];
       const resolvedRole = nonDev.includes("admin")
         ? "admin"
         : nonDev[0] ?? (dev ? "developer" : null);
@@ -76,6 +81,7 @@ export function useAuth(): AuthState {
         setRole(null);
         setPermissions([]);
         setIsDeveloper(false);
+        setIsSuperAdmin(false);
       }
     });
 
@@ -85,5 +91,5 @@ export function useAuth(): AuthState {
     };
   }, []);
 
-  return { user, role, permissions, isDeveloper, loading };
+  return { user, role, permissions, isDeveloper, isSuperAdmin, loading };
 }

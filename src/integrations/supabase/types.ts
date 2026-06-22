@@ -14,6 +14,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_keys: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          key_value: string
+          last_used_at: string | null
+          name: string
+          status: string
+          updated_at: string
+          usage_count: number
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          key_value: string
+          last_used_at?: string | null
+          name: string
+          status?: string
+          updated_at?: string
+          usage_count?: number
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          key_value?: string
+          last_used_at?: string | null
+          name?: string
+          status?: string
+          updated_at?: string
+          usage_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "access_keys_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           created_at: string
@@ -74,6 +124,45 @@ export type Database = {
           size_bytes?: number
           storage_path?: string | null
           store_name?: string | null
+        }
+        Relationships: []
+      }
+      clients: {
+        Row: {
+          company_name: string
+          contact_name: string | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          id: string
+          last_login_at: string | null
+          notes: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          company_name: string
+          contact_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          last_login_at?: string | null
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          company_name?: string
+          contact_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          last_login_at?: string | null
+          notes?: string | null
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -186,6 +275,7 @@ export type Database = {
       }
       employees: {
         Row: {
+          client_id: string | null
           created_at: string
           created_by: string | null
           first_name: string
@@ -202,6 +292,7 @@ export type Database = {
           username: string
         }
         Insert: {
+          client_id?: string | null
           created_at?: string
           created_by?: string | null
           first_name?: string
@@ -218,6 +309,7 @@ export type Database = {
           username: string
         }
         Update: {
+          client_id?: string | null
           created_at?: string
           created_by?: string | null
           first_name?: string
@@ -233,7 +325,15 @@ export type Database = {
           user_id?: string | null
           username?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "employees_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       expense_categories: {
         Row: {
@@ -428,6 +528,56 @@ export type Database = {
           usd_eur_rate?: number | null
         }
         Relationships: []
+      }
+      invitations: {
+        Row: {
+          client_id: string | null
+          code: string
+          created_at: string
+          created_by: string | null
+          disabled: boolean
+          expires_at: string | null
+          grant_role: Database["public"]["Enums"]["app_role"]
+          id: string
+          max_uses: number
+          updated_at: string
+          used_count: number
+        }
+        Insert: {
+          client_id?: string | null
+          code: string
+          created_at?: string
+          created_by?: string | null
+          disabled?: boolean
+          expires_at?: string | null
+          grant_role?: Database["public"]["Enums"]["app_role"]
+          id?: string
+          max_uses?: number
+          updated_at?: string
+          used_count?: number
+        }
+        Update: {
+          client_id?: string | null
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          disabled?: boolean
+          expires_at?: string | null
+          grant_role?: Database["public"]["Enums"]["app_role"]
+          id?: string
+          max_uses?: number
+          updated_at?: string
+          used_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invitations_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       invoices: {
         Row: {
@@ -1730,6 +1880,7 @@ export type Database = {
         Returns: string
       }
       is_developer: { Args: { _user_id: string }; Returns: boolean }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       next_expense_number: { Args: never; Returns: string }
       next_invoice_number: { Args: { _prefix?: string }; Returns: string }
       next_purchase_number: { Args: never; Returns: string }
@@ -1740,7 +1891,7 @@ export type Database = {
       seed_demo_data: { Args: never; Returns: undefined }
     }
     Enums: {
-      app_role: "admin" | "employe" | "developer"
+      app_role: "admin" | "employe" | "developer" | "super_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1868,7 +2019,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "employe", "developer"],
+      app_role: ["admin", "employe", "developer", "super_admin"],
     },
   },
 } as const
