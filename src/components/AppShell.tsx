@@ -18,6 +18,7 @@ import {
   Layers,
   Recycle,
   BookOpen,
+  KeyRound,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BrandIntro } from "@/components/BrandIntro";
@@ -50,6 +51,7 @@ const NAV: readonly {
   icon: typeof Gem;
   roles: readonly AppRole[];
   perm?: PermissionKey;
+  developerOnly?: boolean;
 }[] = [
   { to: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard, roles: ["admin"], perm: "dashboard" },
   { to: "/nouvelle-vente", label: "Nouvelle vente", icon: ShoppingCart, roles: ["admin", "employe"], perm: "sales" },
@@ -66,15 +68,19 @@ const NAV: readonly {
   { to: "/cours-or", label: "Cours de l'or", icon: Coins, roles: ["admin"] },
   { to: "/boutique", label: "Boutique", icon: Store, roles: ["admin"], perm: "settings" },
   { to: "/parametres", label: "Paramètres", icon: Settings, roles: ["admin"], perm: "settings" },
+  { to: "/licences", label: "Gestion des licences", icon: KeyRound, roles: ["admin", "employe", "developer"], developerOnly: true },
 ];
 
 /** A nav item is visible when the role allows it and (admin, no permission gate,
- *  or the employee has been granted that permission). */
+ *  or the employee has been granted that permission). Developer-only items are
+ *  shown solely to users holding the developer role. */
 function canAccess(
-  item: { roles: readonly AppRole[]; perm?: PermissionKey },
+  item: { roles: readonly AppRole[]; perm?: PermissionKey; developerOnly?: boolean },
   role: AppRole | null,
   permissions: PermissionKey[],
+  isDeveloper: boolean,
 ): boolean {
+  if (item.developerOnly) return isDeveloper;
   if (role == null || !item.roles.includes(role)) return false;
   if (role === "admin" || !item.perm) return true;
   return permissions.includes(item.perm);
@@ -82,7 +88,7 @@ function canAccess(
 
 function AppSidebar() {
   const navigate = useNavigate();
-  const { user, role, permissions } = useAuth();
+  const { user, role, permissions, isDeveloper } = useAuth();
   const { data: settings } = useStoreSettings();
   const { data: prefs } = useUserPreferences();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -91,7 +97,7 @@ function AppSidebar() {
   const storeTag = settings?.slogan || settings?.tagline || "Gestion bijouterie";
 
   const orderedNav = (() => {
-    const items = NAV.filter((item) => canAccess(item, role, permissions));
+    const items = NAV.filter((item) => canAccess(item, role, permissions, isDeveloper));
     const order = prefs?.menu_order;
     if (!order || order.length === 0) return items;
     return [...items].sort(
@@ -146,7 +152,8 @@ function AppSidebar() {
         <div className="px-2 py-2">
           <p className="truncate text-sm font-medium">{user?.email}</p>
           <p className="text-xs capitalize text-sidebar-foreground/60">
-            {role === "admin" ? "Administrateur" : "Employé"}
+            {role === "admin" ? "Administrateur" : role === "developer" ? "Développeur" : "Employé"}
+            {isDeveloper && role === "admin" ? " · Développeur" : ""}
           </p>
         </div>
         <Button variant="ghost" className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent" onClick={signOut}>
@@ -160,16 +167,16 @@ function AppSidebar() {
 /** Redirects employees who reach a route they lack permission for (direct URL). */
 function PermissionGuard({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
-  const { role, permissions, loading } = useAuth();
+  const { role, permissions, isDeveloper, loading } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
     if (loading || role == null || role === "admin") return;
     const item = NAV.find((n) => n.to === pathname);
-    if (item && !canAccess(item, role, permissions)) {
+    if (item && !canAccess(item, role, permissions, isDeveloper)) {
       navigate({ to: "/nouvelle-vente", replace: true });
     }
-  }, [loading, role, permissions, pathname, navigate]);
+  }, [loading, role, permissions, isDeveloper, pathname, navigate]);
 
   return <>{children}</>;
 }

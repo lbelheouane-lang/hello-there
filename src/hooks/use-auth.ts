@@ -3,12 +3,13 @@ import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { ALL_PERMISSIONS, type PermissionKey } from "@/lib/permissions";
 
-export type AppRole = "admin" | "employe";
+export type AppRole = "admin" | "employe" | "developer";
 
 export interface AuthState {
   user: User | null;
   role: AppRole | null;
   permissions: PermissionKey[];
+  isDeveloper: boolean;
   loading: boolean;
 }
 
@@ -16,6 +17,7 @@ export function useAuth(): AuthState {
   const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
   const [permissions, setPermissions] = useState<PermissionKey[]>([]);
+  const [isDeveloper, setIsDeveloper] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -37,7 +39,12 @@ export function useAuth(): AuthState {
       if (!active) return;
 
       const roles = (roleRows ?? []).map((r) => r.role as AppRole);
-      const resolvedRole = roles.includes("admin") ? "admin" : roles[0] ?? null;
+      const dev = roles.includes("developer");
+      setIsDeveloper(dev);
+      const nonDev = roles.filter((r) => r !== "developer");
+      const resolvedRole = nonDev.includes("admin")
+        ? "admin"
+        : nonDev[0] ?? (dev ? "developer" : null);
       setRole(resolvedRole);
 
       if (resolvedRole === "admin") {
@@ -66,6 +73,7 @@ export function useAuth(): AuthState {
       else {
         setRole(null);
         setPermissions([]);
+        setIsDeveloper(false);
       }
     });
 
@@ -75,5 +83,5 @@ export function useAuth(): AuthState {
     };
   }, []);
 
-  return { user, role, permissions, loading };
+  return { user, role, permissions, isDeveloper, loading };
 }
