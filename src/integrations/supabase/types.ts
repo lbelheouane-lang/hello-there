@@ -48,6 +48,7 @@ export type Database = {
           kind: string
           record_counts: Json
           size_bytes: number
+          storage_path: string | null
           store_name: string | null
         }
         Insert: {
@@ -59,6 +60,7 @@ export type Database = {
           kind?: string
           record_counts?: Json
           size_bytes?: number
+          storage_path?: string | null
           store_name?: string | null
         }
         Update: {
@@ -70,6 +72,7 @@ export type Database = {
           kind?: string
           record_counts?: Json
           size_bytes?: number
+          storage_path?: string | null
           store_name?: string | null
         }
         Relationships: []
