@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { ALL_PERMISSIONS, type PermissionKey } from "@/lib/permissions";
-import { isDeveloperEmail } from "@/lib/license-activation";
 
 export type AppRole = "admin" | "employe" | "developer";
 
