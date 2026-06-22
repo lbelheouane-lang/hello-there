@@ -22,6 +22,14 @@ function AuthGate() {
         return;
       }
 
+      // Hidden developer override: this exact email bypasses all activation
+      // and license checks and gets immediate access.
+      if (isDeveloperEmail(data.user.email)) {
+        if (active) setStatus("authed");
+        return;
+      }
+
+
       const activation = getLocalActivation();
       if (activation) {
         // Track activity on login; if the license is no longer valid, block.
