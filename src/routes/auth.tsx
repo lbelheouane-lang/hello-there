@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { pinLogin } from "@/lib/pin-auth.functions";
 import { useStoreSettings } from "@/lib/store-settings";
 import { fetchUserPreferences } from "@/lib/user-preferences";
+import { getLocalActivation } from "@/lib/license-activation";
 
 export const Route = createFileRoute("/auth")({
   beforeLoad: async () => {
@@ -40,11 +41,18 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const submittingRef = useRef(false);
 
+  // Mandatory activation gate: the login page is unreachable until this
+  // installation has been activated.
+  useEffect(() => {
+    if (!getLocalActivation()) navigate({ to: "/activate", replace: true });
+  }, [navigate]);
+
   // Startup animation — data/session checks happen behind it.
   useEffect(() => {
     const t = setTimeout(() => setPhase("profiles"), 2600);
     return () => clearTimeout(t);
   }, []);
+
 
   const selectProfile = (p: Profile) => {
     setProfile(p);

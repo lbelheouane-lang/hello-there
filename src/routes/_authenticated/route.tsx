@@ -30,7 +30,7 @@ function AuthGate() {
             data: { license_key: activation.license_key, store_name: activation.store_name },
           });
           if (!res.valid) {
-            navigate({ to: "/activation" });
+            navigate({ to: "/activate" });
             return;
           }
         } catch {
@@ -49,7 +49,7 @@ function AuthGate() {
       if (isDeveloper) {
         if (active) setStatus("authed");
       } else {
-        navigate({ to: "/activation" });
+        navigate({ to: "/activate" });
       }
     });
     return () => {
