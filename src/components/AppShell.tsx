@@ -191,6 +191,7 @@ export function AppShell({
   const inner = (
     <SidebarProvider defaultOpen={prefs?.sidebar_default !== "collapsed"}>
       <BrandIntro />
+      <AutoBackupRunner />
       <AppSidebar />
       <SidebarInset>
         <header
