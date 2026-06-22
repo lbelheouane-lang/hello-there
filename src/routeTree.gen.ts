@@ -10,8 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as ActivationRouteImport } from './routes/activation'
-import { Route as ActivateRouteImport } from './routes/activate'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuiviTokenRouteImport } from './routes/suivi.$token'
@@ -39,16 +37,6 @@ import { Route as ApiPublicHooksUpdateGoldPricesRouteImport } from './routes/api
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ActivationRoute = ActivationRouteImport.update({
-  id: '/activation',
-  path: '/activation',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ActivateRoute = ActivateRouteImport.update({
-  id: '/activate',
-  path: '/activate',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -175,8 +163,6 @@ const ApiPublicHooksUpdateGoldPricesRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/activate': typeof ActivateRoute
-  '/activation': typeof ActivationRoute
   '/auth': typeof AuthRoute
   '/boutique': typeof AuthenticatedBoutiqueRoute
   '/clients': typeof AuthenticatedClientsRoute
@@ -202,8 +188,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/activate': typeof ActivateRoute
-  '/activation': typeof ActivationRoute
   '/auth': typeof AuthRoute
   '/boutique': typeof AuthenticatedBoutiqueRoute
   '/clients': typeof AuthenticatedClientsRoute
@@ -231,8 +215,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/activate': typeof ActivateRoute
-  '/activation': typeof ActivationRoute
   '/auth': typeof AuthRoute
   '/_authenticated/boutique': typeof AuthenticatedBoutiqueRoute
   '/_authenticated/clients': typeof AuthenticatedClientsRoute
@@ -260,8 +242,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/activate'
-    | '/activation'
     | '/auth'
     | '/boutique'
     | '/clients'
@@ -287,8 +267,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/activate'
-    | '/activation'
     | '/auth'
     | '/boutique'
     | '/clients'
@@ -315,8 +293,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
-    | '/activate'
-    | '/activation'
     | '/auth'
     | '/_authenticated/boutique'
     | '/_authenticated/clients'
@@ -344,8 +320,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  ActivateRoute: typeof ActivateRoute
-  ActivationRoute: typeof ActivationRoute
   AuthRoute: typeof AuthRoute
   SuiviTokenRoute: typeof SuiviTokenRoute
   ApiPublicHooksUpdateGoldPricesRoute: typeof ApiPublicHooksUpdateGoldPricesRoute
@@ -358,20 +332,6 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/activation': {
-      id: '/activation'
-      path: '/activation'
-      fullPath: '/activation'
-      preLoaderRoute: typeof ActivationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/activate': {
-      id: '/activate'
-      path: '/activate'
-      fullPath: '/activate'
-      preLoaderRoute: typeof ActivateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -588,8 +548,6 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  ActivateRoute: ActivateRoute,
-  ActivationRoute: ActivationRoute,
   AuthRoute: AuthRoute,
   SuiviTokenRoute: SuiviTokenRoute,
   ApiPublicHooksUpdateGoldPricesRoute: ApiPublicHooksUpdateGoldPricesRoute,
