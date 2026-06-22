@@ -626,6 +626,77 @@ export type Database = {
         }
         Relationships: []
       }
+      license_activations: {
+        Row: {
+          activated_at: string
+          id: string
+          last_activity: string
+          license_id: string
+          store_name: string
+        }
+        Insert: {
+          activated_at?: string
+          id?: string
+          last_activity?: string
+          license_id: string
+          store_name: string
+        }
+        Update: {
+          activated_at?: string
+          id?: string
+          last_activity?: string
+          license_id?: string
+          store_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "license_activations_license_id_fkey"
+            columns: ["license_id"]
+            isOneToOne: false
+            referencedRelation: "licenses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      licenses: {
+        Row: {
+          activation_date: string | null
+          created_at: string
+          id: string
+          last_activity: string | null
+          license_key: string
+          max_users: number
+          notes: string | null
+          status: string
+          store_name: string
+          updated_at: string
+        }
+        Insert: {
+          activation_date?: string | null
+          created_at?: string
+          id?: string
+          last_activity?: string | null
+          license_key: string
+          max_users?: number
+          notes?: string | null
+          status?: string
+          store_name: string
+          updated_at?: string
+        }
+        Update: {
+          activation_date?: string | null
+          created_at?: string
+          id?: string
+          last_activity?: string | null
+          license_key?: string
+          max_users?: number
+          notes?: string | null
+          status?: string
+          store_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
@@ -1682,6 +1753,7 @@ export type Database = {
         Args: { _due: string; _paid: number; _total: number }
         Returns: string
       }
+      is_developer: { Args: { _user_id: string }; Returns: boolean }
       next_expense_number: { Args: never; Returns: string }
       next_invoice_number: { Args: { _prefix?: string }; Returns: string }
       next_purchase_number: { Args: never; Returns: string }
@@ -1692,7 +1764,7 @@ export type Database = {
       seed_demo_data: { Args: never; Returns: undefined }
     }
     Enums: {
-      app_role: "admin" | "employe"
+      app_role: "admin" | "employe" | "developer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1820,7 +1892,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "employe"],
+      app_role: ["admin", "employe", "developer"],
     },
   },
 } as const
