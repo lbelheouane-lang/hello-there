@@ -106,12 +106,24 @@ export async function createBackup(
   };
 }
 
+/** Uploads a backup archive to the private "backups" storage bucket. */
+export async function uploadBackup(blob: Blob, fileName: string, userId: string | null): Promise<string> {
+  const path = `${userId ?? "system"}/${Date.now()}-${fileName}`;
+  const { error } = await supabase.storage.from("backups").upload(path, blob, {
+    contentType: "application/zip",
+    upsert: false,
+  });
+  if (error) throw new Error(error.message);
+  return path;
+}
+
 /** Records a backup in the history table. */
 export async function recordBackupHistory(
   backup: CreatedBackup,
   kind: "manual" | "auto",
   userId: string | null,
   userName: string | null,
+  storagePath: string | null,
 ): Promise<void> {
   const { error } = await supabase.from("backups").insert({
     file_name: backup.fileName,
@@ -121,8 +133,22 @@ export async function recordBackupHistory(
     kind,
     created_by: userId,
     created_by_name: userName,
+    storage_path: storagePath,
   } as never);
   if (error) throw new Error(error.message);
+}
+
+/** Downloads a stored backup archive as a Blob. */
+export async function downloadStoredBackup(storagePath: string): Promise<Blob> {
+  const { data, error } = await supabase.storage.from("backups").download(storagePath);
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+/** Deletes a stored backup archive (ignores missing files). */
+export async function deleteStoredBackup(storagePath: string | null): Promise<void> {
+  if (!storagePath) return;
+  await supabase.storage.from("backups").remove([storagePath]);
 }
 
 /** Triggers a browser download for a generated backup blob. */
