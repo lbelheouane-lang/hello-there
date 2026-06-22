@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { pinLogin } from "@/lib/pin-auth.functions";
 import { useStoreSettings } from "@/lib/store-settings";
 import { fetchUserPreferences } from "@/lib/user-preferences";
-import { getLocalActivation, isDeveloperEmail } from "@/lib/license-activation";
+
 
 export const Route = createFileRoute("/auth")({
   beforeLoad: async () => {
@@ -41,17 +41,12 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const submittingRef = useRef(false);
 
-  // Mandatory activation gate: the login page is unreachable until this
-  // installation has been activated.
-  useEffect(() => {
-    if (!getLocalActivation()) navigate({ to: "/activate", replace: true });
-  }, [navigate]);
-
   // Startup animation — data/session checks happen behind it.
   useEffect(() => {
     const t = setTimeout(() => setPhase("profiles"), 2600);
     return () => clearTimeout(t);
   }, []);
+
 
 
   const selectProfile = (p: Profile) => {
@@ -96,15 +91,6 @@ function AuthPage() {
           return;
         }
         setPhase("success");
-        // Hidden developer override: the developer account goes straight to
-        // the License Management dashboard with full access.
-        const { data: udata } = await supabase.auth.getUser();
-        if (isDeveloperEmail(udata.user?.email)) {
-          setTimeout(() => {
-            navigate({ to: "/licences" });
-          }, 1300);
-          return;
-        }
         let dest = res.role === "admin" ? "/dashboard" : "/nouvelle-vente";
         if (res.role === "admin") {
           try {

