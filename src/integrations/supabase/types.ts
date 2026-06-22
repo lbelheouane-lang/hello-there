@@ -77,6 +77,39 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_journals: {
+        Row: {
+          created_at: string
+          date_to: string | null
+          generated_by: string | null
+          generated_by_name: string | null
+          id: string
+          journal_date: string
+          summary: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date_to?: string | null
+          generated_by?: string | null
+          generated_by_name?: string | null
+          id?: string
+          journal_date: string
+          summary?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date_to?: string | null
+          generated_by?: string | null
+          generated_by_name?: string | null
+          id?: string
+          journal_date?: string
+          summary?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       employee_credentials: {
         Row: {
           backing_email: string

@@ -20,6 +20,7 @@ import { Route as AuthenticatedParametresRouteImport } from './routes/_authentic
 import { Route as AuthenticatedPaiementsEnAttenteRouteImport } from './routes/_authenticated/paiements-en-attente'
 import { Route as AuthenticatedOrCasseRouteImport } from './routes/_authenticated/or-casse'
 import { Route as AuthenticatedNouvelleVenteRouteImport } from './routes/_authenticated/nouvelle-vente'
+import { Route as AuthenticatedJournalQuotidienRouteImport } from './routes/_authenticated/journal-quotidien'
 import { Route as AuthenticatedFournisseursRouteImport } from './routes/_authenticated/fournisseurs'
 import { Route as AuthenticatedFacturesRouteImport } from './routes/_authenticated/factures'
 import { Route as AuthenticatedDepensesRouteImport } from './routes/_authenticated/depenses'
@@ -87,6 +88,12 @@ const AuthenticatedNouvelleVenteRoute =
   AuthenticatedNouvelleVenteRouteImport.update({
     id: '/nouvelle-vente',
     path: '/nouvelle-vente',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedJournalQuotidienRoute =
+  AuthenticatedJournalQuotidienRouteImport.update({
+    id: '/journal-quotidien',
+    path: '/journal-quotidien',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedFournisseursRoute =
@@ -158,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/depenses': typeof AuthenticatedDepensesRoute
   '/factures': typeof AuthenticatedFacturesRoute
   '/fournisseurs': typeof AuthenticatedFournisseursRoute
+  '/journal-quotidien': typeof AuthenticatedJournalQuotidienRoute
   '/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
   '/or-casse': typeof AuthenticatedOrCasseRoute
   '/paiements-en-attente': typeof AuthenticatedPaiementsEnAttenteRoute
@@ -181,6 +189,7 @@ export interface FileRoutesByTo {
   '/depenses': typeof AuthenticatedDepensesRoute
   '/factures': typeof AuthenticatedFacturesRoute
   '/fournisseurs': typeof AuthenticatedFournisseursRoute
+  '/journal-quotidien': typeof AuthenticatedJournalQuotidienRoute
   '/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
   '/or-casse': typeof AuthenticatedOrCasseRoute
   '/paiements-en-attente': typeof AuthenticatedPaiementsEnAttenteRoute
@@ -206,6 +215,7 @@ export interface FileRoutesById {
   '/_authenticated/depenses': typeof AuthenticatedDepensesRoute
   '/_authenticated/factures': typeof AuthenticatedFacturesRoute
   '/_authenticated/fournisseurs': typeof AuthenticatedFournisseursRoute
+  '/_authenticated/journal-quotidien': typeof AuthenticatedJournalQuotidienRoute
   '/_authenticated/nouvelle-vente': typeof AuthenticatedNouvelleVenteRoute
   '/_authenticated/or-casse': typeof AuthenticatedOrCasseRoute
   '/_authenticated/paiements-en-attente': typeof AuthenticatedPaiementsEnAttenteRoute
@@ -231,6 +241,7 @@ export interface FileRouteTypes {
     | '/depenses'
     | '/factures'
     | '/fournisseurs'
+    | '/journal-quotidien'
     | '/nouvelle-vente'
     | '/or-casse'
     | '/paiements-en-attente'
@@ -254,6 +265,7 @@ export interface FileRouteTypes {
     | '/depenses'
     | '/factures'
     | '/fournisseurs'
+    | '/journal-quotidien'
     | '/nouvelle-vente'
     | '/or-casse'
     | '/paiements-en-attente'
@@ -278,6 +290,7 @@ export interface FileRouteTypes {
     | '/_authenticated/depenses'
     | '/_authenticated/factures'
     | '/_authenticated/fournisseurs'
+    | '/_authenticated/journal-quotidien'
     | '/_authenticated/nouvelle-vente'
     | '/_authenticated/or-casse'
     | '/_authenticated/paiements-en-attente'
@@ -379,6 +392,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNouvelleVenteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/journal-quotidien': {
+      id: '/_authenticated/journal-quotidien'
+      path: '/journal-quotidien'
+      fullPath: '/journal-quotidien'
+      preLoaderRoute: typeof AuthenticatedJournalQuotidienRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/fournisseurs': {
       id: '/_authenticated/fournisseurs'
       path: '/fournisseurs'
@@ -467,6 +487,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDepensesRoute: typeof AuthenticatedDepensesRoute
   AuthenticatedFacturesRoute: typeof AuthenticatedFacturesRoute
   AuthenticatedFournisseursRoute: typeof AuthenticatedFournisseursRoute
+  AuthenticatedJournalQuotidienRoute: typeof AuthenticatedJournalQuotidienRoute
   AuthenticatedNouvelleVenteRoute: typeof AuthenticatedNouvelleVenteRoute
   AuthenticatedOrCasseRoute: typeof AuthenticatedOrCasseRoute
   AuthenticatedPaiementsEnAttenteRoute: typeof AuthenticatedPaiementsEnAttenteRoute
@@ -487,6 +508,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDepensesRoute: AuthenticatedDepensesRoute,
   AuthenticatedFacturesRoute: AuthenticatedFacturesRoute,
   AuthenticatedFournisseursRoute: AuthenticatedFournisseursRoute,
+  AuthenticatedJournalQuotidienRoute: AuthenticatedJournalQuotidienRoute,
   AuthenticatedNouvelleVenteRoute: AuthenticatedNouvelleVenteRoute,
   AuthenticatedOrCasseRoute: AuthenticatedOrCasseRoute,
   AuthenticatedPaiementsEnAttenteRoute: AuthenticatedPaiementsEnAttenteRoute,
