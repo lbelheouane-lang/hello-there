@@ -59,6 +59,7 @@ interface Scrap {
   weight_grams: number;
   gold_karat: number;
   price_per_gram: number;
+  estimated_value: number;
   total_amount: number;
   status: string;
   is_demo: boolean;
@@ -81,6 +82,7 @@ interface ScrapForm {
   gold_karat: string;
   weight_grams: string;
   price_per_gram: string;
+  total_amount: string;
   status: string;
   notes: string;
 }
@@ -92,6 +94,7 @@ const emptyForm: ScrapForm = {
   gold_karat: "18",
   weight_grams: "",
   price_per_gram: "",
+  total_amount: "",
   status: "en_stock",
   notes: "",
 };
