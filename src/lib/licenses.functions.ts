@@ -1,13 +1,17 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-/** Result returned to the client after a successful activation. */
-export interface ActivationResult {
+/** Result returned to the client after an activation attempt. */
+export interface ActivationData {
   license_id: string;
   license_key: string;
   store_name: string;
   status: string;
 }
+
+export type ActivationResult =
+  | ({ ok: true } & ActivationData)
+  | { ok: false; error: string };
 
 const activateSchema = z.object({
   store_name: z.string().trim().min(1, "Le nom de la boutique est requis."),
