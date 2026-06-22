@@ -44,6 +44,10 @@ function ActivatePage() {
     setBusy(true);
     try {
       const res = await activate({ data: { store_name: storeName, license_key: licenseKey } });
+      if (!res.ok) {
+        setError(res.error);
+        return;
+      }
       setLocalActivation({
         license_id: res.license_id,
         license_key: res.license_key,
@@ -51,8 +55,8 @@ function ActivatePage() {
         activated_at: new Date().toISOString(),
       });
       navigate({ to: "/auth", replace: true });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Clé d'activation invalide.");
+    } catch {
+      setError("Une erreur est survenue. Réessayez.");
     } finally {
       setBusy(false);
     }
