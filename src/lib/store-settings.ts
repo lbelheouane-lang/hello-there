@@ -100,10 +100,25 @@ function normalize(row: Record<string, unknown> | null): StoreSettings {
 }
 
 export async function fetchStoreSettings(): Promise<StoreSettings> {
+  // Signed-in users read the full settings row; anonymous visitors (login,
+  // public repair tracking) only get safe branding fields via a public view.
+  const { data: auth } = await supabase.auth.getSession();
+
+  if (auth.session) {
+    const { data, error } = await supabase
+      .from("store_settings")
+      .select("*")
+      .eq("singleton", true)
+      .maybeSingle();
+    if (error) throw error;
+    const settings = normalize(data as Record<string, unknown> | null);
+    setStoreSettingsCache(settings);
+    return settings;
+  }
+
   const { data, error } = await supabase
-    .from("store_settings")
+    .from("store_branding_public")
     .select("*")
-    .eq("singleton", true)
     .maybeSingle();
   if (error) throw error;
   const settings = normalize(data as Record<string, unknown> | null);
