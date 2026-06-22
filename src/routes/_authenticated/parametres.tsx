@@ -22,6 +22,7 @@ import {
   EmployeesCard, ChangeOwnPinCard, PinAuditCard,
 } from "@/components/settings/employee-management";
 import { AppearanceCard } from "@/components/settings/appearance";
+import { BackupRestoreCard } from "@/components/settings/backup-restore";
 
 export const Route = createFileRoute("/_authenticated/parametres")({
   component: SettingsPage,
