@@ -187,6 +187,7 @@ function ScrapGoldPage() {
       gold_karat: String(s.gold_karat),
       weight_grams: String(s.weight_grams),
       price_per_gram: String(s.price_per_gram),
+      total_amount: String(s.total_amount),
       status: s.status,
       notes: s.notes ?? "",
     });
