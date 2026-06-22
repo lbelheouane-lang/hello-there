@@ -33,6 +33,10 @@ export interface StoreSettings {
   login_logo_url: string | null;
   login_background_url: string | null;
   favicon_url: string | null;
+  auto_backup_enabled: boolean;
+  auto_backup_frequency: string;
+  auto_backup_time: string;
+  last_auto_backup_at: string | null;
 }
 
 export const DEFAULT_SETTINGS: StoreSettings = {
