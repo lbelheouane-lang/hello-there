@@ -170,7 +170,8 @@ function ScrapGoldPage() {
     setStatusFilter("all"); setKaratFilter("all"); setFromDate(""); setToDate("");
   }
 
-  const liveTotal = (Number(form.weight_grams) || 0) * (Number(form.price_per_gram) || 0);
+  const liveEstimated = (Number(form.weight_grams) || 0) * (Number(form.price_per_gram) || 0);
+  const liveTotal = form.total_amount.trim() !== "" ? Number(form.total_amount) || 0 : liveEstimated;
 
   function openCreate() {
     setEditing(null);
