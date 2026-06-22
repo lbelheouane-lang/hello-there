@@ -87,13 +87,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Maison d'Or — Gestion de bijouterie" },
+      { title: "Orus" },
       { name: "description", content: "ERP bijoutier : stock, fournisseurs, ventes et cours de l'or en temps réel." },
       { name: "author", content: "Maison d'Or" },
-      { property: "og:title", content: "Maison d'Or — Gestion de bijouterie" },
+      { property: "og:title", content: "Orus" },
       { property: "og:description", content: "ERP bijoutier : stock, fournisseurs, ventes et cours de l'or en temps réel." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Orus" },
+      { name: "twitter:description", content: "ERP bijoutier : stock, fournisseurs, ventes et cours de l'or en temps réel." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b3f382ee-44de-4753-84cd-dbe9a6c2daf1/id-preview-40661221--f6d7eaaf-3ac9-4958-88ba-09a64121b1c4.lovable.app-1782158924599.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b3f382ee-44de-4753-84cd-dbe9a6c2daf1/id-preview-40661221--f6d7eaaf-3ac9-4958-88ba-09a64121b1c4.lovable.app-1782158924599.png" },
     ],
     links: [
       {
