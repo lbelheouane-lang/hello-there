@@ -450,10 +450,25 @@ function ScrapGoldPage() {
             </div>
             <div className="sm:col-span-2 rounded-lg border bg-muted/30 p-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Montant total d'achat</span>
-                <span className="font-serif text-xl font-semibold text-primary">{formatDZD(liveTotal)}</span>
+                <span className="text-sm text-muted-foreground">Valeur estimée</span>
+                <span className="font-serif text-lg font-semibold">{formatDZD(liveEstimated)}</span>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">Poids × prix au gramme (calculé automatiquement)</p>
+              <p className="mt-1 text-xs text-muted-foreground">Poids × prix au gramme (à titre indicatif)</p>
+            </div>
+            <div className="sm:col-span-2">
+              <Label>Montant total d'achat (DZD)</Label>
+              <Input
+                type="number"
+                min={0}
+                step="0.01"
+                value={form.total_amount}
+                onChange={(e) => setForm({ ...form, total_amount: e.target.value })}
+                placeholder={`Estimé : ${formatDZD(liveEstimated)}`}
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Montant officiel payé. Laissez vide pour utiliser la valeur estimée. Total retenu :{" "}
+                <span className="font-medium text-primary">{formatDZD(liveTotal)}</span>
+              </p>
             </div>
             <div className="sm:col-span-2">
               <Label>Notes</Label>
