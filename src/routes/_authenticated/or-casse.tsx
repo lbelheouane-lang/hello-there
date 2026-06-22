@@ -369,6 +369,7 @@ function ScrapGoldPage() {
                         <td className="px-3 py-2">{s.gold_karat}K</td>
                         <td className="px-3 py-2 text-right">{formatGrams(Number(s.weight_grams))}</td>
                         <td className="px-3 py-2 text-right">{formatDZD(Number(s.price_per_gram))}</td>
+                        <td className="px-3 py-2 text-right text-muted-foreground">{formatDZD(Number(s.estimated_value))}</td>
                         <td className="px-3 py-2 text-right font-medium">{formatDZD(Number(s.total_amount))}</td>
                         <td className="px-3 py-2">
                           <Select value={s.status} onValueChange={(v) => changeStatus.mutate({ id: s.id, status: v })}>
