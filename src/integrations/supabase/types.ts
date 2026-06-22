@@ -1717,7 +1717,54 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      store_branding_public: {
+        Row: {
+          currency: string | null
+          default_mode: string | null
+          default_theme: string | null
+          favicon_url: string | null
+          language: string | null
+          login_background_url: string | null
+          login_logo_url: string | null
+          logo_url: string | null
+          slogan: string | null
+          social: Json | null
+          store_name: string | null
+          tagline: string | null
+          website: string | null
+        }
+        Insert: {
+          currency?: string | null
+          default_mode?: string | null
+          default_theme?: string | null
+          favicon_url?: string | null
+          language?: string | null
+          login_background_url?: string | null
+          login_logo_url?: string | null
+          logo_url?: string | null
+          slogan?: string | null
+          social?: Json | null
+          store_name?: string | null
+          tagline?: string | null
+          website?: string | null
+        }
+        Update: {
+          currency?: string | null
+          default_mode?: string | null
+          default_theme?: string | null
+          favicon_url?: string | null
+          language?: string | null
+          login_background_url?: string | null
+          login_logo_url?: string | null
+          logo_url?: string | null
+          slogan?: string | null
+          social?: Json | null
+          store_name?: string | null
+          tagline?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       backup_all: { Args: never; Returns: Json }
