@@ -410,20 +410,14 @@ function PendingPaymentsPage() {
                 <TableHead>Client</TableHead>
                 <TableHead>Facture</TableHead>
                 <TableHead className="text-right">Montant initial</TableHead>
-                <TableHead className="text-right">Payé</TableHead>
-                <TableHead className="w-44">Progression</TableHead>
-                <TableHead className="text-right">Reste</TableHead>
-                <TableHead>Dernier paiement</TableHead>
-                <TableHead>Statut</TableHead>
+                <TableHead className="text-right">Reste à payer</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filtered.map((s) => {
                 const status = statusForSale(s);
-                const meta = STATUS_META[status];
                 const isUrgent = status === "overdue" || status === "due_today";
-                const last = lastPaymentBySale.get(s.id);
                 return (
                   <TableRow key={s.id} className={status === "overdue" ? "bg-destructive/5" : ""}>
                     <TableCell>
@@ -440,17 +434,7 @@ function PendingPaymentsPage() {
                       <p className="text-xs text-muted-foreground">{s.product_name}</p>
                     </TableCell>
                     <TableCell className="text-right text-sm">{formatDZD(s.total_amount)}</TableCell>
-                    <TableCell className="text-right text-sm">{formatDZD(s.amount_paid)}</TableCell>
-                    <TableCell>
-                      <Progress value={percentPaid(s)} />
-                      <div className="mt-1 flex justify-between text-[11px] text-muted-foreground">
-                        <span>{percentPaid(s)}%</span>
-                        <span>/ {formatDZD(s.total_amount)}</span>
-                      </div>
-                    </TableCell>
                     <TableCell className="text-right font-semibold text-destructive">{formatDZD(balanceOf(s))}</TableCell>
-                    <TableCell className="text-sm">{last ? formatDate(last) : "—"}</TableCell>
-                    <TableCell><Badge variant={meta.variant}>{meta.label}</Badge></TableCell>
                     <TableCell>
                       <div className="flex justify-end gap-1">
                         <Button variant="outline" size="sm" onClick={() => openDetail(s)}>
@@ -471,7 +455,7 @@ function PendingPaymentsPage() {
               })}
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={9} className="py-12 text-center text-muted-foreground">
+                  <TableCell colSpan={5} className="py-12 text-center text-muted-foreground">
                     <Wallet className="mx-auto mb-2 h-8 w-8 opacity-40" />
                     Aucun paiement en attente. Toutes les factures sont soldées. 🎉
                   </TableCell>
