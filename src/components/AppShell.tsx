@@ -60,6 +60,7 @@ const NAV: readonly {
   { to: "/or-casse", label: "Or Cassé", icon: Recycle, roles: ["admin"], perm: "scrap_gold" },
   { to: "/fournisseurs", label: "Fournisseurs", icon: Truck, roles: ["admin"], perm: "suppliers" },
   { to: "/depenses", label: "Dépenses", icon: Wallet2, roles: ["admin"], perm: "reports" },
+  { to: "/journal-quotidien", label: "Journal Quotidien", icon: BookOpen, roles: ["admin", "employe"], perm: "reports" },
   { to: "/cours-or", label: "Cours de l'or", icon: Coins, roles: ["admin"] },
   { to: "/boutique", label: "Boutique", icon: Store, roles: ["admin"], perm: "settings" },
   { to: "/parametres", label: "Paramètres", icon: Settings, roles: ["admin"], perm: "settings" },
