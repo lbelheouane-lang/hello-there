@@ -38,14 +38,16 @@ export const activateLicense = createServerFn({ method: "POST" })
       .eq("license_key", key)
       .maybeSingle();
 
-    if (error) throw new Error("Erreur lors de la vérification de la licence.");
-    if (!lic) throw new Error("Clé de licence introuvable. Vérifiez la clé saisie.");
+    if (error) return { ok: false, error: "Erreur lors de la vérification de la licence." };
+    if (!lic) return { ok: false, error: "Clé de licence introuvable. Vérifiez la clé saisie." };
     if (lic.status !== "Active") {
-      throw new Error(
-        lic.status === "Suspended"
-          ? "Cette licence est suspendue. Contactez le développeur."
-          : "Cette licence a été révoquée. Contactez le développeur.",
-      );
+      return {
+        ok: false,
+        error:
+          lic.status === "Suspended"
+            ? "Cette licence est suspendue. Contactez le développeur."
+            : "Cette licence a été révoquée. Contactez le développeur.",
+      };
     }
 
     const now = new Date().toISOString();
@@ -81,6 +83,7 @@ export const activateLicense = createServerFn({ method: "POST" })
     }
 
     return {
+      ok: true,
       license_id: lic.id,
       license_key: lic.license_key,
       store_name: store,
