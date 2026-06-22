@@ -35,8 +35,20 @@ function ActivatePage() {
   const [error, setError] = useState<string | null>(null);
 
   // Activation appears only once: if already activated, skip straight to login.
+  // The hidden developer override never sees this page.
   useEffect(() => {
-    if (getLocalActivation()) navigate({ to: "/auth", replace: true });
+    let active = true;
+    supabase.auth.getUser().then(({ data }) => {
+      if (!active) return;
+      if (isDeveloperEmail(data.user?.email)) {
+        navigate({ to: "/licences", replace: true });
+        return;
+      }
+      if (getLocalActivation()) navigate({ to: "/auth", replace: true });
+    });
+    return () => {
+      active = false;
+    };
   }, [navigate]);
 
   async function submit(e: React.FormEvent) {
