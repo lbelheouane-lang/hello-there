@@ -18,7 +18,6 @@ import {
   Layers,
   Recycle,
   BookOpen,
-  KeyRound,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BrandIntro } from "@/components/BrandIntro";
@@ -68,7 +67,6 @@ const NAV: readonly {
   { to: "/cours-or", label: "Cours de l'or", icon: Coins, roles: ["admin"] },
   { to: "/boutique", label: "Boutique", icon: Store, roles: ["admin"], perm: "settings" },
   { to: "/parametres", label: "Paramètres", icon: Settings, roles: ["admin"], perm: "settings" },
-  { to: "/licences", label: "Gestion des licences", icon: KeyRound, roles: ["admin", "employe", "developer"], developerOnly: true },
 ];
 
 /** A nav item is visible when the role allows it and (admin, no permission gate,

@@ -6,7 +6,6 @@ import { useAuth, type AppRole } from "@/hooks/use-auth";
 /** Default landing route for each role after access decisions. */
 export function defaultRouteForRole(role: AppRole | null): string {
   if (role === "admin") return "/dashboard";
-  if (role === "developer") return "/licences";
   return "/nouvelle-vente";
 }
 
