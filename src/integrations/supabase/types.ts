@@ -1233,6 +1233,7 @@ export type Database = {
           created_by: string | null
           customer_id: string | null
           customer_name: string | null
+          estimated_value: number
           gold_karat: number
           id: string
           is_demo: boolean
@@ -1250,6 +1251,7 @@ export type Database = {
           created_by?: string | null
           customer_id?: string | null
           customer_name?: string | null
+          estimated_value?: number
           gold_karat?: number
           id?: string
           is_demo?: boolean
@@ -1267,6 +1269,7 @@ export type Database = {
           created_by?: string | null
           customer_id?: string | null
           customer_name?: string | null
+          estimated_value?: number
           gold_karat?: number
           id?: string
           is_demo?: boolean

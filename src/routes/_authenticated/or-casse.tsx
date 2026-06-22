@@ -59,6 +59,7 @@ interface Scrap {
   weight_grams: number;
   gold_karat: number;
   price_per_gram: number;
+  estimated_value: number;
   total_amount: number;
   status: string;
   is_demo: boolean;
@@ -81,6 +82,7 @@ interface ScrapForm {
   gold_karat: string;
   weight_grams: string;
   price_per_gram: string;
+  total_amount: string;
   status: string;
   notes: string;
 }
@@ -92,6 +94,7 @@ const emptyForm: ScrapForm = {
   gold_karat: "18",
   weight_grams: "",
   price_per_gram: "",
+  total_amount: "",
   status: "en_stock",
   notes: "",
 };
@@ -167,7 +170,8 @@ function ScrapGoldPage() {
     setStatusFilter("all"); setKaratFilter("all"); setFromDate(""); setToDate("");
   }
 
-  const liveTotal = (Number(form.weight_grams) || 0) * (Number(form.price_per_gram) || 0);
+  const liveEstimated = (Number(form.weight_grams) || 0) * (Number(form.price_per_gram) || 0);
+  const liveTotal = form.total_amount.trim() !== "" ? Number(form.total_amount) || 0 : liveEstimated;
 
   function openCreate() {
     setEditing(null);
@@ -184,6 +188,7 @@ function ScrapGoldPage() {
       gold_karat: String(s.gold_karat),
       weight_grams: String(s.weight_grams),
       price_per_gram: String(s.price_per_gram),
+      total_amount: String(s.total_amount),
       status: s.status,
       notes: s.notes ?? "",
     });
@@ -205,6 +210,9 @@ function ScrapGoldPage() {
       const ppg = Number(form.price_per_gram);
       if (!weight || weight <= 0) throw new Error("Indiquez un poids valide.");
       if (!ppg || ppg <= 0) throw new Error("Indiquez le prix d'achat au gramme.");
+      const estimated = weight * ppg;
+      const manualTotal = form.total_amount.trim() !== "" ? Number(form.total_amount) : estimated;
+      if (manualTotal < 0 || Number.isNaN(manualTotal)) throw new Error("Indiquez un montant total valide.");
       const payload = {
         purchased_at: new Date(form.purchased_at).toISOString(),
         customer_id: form.customer_id || null,
@@ -212,6 +220,7 @@ function ScrapGoldPage() {
         gold_karat: Number(form.gold_karat),
         weight_grams: weight,
         price_per_gram: ppg,
+        total_amount: manualTotal,
         status: form.status,
         notes: form.notes.trim() || null,
       };
@@ -334,15 +343,16 @@ function ScrapGoldPage() {
                     <th className="px-3 py-2">Titre</th>
                     <th className="px-3 py-2 text-right">Poids</th>
                     <th className="px-3 py-2 text-right">Prix / g</th>
-                    <th className="px-3 py-2 text-right">Valeur</th>
+                    <th className="px-3 py-2 text-right">Valeur estimée</th>
+                    <th className="px-3 py-2 text-right">Montant total</th>
                     <th className="px-3 py-2">Statut</th>
                     <th className="px-3 py-2 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {isLoading && <tr><td colSpan={8} className="px-3 py-6 text-center text-muted-foreground">Chargement…</td></tr>}
+                  {isLoading && <tr><td colSpan={9} className="px-3 py-6 text-center text-muted-foreground">Chargement…</td></tr>}
                   {!isLoading && filtered.length === 0 && (
-                    <tr><td colSpan={8} className="px-3 py-10 text-center text-muted-foreground">
+                    <tr><td colSpan={9} className="px-3 py-10 text-center text-muted-foreground">
                       <Recycle className="mx-auto mb-2 h-8 w-8 opacity-40" />
                       Aucun achat d'or cassé.
                     </td></tr>
@@ -359,6 +369,7 @@ function ScrapGoldPage() {
                         <td className="px-3 py-2">{s.gold_karat}K</td>
                         <td className="px-3 py-2 text-right">{formatGrams(Number(s.weight_grams))}</td>
                         <td className="px-3 py-2 text-right">{formatDZD(Number(s.price_per_gram))}</td>
+                        <td className="px-3 py-2 text-right text-muted-foreground">{formatDZD(Number(s.estimated_value))}</td>
                         <td className="px-3 py-2 text-right font-medium">{formatDZD(Number(s.total_amount))}</td>
                         <td className="px-3 py-2">
                           <Select value={s.status} onValueChange={(v) => changeStatus.mutate({ id: s.id, status: v })}>
@@ -441,10 +452,25 @@ function ScrapGoldPage() {
             </div>
             <div className="sm:col-span-2 rounded-lg border bg-muted/30 p-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Montant total d'achat</span>
-                <span className="font-serif text-xl font-semibold text-primary">{formatDZD(liveTotal)}</span>
+                <span className="text-sm text-muted-foreground">Valeur estimée</span>
+                <span className="font-serif text-lg font-semibold">{formatDZD(liveEstimated)}</span>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">Poids × prix au gramme (calculé automatiquement)</p>
+              <p className="mt-1 text-xs text-muted-foreground">Poids × prix au gramme (à titre indicatif)</p>
+            </div>
+            <div className="sm:col-span-2">
+              <Label>Montant total d'achat (DZD)</Label>
+              <Input
+                type="number"
+                min={0}
+                step="0.01"
+                value={form.total_amount}
+                onChange={(e) => setForm({ ...form, total_amount: e.target.value })}
+                placeholder={`Estimé : ${formatDZD(liveEstimated)}`}
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Montant officiel payé. Laissez vide pour utiliser la valeur estimée. Total retenu :{" "}
+                <span className="font-medium text-primary">{formatDZD(liveTotal)}</span>
+              </p>
             </div>
             <div className="sm:col-span-2">
               <Label>Notes</Label>
@@ -526,6 +552,7 @@ function ScrapDetailDialog({ scrap, onClose, onEdit }: { scrap: Scrap | null; on
           <div><span className="text-muted-foreground">Titre : </span>{scrap.gold_karat}K</div>
           <div><span className="text-muted-foreground">Poids : </span>{formatGrams(Number(scrap.weight_grams))}</div>
           <div><span className="text-muted-foreground">Prix / gramme : </span>{formatDZD(Number(scrap.price_per_gram))}</div>
+          <div><span className="text-muted-foreground">Valeur estimée : </span>{formatDZD(Number(scrap.estimated_value))}</div>
           <div><span className="text-muted-foreground">Montant total : </span><span className="font-semibold text-primary">{formatDZD(Number(scrap.total_amount))}</span></div>
           {scrap.notes && <div className="sm:col-span-2"><span className="text-muted-foreground">Notes : </span>{scrap.notes}</div>}
         </div>
