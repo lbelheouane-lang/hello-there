@@ -212,16 +212,9 @@ export async function fetchJournalSummary(from: string, to: string): Promise<Jou
     const k = Number(g.karat);
     if (!prevByKarat.has(k)) prevByKarat.set(k, Number(g.price_per_gram));
   }
-  const seenKarat = new Set<number>();
   const goldPrices: JournalSummary["goldPrices"] = [];
   for (const g of gold) {
     const k = Number(g.karat);
-    const key = `${k}-${g.source}`;
-    if (seenKarat.has(k as unknown as number) && goldPrices.some((x) => x.karat === k)) {
-      // keep latest per karat: replace
-    }
-    void key;
-    const existingIdx = goldPrices.findIndex((x) => x.karat === k);
     const entry = {
       karat: k,
       previous: prevByKarat.has(k) ? prevByKarat.get(k)! : null,
@@ -230,15 +223,16 @@ export async function fetchJournalSummary(from: string, to: string): Promise<Jou
       at: (g.fetched_at as string) || (g.created_at as string),
       user: (g.source as string) === "manual" ? "Manuel" : "Synchronisation",
     };
-    if (existingIdx >= 0) goldPrices[existingIdx] = entry;
+    const existingIdx = goldPrices.findIndex((x) => x.karat === k);
+    if (existingIdx >= 0) goldPrices[existingIdx] = entry; // keep latest per karat
     else goldPrices.push(entry);
-    seenKarat.add(k);
   }
   goldPrices.sort((a, b) => b.karat - a.karat);
 
   // --- User activity ---
-  const actMap = new Map<string, { sales: number; inventory: number; payments: number; expenses: number; scrap: number }>();
-  const bump = (id: unknown, key: keyof ReturnType<() => { sales: 0; inventory: 0; payments: 0; expenses: 0; scrap: 0 }>) => {
+  type ActKey = "sales" | "inventory" | "payments" | "expenses" | "scrap";
+  const actMap = new Map<string, Record<ActKey, number>>();
+  const bump = (id: unknown, key: ActKey) => {
     const name = uname(id);
     const g = actMap.get(name) ?? { sales: 0, inventory: 0, payments: 0, expenses: 0, scrap: 0 };
     g[key]++;
