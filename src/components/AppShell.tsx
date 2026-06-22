@@ -26,6 +26,7 @@ import type { PermissionKey } from "@/lib/permissions";
 import { useStoreSettings } from "@/lib/store-settings";
 import { useUserPreferences } from "@/lib/user-preferences";
 import { RequireRole } from "@/components/RequireRole";
+import { AutoBackupRunner } from "@/components/AutoBackupRunner";
 import { Button } from "@/components/ui/button";
 import {
   Sidebar,
