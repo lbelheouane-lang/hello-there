@@ -64,7 +64,7 @@ export function useAuth(): AuthState {
     supabase.auth.getUser().then(({ data }) => {
       if (!active) return;
       setUser(data.user ?? null);
-      if (data.user) loadProfile(data.user.id, data.user.email ?? null).finally(() => active && setLoading(false));
+      if (data.user) loadProfile(data.user.id).finally(() => active && setLoading(false));
       else setLoading(false);
     });
 
