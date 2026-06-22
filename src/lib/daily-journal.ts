@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
-import { formatDZD, formatGrams, formatDate, formatDateTime, paymentLabel } from "@/lib/format";
-import { getStoreInfo, getStoreInfo as _store } from "@/lib/invoice";
+import { formatDZD, formatGrams, formatDate, formatDateTime } from "@/lib/format";
+import { getStoreInfo } from "@/lib/invoice";
 import { getStoreSettings } from "@/lib/store-settings";
 
 /** Complete aggregated summary of a day's (or range's) activity. */
