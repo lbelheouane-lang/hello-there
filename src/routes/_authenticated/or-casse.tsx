@@ -210,6 +210,9 @@ function ScrapGoldPage() {
       const ppg = Number(form.price_per_gram);
       if (!weight || weight <= 0) throw new Error("Indiquez un poids valide.");
       if (!ppg || ppg <= 0) throw new Error("Indiquez le prix d'achat au gramme.");
+      const estimated = weight * ppg;
+      const manualTotal = form.total_amount.trim() !== "" ? Number(form.total_amount) : estimated;
+      if (manualTotal < 0 || Number.isNaN(manualTotal)) throw new Error("Indiquez un montant total valide.");
       const payload = {
         purchased_at: new Date(form.purchased_at).toISOString(),
         customer_id: form.customer_id || null,
@@ -217,6 +220,7 @@ function ScrapGoldPage() {
         gold_karat: Number(form.gold_karat),
         weight_grams: weight,
         price_per_gram: ppg,
+        total_amount: manualTotal,
         status: form.status,
         notes: form.notes.trim() || null,
       };
