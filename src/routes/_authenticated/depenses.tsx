@@ -309,6 +309,10 @@ function ExpensesPage() {
           });
           if (error) throw error;
         }
+      } else if (editing) {
+        // The expense was changed from a stock purchase to another category:
+        // drop any previously linked supplier purchase to avoid a stale record.
+        await supabase.from("purchases").delete().eq("expense_id", expenseId);
       }
     },
     onSuccess: () => {
