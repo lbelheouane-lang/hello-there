@@ -49,7 +49,7 @@ function AuthGate() {
       if (isDeveloper) {
         if (active) setStatus("authed");
       } else {
-        navigate({ to: "/activation" });
+        navigate({ to: "/activate" });
       }
     });
     return () => {
