@@ -1,11 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Delete, Loader2, LogOut, ShieldCheck } from "lucide-react";
+import { Crown, Delete, Loader2, LogOut, ShieldCheck, UserRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { pinLogin } from "@/lib/pin-auth.functions";
 import { useStoreSettings } from "@/lib/store-settings";
 import { defaultRouteForRole } from "@/components/RequireRole";
 import { Button } from "@/components/ui/button";
+
+type SelectedRole = "admin" | "employe";
 
 export const PIN_DONE_KEY = "md_pin_done";
 
