@@ -1,11 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Delete, Loader2, LogOut, ShieldCheck } from "lucide-react";
+import { Crown, Delete, Loader2, LogOut, ShieldCheck, UserRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { pinLogin } from "@/lib/pin-auth.functions";
 import { useStoreSettings } from "@/lib/store-settings";
 import { defaultRouteForRole } from "@/components/RequireRole";
 import { Button } from "@/components/ui/button";
+
+type SelectedRole = "admin" | "employe";
 
 export const PIN_DONE_KEY = "md_pin_done";
 
@@ -24,6 +26,7 @@ function AccessPage() {
   const { data: storeSettings } = useStoreSettings();
   const storeName = storeSettings?.store_name || "Maison d'Or";
 
+  const [role, setRole] = useState<SelectedRole>("admin");
   const [pin, setPin] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -67,7 +70,7 @@ function AccessPage() {
     setBusy(true);
     setError(null);
     try {
-      const res = await pinLogin({ data: { pin: value } });
+      const res = await pinLogin({ data: { pin: value, expectedRole: role } });
       if (!res.ok) {
         setError(res.error);
         setPin("");
@@ -142,8 +145,38 @@ function AccessPage() {
           </div>
           <h1 className="mt-4 font-serif text-2xl font-semibold tracking-tight">{storeName}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Entrez votre code PIN pour accéder
+            Choisissez un rôle, puis entrez le code PIN
           </p>
+        </div>
+
+        {/* Role selector */}
+        <div className="mt-6 grid grid-cols-2 gap-2">
+          {([
+            { value: "admin" as const, label: "Administrateur", icon: Crown },
+            { value: "employe" as const, label: "Employé", icon: UserRound },
+          ]).map((opt) => {
+            const active = role === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                disabled={busy}
+                onClick={() => {
+                  setRole(opt.value);
+                  setError(null);
+                  setPin("");
+                }}
+                className={`flex flex-col items-center gap-1 rounded-2xl border px-2 py-3 text-sm font-medium transition-colors disabled:opacity-50 ${
+                  active
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-muted/40 text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                <opt.icon className="h-5 w-5" />
+                {opt.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* PIN dots */}
