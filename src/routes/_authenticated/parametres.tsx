@@ -164,6 +164,11 @@ function SettingsPage() {
             <AppearanceCard />
           </TabsContent>
 
+          <TabsContent value="application" className="space-y-6">
+            <InstallAppCard />
+          </TabsContent>
+
+
 
 
 
