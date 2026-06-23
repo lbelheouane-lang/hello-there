@@ -31,7 +31,11 @@ import {
   KARATS, CATEGORIES, METAL_TYPES, PRODUCT_STATUSES, METAL_ORIGINS, ORIGIN_COUNTRIES,
   formatGrams, statusLabel, metalValue, metalOriginLabel,
 } from "@/lib/format";
-import { formatFromEUR } from "@/lib/currency";
+import { formatFromEUR, dzdFromEur } from "@/lib/currency";
+import { useAuth } from "@/hooks/use-auth";
+import {
+  printStockReport, exportStockReportExcel, type StockReportData, type StockReportRow, type StockGroupTotal,
+} from "@/lib/stock-report";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
 import { LabelDialog, type LabelProduct } from "@/components/LabelDialog";
 import { productImage } from "@/lib/product-image";
