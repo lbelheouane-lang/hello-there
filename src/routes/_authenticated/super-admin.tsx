@@ -18,6 +18,10 @@ import {
   Fingerprint,
   Users,
   Search,
+  ShieldCheck,
+  Eye,
+  EyeOff,
+  Clock,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
