@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as MobileRouteImport } from './routes/mobile'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -34,15 +33,8 @@ import { Route as AuthenticatedBoutiqueRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProduitIdRouteImport } from './routes/_authenticated/produit.$id'
 import { Route as AuthenticatedFournisseursIdRouteImport } from './routes/_authenticated/fournisseurs_.$id'
 import { Route as AuthenticatedClientsIdRouteImport } from './routes/_authenticated/clients_.$id'
-import { Route as ApiPublicMobileSyncRouteImport } from './routes/api/public/mobile/sync'
-import { Route as ApiPublicMobilePairRouteImport } from './routes/api/public/mobile/pair'
 import { Route as ApiPublicHooksUpdateGoldPricesRouteImport } from './routes/api/public/hooks/update-gold-prices'
 
-const MobileRoute = MobileRouteImport.update({
-  id: '/mobile',
-  path: '/mobile',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -168,16 +160,6 @@ const AuthenticatedClientsIdRoute = AuthenticatedClientsIdRouteImport.update({
   path: '/clients/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const ApiPublicMobileSyncRoute = ApiPublicMobileSyncRouteImport.update({
-  id: '/api/public/mobile/sync',
-  path: '/api/public/mobile/sync',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicMobilePairRoute = ApiPublicMobilePairRouteImport.update({
-  id: '/api/public/mobile/pair',
-  path: '/api/public/mobile/pair',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiPublicHooksUpdateGoldPricesRoute =
   ApiPublicHooksUpdateGoldPricesRouteImport.update({
     id: '/api/public/hooks/update-gold-prices',
@@ -188,7 +170,6 @@ const ApiPublicHooksUpdateGoldPricesRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/mobile': typeof MobileRoute
   '/boutique': typeof AuthenticatedBoutiqueRoute
   '/clients': typeof AuthenticatedClientsRoute
   '/cours-or': typeof AuthenticatedCoursOrRoute
@@ -211,13 +192,10 @@ export interface FileRoutesByFullPath {
   '/fournisseurs/$id': typeof AuthenticatedFournisseursIdRoute
   '/produit/$id': typeof AuthenticatedProduitIdRoute
   '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
-  '/api/public/mobile/pair': typeof ApiPublicMobilePairRoute
-  '/api/public/mobile/sync': typeof ApiPublicMobileSyncRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/mobile': typeof MobileRoute
   '/boutique': typeof AuthenticatedBoutiqueRoute
   '/clients': typeof AuthenticatedClientsRoute
   '/cours-or': typeof AuthenticatedCoursOrRoute
@@ -240,15 +218,12 @@ export interface FileRoutesByTo {
   '/fournisseurs/$id': typeof AuthenticatedFournisseursIdRoute
   '/produit/$id': typeof AuthenticatedProduitIdRoute
   '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
-  '/api/public/mobile/pair': typeof ApiPublicMobilePairRoute
-  '/api/public/mobile/sync': typeof ApiPublicMobileSyncRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/mobile': typeof MobileRoute
   '/_authenticated/boutique': typeof AuthenticatedBoutiqueRoute
   '/_authenticated/clients': typeof AuthenticatedClientsRoute
   '/_authenticated/cours-or': typeof AuthenticatedCoursOrRoute
@@ -271,15 +246,12 @@ export interface FileRoutesById {
   '/_authenticated/fournisseurs_/$id': typeof AuthenticatedFournisseursIdRoute
   '/_authenticated/produit/$id': typeof AuthenticatedProduitIdRoute
   '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
-  '/api/public/mobile/pair': typeof ApiPublicMobilePairRoute
-  '/api/public/mobile/sync': typeof ApiPublicMobileSyncRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
-    | '/mobile'
     | '/boutique'
     | '/clients'
     | '/cours-or'
@@ -302,13 +274,10 @@ export interface FileRouteTypes {
     | '/fournisseurs/$id'
     | '/produit/$id'
     | '/api/public/hooks/update-gold-prices'
-    | '/api/public/mobile/pair'
-    | '/api/public/mobile/sync'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
-    | '/mobile'
     | '/boutique'
     | '/clients'
     | '/cours-or'
@@ -331,14 +300,11 @@ export interface FileRouteTypes {
     | '/fournisseurs/$id'
     | '/produit/$id'
     | '/api/public/hooks/update-gold-prices'
-    | '/api/public/mobile/pair'
-    | '/api/public/mobile/sync'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
-    | '/mobile'
     | '/_authenticated/boutique'
     | '/_authenticated/clients'
     | '/_authenticated/cours-or'
@@ -361,31 +327,19 @@ export interface FileRouteTypes {
     | '/_authenticated/fournisseurs_/$id'
     | '/_authenticated/produit/$id'
     | '/api/public/hooks/update-gold-prices'
-    | '/api/public/mobile/pair'
-    | '/api/public/mobile/sync'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
-  MobileRoute: typeof MobileRoute
   InviteCodeRoute: typeof InviteCodeRoute
   SuiviTokenRoute: typeof SuiviTokenRoute
   ApiPublicHooksUpdateGoldPricesRoute: typeof ApiPublicHooksUpdateGoldPricesRoute
-  ApiPublicMobilePairRoute: typeof ApiPublicMobilePairRoute
-  ApiPublicMobileSyncRoute: typeof ApiPublicMobileSyncRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/mobile': {
-      id: '/mobile'
-      path: '/mobile'
-      fullPath: '/mobile'
-      preLoaderRoute: typeof MobileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -554,20 +508,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClientsIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/api/public/mobile/sync': {
-      id: '/api/public/mobile/sync'
-      path: '/api/public/mobile/sync'
-      fullPath: '/api/public/mobile/sync'
-      preLoaderRoute: typeof ApiPublicMobileSyncRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/mobile/pair': {
-      id: '/api/public/mobile/pair'
-      path: '/api/public/mobile/pair'
-      fullPath: '/api/public/mobile/pair'
-      preLoaderRoute: typeof ApiPublicMobilePairRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/public/hooks/update-gold-prices': {
       id: '/api/public/hooks/update-gold-prices'
       path: '/api/public/hooks/update-gold-prices'
@@ -629,12 +569,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
-  MobileRoute: MobileRoute,
   InviteCodeRoute: InviteCodeRoute,
   SuiviTokenRoute: SuiviTokenRoute,
   ApiPublicHooksUpdateGoldPricesRoute: ApiPublicHooksUpdateGoldPricesRoute,
-  ApiPublicMobilePairRoute: ApiPublicMobilePairRoute,
-  ApiPublicMobileSyncRoute: ApiPublicMobileSyncRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
