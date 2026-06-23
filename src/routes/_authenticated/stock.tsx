@@ -821,6 +821,7 @@ function StockPage() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+            </div>
           </div>
 
           {/* Filter bar */}
