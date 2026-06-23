@@ -146,6 +146,9 @@ function SuperAdminPanel() {
             <TabsTrigger value="users" className="gap-2">
               <Users className="h-4 w-4" /> Utilisateurs
             </TabsTrigger>
+            <TabsTrigger value="sa-access" className="gap-2">
+              <ShieldCheck className="h-4 w-4" /> Accès Super Admin
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard">
