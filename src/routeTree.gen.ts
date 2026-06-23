@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SuperAdminAccessRouteImport } from './routes/super-admin-access'
 import { Route as OwnerRouteImport } from './routes/owner'
 import { Route as CreateAccountRouteImport } from './routes/create-account'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -38,6 +39,11 @@ import { Route as AuthenticatedFournisseursIdRouteImport } from './routes/_authe
 import { Route as AuthenticatedClientsIdRouteImport } from './routes/_authenticated/clients_.$id'
 import { Route as ApiPublicHooksUpdateGoldPricesRouteImport } from './routes/api/public/hooks/update-gold-prices'
 
+const SuperAdminAccessRoute = SuperAdminAccessRouteImport.update({
+  id: '/super-admin-access',
+  path: '/super-admin-access',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OwnerRoute = OwnerRouteImport.update({
   id: '/owner',
   path: '/owner',
@@ -191,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/create-account': typeof CreateAccountRoute
   '/owner': typeof OwnerRoute
+  '/super-admin-access': typeof SuperAdminAccessRoute
   '/boutique': typeof AuthenticatedBoutiqueRoute
   '/clients': typeof AuthenticatedClientsRoute
   '/cours-or': typeof AuthenticatedCoursOrRoute
@@ -220,6 +227,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/create-account': typeof CreateAccountRoute
   '/owner': typeof OwnerRoute
+  '/super-admin-access': typeof SuperAdminAccessRoute
   '/boutique': typeof AuthenticatedBoutiqueRoute
   '/clients': typeof AuthenticatedClientsRoute
   '/cours-or': typeof AuthenticatedCoursOrRoute
@@ -251,6 +259,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/create-account': typeof CreateAccountRoute
   '/owner': typeof OwnerRoute
+  '/super-admin-access': typeof SuperAdminAccessRoute
   '/_authenticated/boutique': typeof AuthenticatedBoutiqueRoute
   '/_authenticated/clients': typeof AuthenticatedClientsRoute
   '/_authenticated/cours-or': typeof AuthenticatedCoursOrRoute
@@ -282,6 +291,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/create-account'
     | '/owner'
+    | '/super-admin-access'
     | '/boutique'
     | '/clients'
     | '/cours-or'
@@ -311,6 +321,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/create-account'
     | '/owner'
+    | '/super-admin-access'
     | '/boutique'
     | '/clients'
     | '/cours-or'
@@ -341,6 +352,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/create-account'
     | '/owner'
+    | '/super-admin-access'
     | '/_authenticated/boutique'
     | '/_authenticated/clients'
     | '/_authenticated/cours-or'
@@ -372,6 +384,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CreateAccountRoute: typeof CreateAccountRoute
   OwnerRoute: typeof OwnerRoute
+  SuperAdminAccessRoute: typeof SuperAdminAccessRoute
   InviteCodeRoute: typeof InviteCodeRoute
   SuiviTokenRoute: typeof SuiviTokenRoute
   ApiPublicHooksUpdateGoldPricesRoute: typeof ApiPublicHooksUpdateGoldPricesRoute
@@ -379,6 +392,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/super-admin-access': {
+      id: '/super-admin-access'
+      path: '/super-admin-access'
+      fullPath: '/super-admin-access'
+      preLoaderRoute: typeof SuperAdminAccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/owner': {
       id: '/owner'
       path: '/owner'
@@ -632,6 +652,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CreateAccountRoute: CreateAccountRoute,
   OwnerRoute: OwnerRoute,
+  SuperAdminAccessRoute: SuperAdminAccessRoute,
   InviteCodeRoute: InviteCodeRoute,
   SuiviTokenRoute: SuiviTokenRoute,
   ApiPublicHooksUpdateGoldPricesRoute: ApiPublicHooksUpdateGoldPricesRoute,
