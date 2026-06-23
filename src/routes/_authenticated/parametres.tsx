@@ -23,7 +23,7 @@ import {
 } from "@/components/settings/employee-management";
 import { AppearanceCard } from "@/components/settings/appearance";
 import { BackupRestoreCard } from "@/components/settings/backup-restore";
-import { MobileAppCard } from "@/components/settings/mobile-app";
+
 
 export const Route = createFileRoute("/_authenticated/parametres")({
   component: SettingsPage,
