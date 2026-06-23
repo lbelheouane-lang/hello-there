@@ -140,6 +140,12 @@ function SuperAdminPanel() {
             <TabsTrigger value="keys" className="gap-2">
               <KeyRound className="h-4 w-4" /> Clés d'accès
             </TabsTrigger>
+            <TabsTrigger value="passkeys" className="gap-2">
+              <Fingerprint className="h-4 w-4" /> Passkeys
+            </TabsTrigger>
+            <TabsTrigger value="users" className="gap-2">
+              <Users className="h-4 w-4" /> Utilisateurs
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard">
@@ -153,6 +159,12 @@ function SuperAdminPanel() {
           </TabsContent>
           <TabsContent value="keys">
             <AccessKeysTab />
+          </TabsContent>
+          <TabsContent value="passkeys">
+            <PasskeysTab />
+          </TabsContent>
+          <TabsContent value="users">
+            <UsersTab />
           </TabsContent>
         </Tabs>
       </div>
