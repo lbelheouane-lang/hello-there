@@ -3,15 +3,16 @@ import { z } from "zod";
 
 const bodySchema = z.object({
   token: z.string().min(32).max(128),
+  deviceId: z.string().trim().min(4).max(128).optional(),
   deviceName: z.string().trim().max(120).optional(),
 });
 
 /**
  * Public pairing-confirmation endpoint called by the mobile companion app once
- * it has scanned the QR code. It validates the secure pairing token (not
- * expired, not revoked, still pending) and binds the device to the store that
- * generated it. A mobile app can therefore only ever reach the store whose QR
- * it scanned — the token carries no other store's identity.
+ * it has scanned the QR code. It validates the secure pairing token (exists,
+ * not expired, not revoked, still pending) and binds the device to the store
+ * that generated it. A mobile app can therefore only ever reach the store whose
+ * QR it scanned — the token carries no other store's identity.
  */
 export const Route = createFileRoute("/api/public/mobile/pair")({
   server: {
@@ -49,22 +50,30 @@ export const Route = createFileRoute("/api/public/mobile/pair")({
           return Response.json({ ok: false, error: "Déjà appairé." }, { status: 409 });
         }
 
-        const userAgent = request.headers.get("user-agent") ?? null;
+        const now = new Date().toISOString();
+        const deviceId =
+          parsed.deviceId ??
+          (globalThis.crypto?.randomUUID?.() ?? `dev-${Date.now()}`);
+
         await supabaseAdmin
           .from("mobile_pairings")
           .update({
             status: "connected",
-            paired_at: new Date().toISOString(),
+            paired_at: now,
+            last_sync: now,
+            device_id: deviceId,
             device_name: parsed.deviceName ?? "Appareil mobile",
-            device_user_agent: userAgent,
+            device_user_agent: request.headers.get("user-agent") ?? null,
           })
           .eq("id", row.id);
 
         // Only the store identity is returned — never another store's data.
         return Response.json({
           ok: true,
+          deviceId,
           storeId: row.store_id,
           storeName: row.store_name,
+          licenseId: row.license_id,
         });
       },
     },
