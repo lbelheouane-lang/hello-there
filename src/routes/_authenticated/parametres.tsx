@@ -23,6 +23,7 @@ import {
 } from "@/components/settings/employee-management";
 import { AppearanceCard } from "@/components/settings/appearance";
 import { BackupRestoreCard } from "@/components/settings/backup-restore";
+import { InstallAppCard } from "@/components/settings/install-app";
 
 
 export const Route = createFileRoute("/_authenticated/parametres")({
@@ -143,6 +144,7 @@ function SettingsPage() {
             <TabsTrigger value="employes">Employés</TabsTrigger>
             <TabsTrigger value="pin">Gestion PIN</TabsTrigger>
             <TabsTrigger value="apparence">Apparence & Personnalisation</TabsTrigger>
+            <TabsTrigger value="application">Application</TabsTrigger>
             
             <TabsTrigger value="logs">Journal système</TabsTrigger>
             <TabsTrigger value="sauvegarde">Sauvegarde &amp; restauration</TabsTrigger>
@@ -161,6 +163,11 @@ function SettingsPage() {
           <TabsContent value="apparence" className="space-y-6">
             <AppearanceCard />
           </TabsContent>
+
+          <TabsContent value="application" className="space-y-6">
+            <InstallAppCard />
+          </TabsContent>
+
 
 
 
