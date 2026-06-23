@@ -1,4 +1,5 @@
 import QRCode from "qrcode";
+import { printHtml } from "@/lib/print";
 import { formatDZD, formatDate, formatDateTime } from "@/lib/format";
 import { getStoreInfo } from "@/lib/invoice";
 import { getStoreSettings } from "@/lib/store-settings";
@@ -180,12 +181,5 @@ export function buildRepairReceiptHtml(d: RepairReceiptData): string {
 
 /** Open the repair receipt in a new window and trigger print / save-as-PDF. */
 export function printRepairReceipt(d: RepairReceiptData): void {
-  const html = buildRepairReceiptHtml(d);
-  const w = window.open("", "_blank", "width=900,height=1000");
-  if (!w) return;
-  w.document.open();
-  w.document.write(html);
-  w.document.close();
-  w.focus();
-  setTimeout(() => w.print(), 350);
+  printHtml(buildRepairReceiptHtml(d));
 }

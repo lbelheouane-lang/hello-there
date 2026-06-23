@@ -1,4 +1,5 @@
 import { formatDZD, formatDateTime, formatDate, paymentLabel } from "@/lib/format";
+import { printHtml } from "@/lib/print";
 import { getStoreInfo } from "@/lib/invoice";
 
 
@@ -130,11 +131,5 @@ export function buildExpenseReportHtml(opts: ExpenseReportOptions): string {
 
 /** Open an HTML document in a new window and trigger the print / save-as-PDF dialog. */
 export function printHtmlDocument(html: string): void {
-  const w = window.open("", "_blank", "width=900,height=1000");
-  if (!w) return;
-  w.document.open();
-  w.document.write(html);
-  w.document.close();
-  w.focus();
-  setTimeout(() => w.print(), 350);
+  printHtml(html);
 }

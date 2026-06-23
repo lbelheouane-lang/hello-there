@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { printHtml } from "@/lib/print";
 import { formatDZD, formatGrams, formatDate, formatDateTime } from "@/lib/format";
 import { getStoreInfo } from "@/lib/invoice";
 import { getStoreSettings } from "@/lib/store-settings";
@@ -499,12 +500,5 @@ export function buildJournalHtml(j: JournalSummary, generatedBy: string): string
 
 /** Open the journal in a new window and trigger the print / save-as-PDF dialog. */
 export function printJournal(j: JournalSummary, generatedBy: string): void {
-  const html = buildJournalHtml(j, generatedBy);
-  const w = window.open("", "_blank", "width=900,height=1000");
-  if (!w) return;
-  w.document.open();
-  w.document.write(html);
-  w.document.close();
-  w.focus();
-  setTimeout(() => w.print(), 350);
+  printHtml(buildJournalHtml(j, generatedBy));
 }

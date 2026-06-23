@@ -1,6 +1,7 @@
 import { formatDZD, formatDateTime, paymentLabel } from "@/lib/format";
 import { getStoreInfo } from "@/lib/invoice";
 import { getStoreSettings } from "@/lib/store-settings";
+import { printHtml } from "@/lib/print";
 
 export interface ReceiptData {
   storeName: string;
@@ -86,16 +87,7 @@ export function buildReceiptHtml(d: ReceiptData): string {
 </body></html>`;
 }
 
-/** Open the receipt in a new window and trigger the print dialog (supports PDF & thermal). */
+/** Print the receipt without leaving the app (supports PDF & thermal). */
 export function printReceipt(d: ReceiptData): void {
-  const html = buildReceiptHtml(d);
-  const w = window.open("", "_blank", "width=420,height=640");
-  if (!w) return;
-  w.document.open();
-  w.document.write(html);
-  w.document.close();
-  w.focus();
-  setTimeout(() => {
-    w.print();
-  }, 300);
+  printHtml(buildReceiptHtml(d));
 }

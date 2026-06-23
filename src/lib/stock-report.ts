@@ -1,4 +1,5 @@
 import { formatDZD, formatGrams, formatDate, formatDateTime } from "@/lib/format";
+import { printHtml } from "@/lib/print";
 import { getStoreInfo } from "@/lib/invoice";
 
 /** A single inventory line in the stock report. */
@@ -153,14 +154,7 @@ export function buildStockReportHtml(data: StockReportData): string {
 
 /** Open the report in a new window and trigger the print / save-as-PDF dialog. */
 export function printStockReport(data: StockReportData): void {
-  const html = buildStockReportHtml(data);
-  const w = window.open("", "_blank", "width=1100,height=900");
-  if (!w) return;
-  w.document.open();
-  w.document.write(html);
-  w.document.close();
-  w.focus();
-  setTimeout(() => w.print(), 350);
+  printHtml(buildStockReportHtml(data));
 }
 
 /** Build an Excel-compatible (HTML table) workbook and download it as .xls. */
