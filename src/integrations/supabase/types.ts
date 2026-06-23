@@ -776,6 +776,36 @@ export type Database = {
         }
         Relationships: []
       }
+      owner_access: {
+        Row: {
+          backing_email: string
+          backing_password: string
+          created_at: string
+          id: string
+          passkey_hash: string
+          passkey_salt: string
+          updated_at: string
+        }
+        Insert: {
+          backing_email: string
+          backing_password: string
+          created_at?: string
+          id?: string
+          passkey_hash: string
+          passkey_salt: string
+          updated_at?: string
+        }
+        Update: {
+          backing_email?: string
+          backing_password?: string
+          created_at?: string
+          id?: string
+          passkey_hash?: string
+          passkey_salt?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
