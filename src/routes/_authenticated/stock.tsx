@@ -87,6 +87,9 @@ function StockPage() {
   const categoryNames = useCategoryNames();
   const { data: subcategories } = useSubcategories();
   const { data: prices } = useLatestGoldPrices();
+  const { user } = useAuth();
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportSort, setReportSort] = useState<"newest" | "oldest">("newest");
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState(empty);
