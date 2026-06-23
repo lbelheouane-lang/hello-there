@@ -1,5 +1,6 @@
 import { formatDZD, formatDateTime, formatGrams, paymentLabel } from "@/lib/format";
 import { getStoreSettings } from "@/lib/store-settings";
+import { printHtml } from "@/lib/print";
 
 /** Live store identity derived from configurable settings (with fallbacks). */
 export function getStoreInfo() {
