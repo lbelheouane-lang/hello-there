@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Gem, Shield, ShoppingCart, Delete, Loader2, ArrowLeft, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { pinLogin } from "@/lib/pin-auth.functions";
+import { getActivationStatus } from "@/lib/activation.functions";
 import { useStoreSettings } from "@/lib/store-settings";
 import { fetchUserPreferences } from "@/lib/user-preferences";
 
@@ -12,6 +13,9 @@ export const Route = createFileRoute("/auth")({
   beforeLoad: async () => {
     const { data } = await supabase.auth.getSession();
     if (data.session) throw redirect({ to: "/dashboard" });
+    // App stays locked until activated with a valid access key.
+    const status = await getActivationStatus();
+    if (!status.activated) throw redirect({ to: "/activation" });
   },
   head: () => ({
     meta: [
