@@ -232,14 +232,51 @@ export function buildInvoiceHtml(inv: InvoiceRecord): string {
 }
 
 
-/** Open the invoice in a new window and trigger the print / save-as-PDF dialog. */
+/**
+ * Print / save-as-PDF without leaving the app.
+ * Renders the invoice into a hidden iframe, triggers the print dialog,
+ * then cleans up — so the user stays on the current tab.
+ */
 export function printInvoice(inv: InvoiceRecord): void {
   const html = buildInvoiceHtml(inv);
-  const w = window.open("", "_blank", "width=900,height=1000");
-  if (!w) return;
-  w.document.open();
-  w.document.write(html);
-  w.document.close();
-  w.focus();
-  setTimeout(() => w.print(), 350);
+
+  const iframe = document.createElement("iframe");
+  iframe.setAttribute("aria-hidden", "true");
+  iframe.style.position = "fixed";
+  iframe.style.right = "0";
+  iframe.style.bottom = "0";
+  iframe.style.width = "0";
+  iframe.style.height = "0";
+  iframe.style.border = "0";
+  iframe.style.visibility = "hidden";
+  document.body.appendChild(iframe);
+
+  const cleanup = () => {
+    setTimeout(() => {
+      if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+    }, 1000);
+  };
+
+  iframe.onload = () => {
+    const win = iframe.contentWindow;
+    if (!win) {
+      cleanup();
+      return;
+    }
+    win.onafterprint = cleanup;
+    setTimeout(() => {
+      win.focus();
+      win.print();
+      setTimeout(cleanup, 60000);
+    }, 300);
+  };
+
+  const doc = iframe.contentWindow?.document;
+  if (!doc) {
+    cleanup();
+    return;
+  }
+  doc.open();
+  doc.write(html);
+  doc.close();
 }
