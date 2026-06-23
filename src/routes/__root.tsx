@@ -150,11 +150,16 @@ function RootComponent() {
     return () => data.subscription.unsubscribe();
   }, [router, queryClient]);
 
+  useEffect(() => {
+    registerPwa();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeManager />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <PwaInstallPrompt />
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
