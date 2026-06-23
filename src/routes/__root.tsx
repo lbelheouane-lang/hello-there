@@ -21,6 +21,8 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeManager } from "@/components/ThemeManager";
+import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
+import { registerPwa } from "@/lib/pwa";
 
 function NotFoundComponent() {
   return (
@@ -91,6 +93,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "ERP bijoutier : stock, fournisseurs, ventes et cours de l'or en temps réel." },
       { name: "author", content: "Maison d'Or" },
       { name: "theme-color", content: "#1a1a1a" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "Orus" },
+      { name: "application-name", content: "Orus" },
       { property: "og:title", content: "Orus" },
       { property: "og:description", content: "ERP bijoutier : stock, fournisseurs, ventes et cours de l'or en temps réel." },
       { property: "og:type", content: "website" },
@@ -105,6 +112,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png" },
+      { rel: "icon", type: "image/png", sizes: "192x192", href: "/icons/app-icon-192.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -140,11 +150,16 @@ function RootComponent() {
     return () => data.subscription.unsubscribe();
   }, [router, queryClient]);
 
+  useEffect(() => {
+    registerPwa();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeManager />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <PwaInstallPrompt />
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
