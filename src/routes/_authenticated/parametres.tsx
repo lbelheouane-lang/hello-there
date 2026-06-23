@@ -143,7 +143,7 @@ function SettingsPage() {
             <TabsTrigger value="employes">Employés</TabsTrigger>
             <TabsTrigger value="pin">Gestion PIN</TabsTrigger>
             <TabsTrigger value="apparence">Apparence & Personnalisation</TabsTrigger>
-            <TabsTrigger value="mobile">Application mobile</TabsTrigger>
+            
             <TabsTrigger value="logs">Journal système</TabsTrigger>
             <TabsTrigger value="sauvegarde">Sauvegarde &amp; restauration</TabsTrigger>
             <TabsTrigger value="backup">Données démo</TabsTrigger>
