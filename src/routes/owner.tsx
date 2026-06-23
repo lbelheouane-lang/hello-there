@@ -1,7 +1,9 @@
 import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useState } from "react";
-import { ShieldCheck, Loader2 } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { ShieldCheck, Loader2, KeyRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { ownerLogin } from "@/lib/owner-auth.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,8 +32,8 @@ export const Route = createFileRoute("/owner")({
 
 function OwnerLogin() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const login = useServerFn(ownerLogin);
+  const [passkey, setPasskey] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -41,23 +43,18 @@ function OwnerLogin() {
     setBusy(true);
     setError(null);
     try {
-      const { data, error: signErr } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-      if (signErr || !data.user) {
-        setError("Identifiants incorrects.");
+      const res = await login({ data: { passkey: passkey.trim() } });
+      if (!res.ok) {
+        setError(res.error);
         setBusy(false);
         return;
       }
-      const { data: roles } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", data.user.id);
-      const isOwner = (roles ?? []).some((r) => String(r.role) === "super_admin");
-      if (!isOwner) {
-        await supabase.auth.signOut();
-        setError("Ce compte n'a pas les droits propriétaire.");
+      const { error: sessErr } = await supabase.auth.setSession({
+        access_token: res.access_token,
+        refresh_token: res.refresh_token,
+      });
+      if (sessErr) {
+        setError("Connexion impossible. Réessayez.");
         setBusy(false);
         return;
       }
@@ -80,30 +77,23 @@ function OwnerLogin() {
           </div>
           <h1 className="mt-4 font-serif text-2xl font-semibold">Espace propriétaire</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Accès réservé au propriétaire de l'application.
+            Saisissez votre passkey propriétaire pour accéder à tout.
           </p>
         </div>
 
-        <div className="mt-6 space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="owner-email">Email</Label>
+        <div className="mt-6 space-y-2">
+          <Label htmlFor="owner-passkey">Passkey</Label>
+          <div className="relative">
+            <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              id="owner-email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="owner-password">Mot de passe</Label>
-            <Input
-              id="owner-password"
+              id="owner-passkey"
               type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="off"
+              spellCheck={false}
+              placeholder="ORUS-XXXX-XXXX-XXXX-XXXX"
+              className="pl-9 font-mono tracking-wide"
+              value={passkey}
+              onChange={(e) => setPasskey(e.target.value)}
               required
             />
           </div>
@@ -113,7 +103,7 @@ function OwnerLogin() {
 
         <Button type="submit" className="mt-6 w-full gap-2" disabled={busy}>
           {busy && <Loader2 className="h-4 w-4 animate-spin" />}
-          Se connecter
+          Accéder
         </Button>
       </form>
     </div>
