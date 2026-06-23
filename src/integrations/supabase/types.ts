@@ -1844,6 +1844,129 @@ export type Database = {
         }
         Relationships: []
       }
+      store_settings_app: {
+        Row: {
+          address: string | null
+          auto_backup_enabled: boolean | null
+          auto_backup_frequency: string | null
+          auto_backup_time: string | null
+          created_at: string | null
+          currency: string | null
+          default_mode: string | null
+          default_theme: string | null
+          email: string | null
+          eur_to_dzd: number | null
+          favicon_url: string | null
+          gold_auto_sync: boolean | null
+          gold_discrepancy_threshold_pct: number | null
+          gold_manual_override: boolean | null
+          gold_manual_price_eur: number | null
+          id: string | null
+          invoice_footer: string | null
+          invoice_header: string | null
+          invoice_prefix: string | null
+          language: string | null
+          last_auto_backup_at: string | null
+          login_background_url: string | null
+          login_logo_url: string | null
+          logo_url: string | null
+          phone: string | null
+          receipt_prefix: string | null
+          signature_left: string | null
+          signature_right: string | null
+          singleton: boolean | null
+          slogan: string | null
+          social: Json | null
+          store_name: string | null
+          tagline: string | null
+          tax_id: string | null
+          terms: string | null
+          thank_you_message: string | null
+          updated_at: string | null
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          auto_backup_enabled?: never
+          auto_backup_frequency?: never
+          auto_backup_time?: never
+          created_at?: string | null
+          currency?: string | null
+          default_mode?: string | null
+          default_theme?: string | null
+          email?: string | null
+          eur_to_dzd?: number | null
+          favicon_url?: string | null
+          gold_auto_sync?: never
+          gold_discrepancy_threshold_pct?: never
+          gold_manual_override?: never
+          gold_manual_price_eur?: never
+          id?: string | null
+          invoice_footer?: string | null
+          invoice_header?: string | null
+          invoice_prefix?: string | null
+          language?: string | null
+          last_auto_backup_at?: never
+          login_background_url?: string | null
+          login_logo_url?: string | null
+          logo_url?: string | null
+          phone?: string | null
+          receipt_prefix?: string | null
+          signature_left?: string | null
+          signature_right?: string | null
+          singleton?: boolean | null
+          slogan?: string | null
+          social?: Json | null
+          store_name?: string | null
+          tagline?: string | null
+          tax_id?: string | null
+          terms?: string | null
+          thank_you_message?: string | null
+          updated_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          auto_backup_enabled?: never
+          auto_backup_frequency?: never
+          auto_backup_time?: never
+          created_at?: string | null
+          currency?: string | null
+          default_mode?: string | null
+          default_theme?: string | null
+          email?: string | null
+          eur_to_dzd?: number | null
+          favicon_url?: string | null
+          gold_auto_sync?: never
+          gold_discrepancy_threshold_pct?: never
+          gold_manual_override?: never
+          gold_manual_price_eur?: never
+          id?: string | null
+          invoice_footer?: string | null
+          invoice_header?: string | null
+          invoice_prefix?: string | null
+          language?: string | null
+          last_auto_backup_at?: never
+          login_background_url?: string | null
+          login_logo_url?: string | null
+          logo_url?: string | null
+          phone?: string | null
+          receipt_prefix?: string | null
+          signature_left?: string | null
+          signature_right?: string | null
+          singleton?: boolean | null
+          slogan?: string | null
+          social?: Json | null
+          store_name?: string | null
+          tagline?: string | null
+          tax_id?: string | null
+          terms?: string | null
+          thank_you_message?: string | null
+          updated_at?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       backup_all: { Args: never; Returns: Json }
