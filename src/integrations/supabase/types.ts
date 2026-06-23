@@ -780,10 +780,12 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
+          device_id: string | null
           device_name: string | null
           device_user_agent: string | null
           expires_at: string
           id: string
+          last_sync: string | null
           license_id: string | null
           paired_at: string | null
           revoked_at: string | null
@@ -796,10 +798,12 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by?: string | null
+          device_id?: string | null
           device_name?: string | null
           device_user_agent?: string | null
           expires_at: string
           id?: string
+          last_sync?: string | null
           license_id?: string | null
           paired_at?: string | null
           revoked_at?: string | null
@@ -812,10 +816,12 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string | null
+          device_id?: string | null
           device_name?: string | null
           device_user_agent?: string | null
           expires_at?: string
           id?: string
+          last_sync?: string | null
           license_id?: string | null
           paired_at?: string | null
           revoked_at?: string | null

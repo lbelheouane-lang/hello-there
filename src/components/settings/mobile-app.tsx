@@ -8,10 +8,10 @@ import {
   QrCode,
   ShieldOff,
   RefreshCw,
-  CheckCircle2,
   Clock,
   Wifi,
   WifiOff,
+  RotateCw,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,10 @@ const EXPIRY_OPTIONS = [
   { value: "1440", label: "24 heures" },
 ];
 
+function fmt(d: string | null): string {
+  return d ? new Date(d).toLocaleString("fr-FR") : "—";
+}
+
 export function MobileAppCard() {
   const qc = useQueryClient();
   const fetchState = useServerFn(getPairingState);
@@ -47,7 +51,7 @@ export function MobileAppCard() {
 
   // Render a QR image whenever a pending payload is available.
   useEffect(() => {
-    const payload = data?.pairing?.qrPayload;
+    const payload = data?.pending?.qrPayload;
     if (!payload) {
       setQrImage(null);
       return;
@@ -55,7 +59,7 @@ export function MobileAppCard() {
     QRCode.toDataURL(payload, { errorCorrectionLevel: "M", margin: 1, width: 320 })
       .then(setQrImage)
       .catch(() => setQrImage(null));
-  }, [data?.pairing?.qrPayload]);
+  }, [data?.pending?.qrPayload]);
 
   const genMut = useMutation({
     mutationFn: () => generate({ data: { expiresInMinutes: Number(expiry) } }),
@@ -67,17 +71,16 @@ export function MobileAppCard() {
   });
 
   const revokeMut = useMutation({
-    mutationFn: () => revoke(),
+    mutationFn: (id?: string) => revoke({ data: id ? { id } : {} }),
     onSuccess: () => {
-      toast.success("Appareil révoqué.");
-      setQrImage(null);
+      toast.success("Appareil déconnecté.");
       qc.invalidateQueries({ queryKey: ["mobile-pairing"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const connected = data?.connected ?? false;
-  const pending = data?.status === "pending";
+  const devices = data?.devices ?? [];
+  const pending = data?.pending ?? null;
   const busy = genMut.isPending || revokeMut.isPending;
 
   return (
@@ -86,42 +89,45 @@ export function MobileAppCard() {
         <CardTitle className="flex items-center gap-2">
           <Smartphone className="h-5 w-5 text-primary" />
           Application mobile
-          {connected ? (
-            <Badge className="gap-1"><Wifi className="h-3 w-3" /> Connecté</Badge>
+          {devices.length > 0 ? (
+            <Badge className="gap-1"><Wifi className="h-3 w-3" /> {devices.length} connecté{devices.length > 1 ? "s" : ""}</Badge>
           ) : (
-            <Badge variant="secondary" className="gap-1"><WifiOff className="h-3 w-3" /> Non connecté</Badge>
+            <Badge variant="secondary" className="gap-1"><WifiOff className="h-3 w-3" /> Aucun appareil</Badge>
           )}
         </CardTitle>
         <CardDescription>
-          Appairez l'application mobile compagnon à cette boutique en scannant un
-          QR code sécurisé. L'appareil n'accède qu'aux données de cette boutique,
+          Appairez l'application mobile compagnon à cette boutique via un QR code
+          sécurisé. Chaque appareil n'accède qu'aux données de cette boutique,
           selon les permissions de l'utilisateur connecté.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Connected device */}
-        {connected && data?.pairing && (
-          <div className="flex items-start gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4">
-            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-            <div className="flex-1 space-y-1 text-sm">
-              <p className="font-medium">{data.pairing.device_name ?? "Appareil mobile"}</p>
-              {data.pairing.paired_at && (
-                <p className="text-muted-foreground">
-                  Appairé le {new Date(data.pairing.paired_at).toLocaleString("fr-FR")}
-                </p>
-              )}
-              {data.pairing.device_user_agent && (
-                <p className="truncate text-xs text-muted-foreground">{data.pairing.device_user_agent}</p>
-              )}
+        {/* Connected devices list */}
+        {devices.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Appareils connectés</p>
+            <div className="divide-y rounded-lg border">
+              {devices.map((d) => (
+                <div key={d.id} className="flex flex-wrap items-center gap-3 p-3">
+                  <Smartphone className="h-5 w-5 shrink-0 text-primary" />
+                  <div className="min-w-0 flex-1 space-y-0.5 text-sm">
+                    <p className="font-medium">{d.device_name ?? "Appareil mobile"}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Connecté le {fmt(d.paired_at)} · Dernière synchro {fmt(d.last_sync)}
+                    </p>
+                  </div>
+                  <Badge className="gap-1"><Wifi className="h-3 w-3" /> Connecté</Badge>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => revokeMut.mutate(d.id)}
+                    disabled={busy}
+                  >
+                    <ShieldOff className="mr-2 h-4 w-4" /> Révoquer
+                  </Button>
+                </div>
+              ))}
             </div>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => revokeMut.mutate()}
-              disabled={busy}
-            >
-              <ShieldOff className="mr-2 h-4 w-4" /> Révoquer l'appareil
-            </Button>
           </div>
         )}
 
@@ -131,52 +137,43 @@ export function MobileAppCard() {
             <img src={qrImage} alt="QR code d'appairage" className="h-56 w-56 rounded-lg bg-white p-2" />
             <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <Clock className="h-4 w-4" />
-              Expire le {new Date(data!.pairing!.expires_at).toLocaleString("fr-FR")}
+              Expire le {fmt(pending.expires_at)}
             </p>
             <p className="max-w-sm text-center text-xs text-muted-foreground">
               Scannez ce code depuis l'application mobile pour appairer l'appareil.
               Le QR devient invalide après expiration ou révocation.
             </p>
-            <Button variant="destructive" size="sm" onClick={() => revokeMut.mutate()} disabled={busy}>
+            <Button variant="destructive" size="sm" onClick={() => revokeMut.mutate(pending.id)} disabled={busy}>
               <ShieldOff className="mr-2 h-4 w-4" /> Annuler le QR
             </Button>
           </div>
         )}
 
         {/* Generate controls */}
-        {!connected && (
-          <div className="flex flex-wrap items-end gap-3">
-            <div className="space-y-1.5">
-              <p className="text-sm font-medium">Durée de validité</p>
-              <Select value={expiry} onValueChange={setExpiry}>
-                <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {EXPIRY_OPTIONS.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <Button onClick={() => genMut.mutate()} disabled={busy || isLoading}>
-              {pending ? <RefreshCw className="mr-2 h-4 w-4" /> : <QrCode className="mr-2 h-4 w-4" />}
-              {pending ? "Régénérer le QR code" : "Générer le QR code"}
-            </Button>
+        <div className="flex flex-wrap items-end gap-3">
+          <div className="space-y-1.5">
+            <p className="text-sm font-medium">Durée de validité du QR</p>
+            <Select value={expiry} onValueChange={setExpiry}>
+              <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {EXPIRY_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        )}
-
-        {connected && (
-          <div className="flex flex-wrap gap-3">
-            <Button
-              variant="outline"
-              onClick={() => {
-                revokeMut.mutateAsync().then(() => genMut.mutate());
-              }}
-              disabled={busy}
-            >
-              <QrCode className="mr-2 h-4 w-4" /> Appairer un nouvel appareil
-            </Button>
-          </div>
-        )}
+          <Button onClick={() => genMut.mutate()} disabled={busy || isLoading}>
+            {pending ? <RefreshCw className="mr-2 h-4 w-4" /> : <QrCode className="mr-2 h-4 w-4" />}
+            {pending ? "Régénérer le QR code" : devices.length > 0 ? "Appairer un nouvel appareil" : "Générer le QR code"}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => qc.invalidateQueries({ queryKey: ["mobile-pairing"] })}
+            disabled={busy}
+          >
+            <RotateCw className="mr-2 h-4 w-4" /> Actualiser
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

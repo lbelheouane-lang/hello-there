@@ -6,21 +6,27 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 // Types
 // ---------------------------------------------------------------------------
 
+export interface ConnectedDevice {
+  id: string;
+  device_id: string | null;
+  device_name: string | null;
+  device_user_agent: string | null;
+  status: string;
+  paired_at: string | null;
+  last_sync: string | null;
+  created_at: string;
+}
+
 export interface PairingState {
-  /** Whether a device is currently connected. */
+  /** All currently connected devices for this store. */
+  devices: ConnectedDevice[];
+  /** True when at least one device is connected. */
   connected: boolean;
-  status: "none" | "pending" | "connected";
-  /** The active (pending or connected) pairing record, if any. */
-  pairing: {
+  /** The live pending QR (if any) waiting to be scanned. */
+  pending: {
     id: string;
-    status: string;
     expires_at: string;
-    device_name: string | null;
-    device_user_agent: string | null;
-    paired_at: string | null;
-    created_at: string;
-    /** Secure payload to encode in the QR — only present while pending. */
-    qrPayload: string | null;
+    qrPayload: string;
   } | null;
 }
 
@@ -38,7 +44,7 @@ async function assertAdmin(context: { supabase: any; userId: string }) {
 }
 
 function secureToken(): string {
-  // 32 bytes of cryptographically-strong randomness, URL-safe.
+  // 32 bytes of cryptographically-strong randomness, URL-safe hex.
   const bytes = new Uint8Array(32);
   crypto.getRandomValues(bytes);
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
@@ -71,36 +77,45 @@ export const getPairingState = createServerFn({ method: "GET" })
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Expire any stale pending tokens lazily.
+    // Lazily expire stale pending tokens.
     await supabaseAdmin
       .from("mobile_pairings")
       .update({ status: "expired" })
       .eq("status", "pending")
       .lt("expires_at", new Date().toISOString());
 
-    const { data } = await supabaseAdmin
-      .from("mobile_pairings")
-      .select("*")
-      .in("status", ["pending", "connected"])
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    const [{ data: devicesRaw }, { data: pendingRaw }] = await Promise.all([
+      supabaseAdmin
+        .from("mobile_pairings")
+        .select("*")
+        .eq("status", "connected")
+        .order("paired_at", { ascending: false }),
+      supabaseAdmin
+        .from("mobile_pairings")
+        .select("*")
+        .eq("status", "pending")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
 
-    if (!data) return { connected: false, status: "none", pairing: null };
+    const devices: ConnectedDevice[] = (devicesRaw ?? []).map((d) => ({
+      id: d.id,
+      device_id: d.device_id,
+      device_name: d.device_name,
+      device_user_agent: d.device_user_agent,
+      status: d.status,
+      paired_at: d.paired_at,
+      last_sync: d.last_sync,
+      created_at: d.created_at,
+    }));
 
     return {
-      connected: data.status === "connected",
-      status: data.status as "pending" | "connected",
-      pairing: {
-        id: data.id,
-        status: data.status,
-        expires_at: data.expires_at,
-        device_name: data.device_name,
-        device_user_agent: data.device_user_agent,
-        paired_at: data.paired_at,
-        created_at: data.created_at,
-        qrPayload: data.status === "pending" ? buildPayload(data) : null,
-      },
+      devices,
+      connected: devices.length > 0,
+      pending: pendingRaw
+        ? { id: pendingRaw.id, expires_at: pendingRaw.expires_at, qrPayload: buildPayload(pendingRaw) }
+        : null,
     };
   });
 
@@ -119,14 +134,14 @@ export const generatePairing = createServerFn({ method: "POST" })
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Read the single store profile for identity stamping.
     const { data: store } = await supabaseAdmin
       .from("store_settings")
       .select("id, store_name")
       .eq("singleton", true)
       .maybeSingle();
 
-    // Invalidate any previous still-pending tokens so only one QR is ever live.
+    // Only one QR is ever live — invalidate previous pending tokens.
+    // Connected devices are NOT affected.
     await supabaseAdmin
       .from("mobile_pairings")
       .update({ status: "revoked", revoked_at: new Date().toISOString() })
@@ -154,17 +169,27 @@ export const generatePairing = createServerFn({ method: "POST" })
   });
 
 // ---------------------------------------------------------------------------
-// Revoke connected device / pending token
+// Revoke / disconnect a device (or the pending token)
 // ---------------------------------------------------------------------------
 
 export const revokeDevice = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<{ ok: true }> => {
+  .inputValidator((d: unknown) =>
+    z.object({ id: z.string().uuid().optional() }).parse(d ?? {}),
+  )
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin
-      .from("mobile_pairings")
-      .update({ status: "revoked", revoked_at: new Date().toISOString() })
-      .in("status", ["pending", "connected"]);
+
+    const update = { status: "revoked", revoked_at: new Date().toISOString() };
+    if (data.id) {
+      await supabaseAdmin.from("mobile_pairings").update(update).eq("id", data.id);
+    } else {
+      // No id → revoke everything currently active (pending + connected).
+      await supabaseAdmin
+        .from("mobile_pairings")
+        .update(update)
+        .in("status", ["pending", "connected"]);
+    }
     return { ok: true };
   });
