@@ -70,7 +70,7 @@ function AccessPage() {
     setBusy(true);
     setError(null);
     try {
-      const res = await pinLogin({ data: { pin: value } });
+      const res = await pinLogin({ data: { pin: value, expectedRole: role } });
       if (!res.ok) {
         setError(res.error);
         setPin("");
