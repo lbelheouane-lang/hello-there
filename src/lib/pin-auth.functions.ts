@@ -42,6 +42,19 @@ export const pinLogin = createServerFn({ method: "POST" })
     const match = await findEmployeeByPin(data.pin);
     if (!match) return { ok: false, error: "Code PIN incorrect." };
 
+    // When a role is explicitly chosen on the access screen, the PIN must
+    // belong to that role.
+    if (data.expectedRole && match.role !== data.expectedRole) {
+      return {
+        ok: false,
+        error:
+          data.expectedRole === "admin"
+            ? "Ce code PIN n'est pas un code administrateur."
+            : "Ce code PIN n'est pas un code employé.",
+      };
+    }
+
+
     const { createClient } = await import("@supabase/supabase-js");
     const supabase = createClient(
       process.env.SUPABASE_URL!,
