@@ -776,6 +776,57 @@ export type Database = {
         }
         Relationships: []
       }
+      mobile_pairings: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          device_name: string | null
+          device_user_agent: string | null
+          expires_at: string
+          id: string
+          license_id: string | null
+          paired_at: string | null
+          revoked_at: string | null
+          status: string
+          store_id: string | null
+          store_name: string | null
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          device_name?: string | null
+          device_user_agent?: string | null
+          expires_at: string
+          id?: string
+          license_id?: string | null
+          paired_at?: string | null
+          revoked_at?: string | null
+          status?: string
+          store_id?: string | null
+          store_name?: string | null
+          token: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          device_name?: string | null
+          device_user_agent?: string | null
+          expires_at?: string
+          id?: string
+          license_id?: string | null
+          paired_at?: string | null
+          revoked_at?: string | null
+          status?: string
+          store_id?: string | null
+          store_name?: string | null
+          token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
