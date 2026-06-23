@@ -1344,3 +1344,252 @@ function Loading() {
     </div>
   );
 }
+
+function SuperAdminAccessTab() {
+  const list = useServerFn(listSuperAdminPasskeys);
+  const create = useServerFn(createSuperAdminPasskey);
+  const setDisabled = useServerFn(setSuperAdminPasskeyDisabled);
+  const remove = useServerFn(deleteSuperAdminPasskey);
+  const listLog = useServerFn(listSuperAdminAccessLog);
+
+  const [rows, setRows] = useState<SuperAdminPasskeyRow[]>([]);
+  const [log, setLog] = useState<SuperAdminAccessLogRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [label, setLabel] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [generated, setGenerated] = useState<string | null>(null);
+
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [pk, lg] = await Promise.all([list(), listLog()]);
+      setRows(pk);
+      setLog(lg);
+    } catch {
+      toast.error("Chargement impossible.");
+    } finally {
+      setLoading(false);
+    }
+  }, [list, listLog]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  async function onCreate() {
+    if (!label.trim() || busy) return;
+    setBusy(true);
+    try {
+      const res = await create({ data: { label: label.trim() } });
+      setGenerated(res.passkey);
+      setLabel("");
+      setOpen(false);
+      await refresh();
+    } catch {
+      toast.error("Création impossible.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onToggle(row: SuperAdminPasskeyRow) {
+    try {
+      await setDisabled({ data: { id: row.id, disabled: !row.disabled } });
+      await refresh();
+    } catch {
+      toast.error("Mise à jour impossible.");
+    }
+  }
+
+  async function onDelete(row: SuperAdminPasskeyRow) {
+    if (!confirm(`Supprimer la passkey « ${row.label} » ?`)) return;
+    try {
+      await remove({ data: { id: row.id } });
+      toast.success("Passkey supprimée.");
+      await refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Suppression impossible.");
+    }
+  }
+
+  if (loading) return <Loading />;
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Passkeys Super Admin</CardTitle>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Seules ces passkeys ouvrent le panneau via l'URL secrète. Les
+              passkeys clients ne donnent jamais cet accès.
+            </p>
+          </div>
+          <Button className="gap-2" onClick={() => setOpen(true)}>
+            <Plus className="h-4 w-4" /> Générer
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Libellé</TableHead>
+                <TableHead>État</TableHead>
+                <TableHead>Dernière utilisation</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell className="font-medium">
+                    {row.label}
+                    {row.is_master && (
+                      <Badge variant="secondary" className="ml-2">Maître</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {row.disabled ? (
+                      <Badge variant="outline">Désactivée</Badge>
+                    ) : (
+                      <Badge>Active</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {row.last_used_at ? formatDateTime(row.last_used_at) : "—"}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title={row.disabled ? "Activer" : "Désactiver"}
+                      onClick={() => onToggle(row)}
+                    >
+                      {row.disabled ? (
+                        <Eye className="h-4 w-4" />
+                      ) : (
+                        <EyeOff className="h-4 w-4" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title={row.is_master ? "La passkey maître ne peut pas être supprimée" : "Supprimer"}
+                      disabled={row.is_master}
+                      onClick={() => onDelete(row)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="h-4 w-4" /> Journal des accès
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Date</TableHead>
+                <TableHead>Résultat</TableHead>
+                <TableHead>Passkey</TableHead>
+                <TableHead>IP</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {log.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center text-muted-foreground">
+                    Aucune tentative enregistrée.
+                  </TableCell>
+                </TableRow>
+              )}
+              {log.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell className="text-muted-foreground">
+                    {formatDateTime(row.created_at)}
+                  </TableCell>
+                  <TableCell>
+                    {row.success ? (
+                      <Badge>Réussi</Badge>
+                    ) : (
+                      <Badge variant="destructive">Échoué</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>{row.label ?? "—"}</TableCell>
+                  <TableCell className="font-mono text-xs text-muted-foreground">
+                    {row.ip_address ?? "—"}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Générer une passkey Super Admin</DialogTitle>
+            <DialogDescription>
+              Donnez un libellé pour identifier cette passkey.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="sa-pk-label">Libellé</Label>
+            <Input
+              id="sa-pk-label"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              placeholder="Ex : Mon téléphone"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Annuler
+            </Button>
+            <Button className="gap-2" disabled={busy} onClick={onCreate}>
+              {busy && <Loader2 className="h-4 w-4 animate-spin" />} Générer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!generated} onOpenChange={(o) => !o && setGenerated(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Nouvelle passkey Super Admin</DialogTitle>
+            <DialogDescription>
+              Copiez-la maintenant : elle ne sera plus affichée.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 p-3">
+            <code className="flex-1 font-mono text-sm tracking-wide">{generated}</code>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                if (generated) navigator.clipboard.writeText(generated);
+                toast.success("Copiée.");
+              }}
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setGenerated(null)}>J'ai enregistré la passkey</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
