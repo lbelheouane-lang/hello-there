@@ -22,6 +22,7 @@ import {
 import {
   getPairingState, generatePairing, revokeDevice,
 } from "@/lib/mobile-pairing.functions";
+import { useStoreSettings } from "@/lib/store-settings";
 
 const EXPIRY_OPTIONS = [
   { value: "5", label: "5 minutes" },
