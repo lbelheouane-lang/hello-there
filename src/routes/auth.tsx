@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/auth")({
   beforeLoad: async () => {
     const { data } = await supabase.auth.getSession();
-    if (data.session) throw redirect({ to: "/dashboard" });
+    if (data.session) throw redirect({ to: "/acces" });
     // App stays locked until activated with a valid access key.
     const status = await getActivationStatus();
     if (!status.activated) throw redirect({ to: "/activation" });
@@ -60,7 +60,9 @@ function AuthPage() {
       setBusy(false);
       return;
     }
-    navigate({ to: "/dashboard" });
+    // Require the PIN step next; clear any stale gate flag from a prior session.
+    sessionStorage.removeItem("md_pin_done");
+    navigate({ to: "/acces" });
   }
 
   return (

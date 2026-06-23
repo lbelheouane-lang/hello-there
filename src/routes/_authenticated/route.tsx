@@ -19,6 +19,11 @@ function AuthGate() {
         navigate({ to: "/auth" });
         return;
       }
+      // The PIN step selects the operating role for this session.
+      if (sessionStorage.getItem("md_pin_done") !== "1") {
+        navigate({ to: "/acces" });
+        return;
+      }
       setStatus("authed");
     });
     return () => {

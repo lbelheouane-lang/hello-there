@@ -106,6 +106,7 @@ function AppSidebar() {
   })();
 
   async function signOut() {
+    sessionStorage.removeItem("md_pin_done");
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   }
