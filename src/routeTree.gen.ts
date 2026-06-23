@@ -13,6 +13,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuiviTokenRouteImport } from './routes/suivi.$token'
+import { Route as InviteCodeRouteImport } from './routes/invite.$code'
+import { Route as AuthenticatedSuperAdminRouteImport } from './routes/_authenticated/super-admin'
 import { Route as AuthenticatedStockRouteImport } from './routes/_authenticated/stock'
 import { Route as AuthenticatedReparationsRouteImport } from './routes/_authenticated/reparations'
 import { Route as AuthenticatedParuresRouteImport } from './routes/_authenticated/parures'
@@ -51,6 +53,16 @@ const SuiviTokenRoute = SuiviTokenRouteImport.update({
   id: '/suivi/$token',
   path: '/suivi/$token',
   getParentRoute: () => rootRouteImport,
+} as any)
+const InviteCodeRoute = InviteCodeRouteImport.update({
+  id: '/invite/$code',
+  path: '/invite/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedSuperAdminRoute = AuthenticatedSuperAdminRouteImport.update({
+  id: '/super-admin',
+  path: '/super-admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedStockRoute = AuthenticatedStockRouteImport.update({
   id: '/stock',
@@ -173,6 +185,8 @@ export interface FileRoutesByFullPath {
   '/parures': typeof AuthenticatedParuresRoute
   '/reparations': typeof AuthenticatedReparationsRoute
   '/stock': typeof AuthenticatedStockRoute
+  '/super-admin': typeof AuthenticatedSuperAdminRoute
+  '/invite/$code': typeof InviteCodeRoute
   '/suivi/$token': typeof SuiviTokenRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
   '/fournisseurs/$id': typeof AuthenticatedFournisseursIdRoute
@@ -197,6 +211,8 @@ export interface FileRoutesByTo {
   '/parures': typeof AuthenticatedParuresRoute
   '/reparations': typeof AuthenticatedReparationsRoute
   '/stock': typeof AuthenticatedStockRoute
+  '/super-admin': typeof AuthenticatedSuperAdminRoute
+  '/invite/$code': typeof InviteCodeRoute
   '/suivi/$token': typeof SuiviTokenRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
   '/fournisseurs/$id': typeof AuthenticatedFournisseursIdRoute
@@ -223,6 +239,8 @@ export interface FileRoutesById {
   '/_authenticated/parures': typeof AuthenticatedParuresRoute
   '/_authenticated/reparations': typeof AuthenticatedReparationsRoute
   '/_authenticated/stock': typeof AuthenticatedStockRoute
+  '/_authenticated/super-admin': typeof AuthenticatedSuperAdminRoute
+  '/invite/$code': typeof InviteCodeRoute
   '/suivi/$token': typeof SuiviTokenRoute
   '/_authenticated/clients_/$id': typeof AuthenticatedClientsIdRoute
   '/_authenticated/fournisseurs_/$id': typeof AuthenticatedFournisseursIdRoute
@@ -249,6 +267,8 @@ export interface FileRouteTypes {
     | '/parures'
     | '/reparations'
     | '/stock'
+    | '/super-admin'
+    | '/invite/$code'
     | '/suivi/$token'
     | '/clients/$id'
     | '/fournisseurs/$id'
@@ -273,6 +293,8 @@ export interface FileRouteTypes {
     | '/parures'
     | '/reparations'
     | '/stock'
+    | '/super-admin'
+    | '/invite/$code'
     | '/suivi/$token'
     | '/clients/$id'
     | '/fournisseurs/$id'
@@ -298,6 +320,8 @@ export interface FileRouteTypes {
     | '/_authenticated/parures'
     | '/_authenticated/reparations'
     | '/_authenticated/stock'
+    | '/_authenticated/super-admin'
+    | '/invite/$code'
     | '/suivi/$token'
     | '/_authenticated/clients_/$id'
     | '/_authenticated/fournisseurs_/$id'
@@ -309,6 +333,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  InviteCodeRoute: typeof InviteCodeRoute
   SuiviTokenRoute: typeof SuiviTokenRoute
   ApiPublicHooksUpdateGoldPricesRoute: typeof ApiPublicHooksUpdateGoldPricesRoute
 }
@@ -342,6 +367,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/suivi/$token'
       preLoaderRoute: typeof SuiviTokenRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/invite/$code': {
+      id: '/invite/$code'
+      path: '/invite/$code'
+      fullPath: '/invite/$code'
+      preLoaderRoute: typeof InviteCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/super-admin': {
+      id: '/_authenticated/super-admin'
+      path: '/super-admin'
+      fullPath: '/super-admin'
+      preLoaderRoute: typeof AuthenticatedSuperAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/stock': {
       id: '/_authenticated/stock'
@@ -495,6 +534,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedParuresRoute: typeof AuthenticatedParuresRoute
   AuthenticatedReparationsRoute: typeof AuthenticatedReparationsRoute
   AuthenticatedStockRoute: typeof AuthenticatedStockRoute
+  AuthenticatedSuperAdminRoute: typeof AuthenticatedSuperAdminRoute
   AuthenticatedClientsIdRoute: typeof AuthenticatedClientsIdRoute
   AuthenticatedFournisseursIdRoute: typeof AuthenticatedFournisseursIdRoute
   AuthenticatedProduitIdRoute: typeof AuthenticatedProduitIdRoute
@@ -516,6 +556,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedParuresRoute: AuthenticatedParuresRoute,
   AuthenticatedReparationsRoute: AuthenticatedReparationsRoute,
   AuthenticatedStockRoute: AuthenticatedStockRoute,
+  AuthenticatedSuperAdminRoute: AuthenticatedSuperAdminRoute,
   AuthenticatedClientsIdRoute: AuthenticatedClientsIdRoute,
   AuthenticatedFournisseursIdRoute: AuthenticatedFournisseursIdRoute,
   AuthenticatedProduitIdRoute: AuthenticatedProduitIdRoute,
@@ -528,6 +569,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  InviteCodeRoute: InviteCodeRoute,
   SuiviTokenRoute: SuiviTokenRoute,
   ApiPublicHooksUpdateGoldPricesRoute: ApiPublicHooksUpdateGoldPricesRoute,
 }
