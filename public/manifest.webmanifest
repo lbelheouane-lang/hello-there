@@ -2,7 +2,7 @@
   "name": "Orus — Bijouterie",
   "short_name": "Orus",
   "description": "Application mobile compagnon de gestion de bijouterie.",
-  "start_url": "/",
+  "start_url": "/mobile",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
