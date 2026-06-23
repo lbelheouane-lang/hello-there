@@ -79,7 +79,10 @@ function SuperAdminGate() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && !isSuperAdmin) navigate({ to: "/dashboard", replace: true });
+    if (!loading && !isSuperAdmin) {
+      toast.error("Accès refusé");
+      navigate({ to: "/dashboard", replace: true });
+    }
   }, [loading, isSuperAdmin, navigate]);
 
   if (loading || !isSuperAdmin) return <div className="min-h-screen bg-background" />;
