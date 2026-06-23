@@ -18,6 +18,7 @@ import {
   Layers,
   Recycle,
   BookOpen,
+  Repeat,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BrandIntro } from "@/components/BrandIntro";
@@ -111,6 +112,13 @@ function AppSidebar() {
     navigate({ to: "/auth", replace: true });
   }
 
+  function switchRole() {
+    // Keep the email/password session, re-show the PIN gate so the operator
+    // can pick a different role (admin / employé) on the same device.
+    sessionStorage.removeItem("md_pin_done");
+    navigate({ to: "/acces", replace: true });
+  }
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -155,6 +163,9 @@ function AppSidebar() {
             {isDeveloper && role === "admin" ? " · Développeur" : ""}
           </p>
         </div>
+        <Button variant="ghost" className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent" onClick={switchRole}>
+          <Repeat className="h-4 w-4" /> Changer de rôle
+        </Button>
         <Button variant="ghost" className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent" onClick={signOut}>
           <LogOut className="h-4 w-4" /> Déconnexion
         </Button>
