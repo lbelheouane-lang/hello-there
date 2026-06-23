@@ -33,6 +33,7 @@ import { Route as AuthenticatedBoutiqueRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProduitIdRouteImport } from './routes/_authenticated/produit.$id'
 import { Route as AuthenticatedFournisseursIdRouteImport } from './routes/_authenticated/fournisseurs_.$id'
 import { Route as AuthenticatedClientsIdRouteImport } from './routes/_authenticated/clients_.$id'
+import { Route as ApiPublicMobileSyncRouteImport } from './routes/api/public/mobile/sync'
 import { Route as ApiPublicMobilePairRouteImport } from './routes/api/public/mobile/pair'
 import { Route as ApiPublicHooksUpdateGoldPricesRouteImport } from './routes/api/public/hooks/update-gold-prices'
 
@@ -161,6 +162,11 @@ const AuthenticatedClientsIdRoute = AuthenticatedClientsIdRouteImport.update({
   path: '/clients/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicMobileSyncRoute = ApiPublicMobileSyncRouteImport.update({
+  id: '/api/public/mobile/sync',
+  path: '/api/public/mobile/sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicMobilePairRoute = ApiPublicMobilePairRouteImport.update({
   id: '/api/public/mobile/pair',
   path: '/api/public/mobile/pair',
@@ -199,6 +205,7 @@ export interface FileRoutesByFullPath {
   '/produit/$id': typeof AuthenticatedProduitIdRoute
   '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
   '/api/public/mobile/pair': typeof ApiPublicMobilePairRoute
+  '/api/public/mobile/sync': typeof ApiPublicMobileSyncRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -226,6 +233,7 @@ export interface FileRoutesByTo {
   '/produit/$id': typeof AuthenticatedProduitIdRoute
   '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
   '/api/public/mobile/pair': typeof ApiPublicMobilePairRoute
+  '/api/public/mobile/sync': typeof ApiPublicMobileSyncRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -255,6 +263,7 @@ export interface FileRoutesById {
   '/_authenticated/produit/$id': typeof AuthenticatedProduitIdRoute
   '/api/public/hooks/update-gold-prices': typeof ApiPublicHooksUpdateGoldPricesRoute
   '/api/public/mobile/pair': typeof ApiPublicMobilePairRoute
+  '/api/public/mobile/sync': typeof ApiPublicMobileSyncRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -284,6 +293,7 @@ export interface FileRouteTypes {
     | '/produit/$id'
     | '/api/public/hooks/update-gold-prices'
     | '/api/public/mobile/pair'
+    | '/api/public/mobile/sync'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -311,6 +321,7 @@ export interface FileRouteTypes {
     | '/produit/$id'
     | '/api/public/hooks/update-gold-prices'
     | '/api/public/mobile/pair'
+    | '/api/public/mobile/sync'
   id:
     | '__root__'
     | '/'
@@ -339,6 +350,7 @@ export interface FileRouteTypes {
     | '/_authenticated/produit/$id'
     | '/api/public/hooks/update-gold-prices'
     | '/api/public/mobile/pair'
+    | '/api/public/mobile/sync'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -349,6 +361,7 @@ export interface RootRouteChildren {
   SuiviTokenRoute: typeof SuiviTokenRoute
   ApiPublicHooksUpdateGoldPricesRoute: typeof ApiPublicHooksUpdateGoldPricesRoute
   ApiPublicMobilePairRoute: typeof ApiPublicMobilePairRoute
+  ApiPublicMobileSyncRoute: typeof ApiPublicMobileSyncRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -521,6 +534,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClientsIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/mobile/sync': {
+      id: '/api/public/mobile/sync'
+      path: '/api/public/mobile/sync'
+      fullPath: '/api/public/mobile/sync'
+      preLoaderRoute: typeof ApiPublicMobileSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/mobile/pair': {
       id: '/api/public/mobile/pair'
       path: '/api/public/mobile/pair'
@@ -593,6 +613,7 @@ const rootRouteChildren: RootRouteChildren = {
   SuiviTokenRoute: SuiviTokenRoute,
   ApiPublicHooksUpdateGoldPricesRoute: ApiPublicHooksUpdateGoldPricesRoute,
   ApiPublicMobilePairRoute: ApiPublicMobilePairRoute,
+  ApiPublicMobileSyncRoute: ApiPublicMobileSyncRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
