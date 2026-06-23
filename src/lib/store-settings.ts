@@ -105,8 +105,13 @@ export async function fetchStoreSettings(): Promise<StoreSettings> {
   const { data: auth } = await supabase.auth.getSession();
 
   if (auth.session) {
+    // Reads through the application view: operational fields (branding,
+    // contact, document prefixes, EUR→DZD rate) are available to all
+    // signed-in users, while sensitive backend automation/config fields are
+    // returned only to administrators (safe defaults otherwise). The base
+    // store_settings table is restricted to admins.
     const { data, error } = await supabase
-      .from("store_settings")
+      .from("store_settings_app")
       .select("*")
       .eq("singleton", true)
       .maybeSingle();
