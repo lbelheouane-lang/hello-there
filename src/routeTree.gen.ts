@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as MobileRouteImport } from './routes/mobile'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -37,6 +38,11 @@ import { Route as ApiPublicMobileSyncRouteImport } from './routes/api/public/mob
 import { Route as ApiPublicMobilePairRouteImport } from './routes/api/public/mobile/pair'
 import { Route as ApiPublicHooksUpdateGoldPricesRouteImport } from './routes/api/public/hooks/update-gold-prices'
 
+const MobileRoute = MobileRouteImport.update({
+  id: '/mobile',
+  path: '/mobile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -182,6 +188,7 @@ const ApiPublicHooksUpdateGoldPricesRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/mobile': typeof MobileRoute
   '/boutique': typeof AuthenticatedBoutiqueRoute
   '/clients': typeof AuthenticatedClientsRoute
   '/cours-or': typeof AuthenticatedCoursOrRoute
@@ -210,6 +217,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/mobile': typeof MobileRoute
   '/boutique': typeof AuthenticatedBoutiqueRoute
   '/clients': typeof AuthenticatedClientsRoute
   '/cours-or': typeof AuthenticatedCoursOrRoute
@@ -240,6 +248,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/mobile': typeof MobileRoute
   '/_authenticated/boutique': typeof AuthenticatedBoutiqueRoute
   '/_authenticated/clients': typeof AuthenticatedClientsRoute
   '/_authenticated/cours-or': typeof AuthenticatedCoursOrRoute
@@ -270,6 +279,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/mobile'
     | '/boutique'
     | '/clients'
     | '/cours-or'
@@ -298,6 +308,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/mobile'
     | '/boutique'
     | '/clients'
     | '/cours-or'
@@ -327,6 +338,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/mobile'
     | '/_authenticated/boutique'
     | '/_authenticated/clients'
     | '/_authenticated/cours-or'
@@ -357,6 +369,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  MobileRoute: typeof MobileRoute
   InviteCodeRoute: typeof InviteCodeRoute
   SuiviTokenRoute: typeof SuiviTokenRoute
   ApiPublicHooksUpdateGoldPricesRoute: typeof ApiPublicHooksUpdateGoldPricesRoute
@@ -366,6 +379,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/mobile': {
+      id: '/mobile'
+      path: '/mobile'
+      fullPath: '/mobile'
+      preLoaderRoute: typeof MobileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -609,6 +629,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  MobileRoute: MobileRoute,
   InviteCodeRoute: InviteCodeRoute,
   SuiviTokenRoute: SuiviTokenRoute,
   ApiPublicHooksUpdateGoldPricesRoute: ApiPublicHooksUpdateGoldPricesRoute,
