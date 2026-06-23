@@ -1810,6 +1810,80 @@ export type Database = {
         }
         Relationships: []
       }
+      super_admin_access_log: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: string | null
+          label: string | null
+          passkey_id: string | null
+          success: boolean
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          label?: string | null
+          passkey_id?: string | null
+          success: boolean
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          label?: string | null
+          passkey_id?: string | null
+          success?: boolean
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "super_admin_access_log_passkey_id_fkey"
+            columns: ["passkey_id"]
+            isOneToOne: false
+            referencedRelation: "super_admin_passkeys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      super_admin_passkeys: {
+        Row: {
+          created_at: string
+          disabled: boolean
+          id: string
+          is_master: boolean
+          label: string
+          last_used_at: string | null
+          passkey_hash: string
+          passkey_salt: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          disabled?: boolean
+          id?: string
+          is_master?: boolean
+          label: string
+          last_used_at?: string | null
+          passkey_hash: string
+          passkey_salt: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          disabled?: boolean
+          id?: string
+          is_master?: boolean
+          label?: string
+          last_used_at?: string | null
+          passkey_hash?: string
+          passkey_salt?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       suppliers: {
         Row: {
           address: string | null
