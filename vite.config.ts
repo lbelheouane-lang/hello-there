@@ -19,6 +19,7 @@ export default defineConfig({
         registerType: "autoUpdate",
         injectRegister: null,
         filename: "sw.js",
+        outDir: "dist/client",
         devOptions: { enabled: false },
         // Manifest is served statically from public/manifest.webmanifest
         // (works in both dev and prod). The plugin only generates the SW.
