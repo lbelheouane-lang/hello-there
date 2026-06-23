@@ -59,6 +59,15 @@ import {
   type PasskeyRow,
   type ManagedUserRow,
 } from "@/lib/passkey-auth.functions";
+import {
+  listSuperAdminPasskeys,
+  createSuperAdminPasskey,
+  setSuperAdminPasskeyDisabled,
+  deleteSuperAdminPasskey,
+  listSuperAdminAccessLog,
+  type SuperAdminPasskeyRow,
+  type SuperAdminAccessLogRow,
+} from "@/lib/super-admin-passkey.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
