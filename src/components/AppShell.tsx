@@ -163,6 +163,9 @@ function AppSidebar() {
             {isDeveloper && role === "admin" ? " · Développeur" : ""}
           </p>
         </div>
+        <Button variant="ghost" className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent" onClick={switchRole}>
+          <Repeat className="h-4 w-4" /> Changer de rôle
+        </Button>
         <Button variant="ghost" className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent" onClick={signOut}>
           <LogOut className="h-4 w-4" /> Déconnexion
         </Button>
