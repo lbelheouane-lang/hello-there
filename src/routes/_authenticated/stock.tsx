@@ -390,6 +390,78 @@ function StockPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  // Build the printable / exportable stock inventory report from in-stock products.
+  function buildReportData(sort: "newest" | "oldest"): StockReportData {
+    const metalLabelOf = (p: Product) => {
+      if (p.metal_type === "or") return p.gold_karat ? `Or ${p.gold_karat}K` : "Or";
+      const m = METAL_TYPES.find((x) => x.value === p.metal_type);
+      return m?.label ?? p.metal_type;
+    };
+    const sellingPriceOf = (p: Product) => {
+      const ppg = p.metal_type === "or" ? priceForKarat(prices, p.gold_karat) : null;
+      const metalDzd = dzdFromEur(metalValue(Number(p.weight_grams), ppg));
+      return Math.round(metalDzd + (Number(p.labor_cost) || 0));
+    };
+
+    const inStock = (products ?? []).filter((p) => p.status === "en_stock");
+    const sorted = [...inStock].sort((a, b) => {
+      const da = new Date(a.created_at).getTime();
+      const db = new Date(b.created_at).getTime();
+      return sort === "newest" ? db - da : da - db;
+    });
+
+    const rows: StockReportRow[] = sorted.map((p) => ({
+      entryDate: p.created_at,
+      name: p.name,
+      category: p.category,
+      metalLabel: metalLabelOf(p),
+      originLabel: metalOriginLabel(p.metal_origin),
+      country: p.metal_origin === "imported" ? p.country_of_origin || "Non précisé" : "—",
+      quantity: Number(p.quantity) || 0,
+      weight: Number(p.weight_grams) || 0,
+      sellingPrice: sellingPriceOf(p),
+    }));
+
+    const totals = {
+      products: rows.length,
+      quantity: rows.reduce((s, r) => s + r.quantity, 0),
+      weight: rows.reduce((s, r) => s + r.weight, 0),
+      value: rows.reduce((s, r) => s + r.sellingPrice * r.quantity, 0),
+    };
+
+    const groupBy = (keyOf: (p: Product, r: StockReportRow) => string): StockGroupTotal[] => {
+      const m = new Map<string, StockGroupTotal>();
+      sorted.forEach((p, i) => {
+        const r = rows[i];
+        const key = keyOf(p, r);
+        const e = m.get(key) ?? { label: key, count: 0, quantity: 0, weight: 0, value: 0 };
+        e.count += 1;
+        e.quantity += r.quantity;
+        e.weight += r.weight;
+        e.value += r.sellingPrice * r.quantity;
+        m.set(key, e);
+      });
+      return Array.from(m.values()).sort((a, b) => b.value - a.value);
+    };
+
+    return {
+      rows,
+      generatedBy: user?.email ?? "Administrateur",
+      sortLabel: sort === "newest" ? "Date d'entrée — plus récent d'abord" : "Date d'entrée — plus ancien d'abord",
+      totals,
+      byMetal: groupBy((_p, r) => r.metalLabel),
+      byOrigin: groupBy((_p, r) => r.originLabel),
+      byCategory: groupBy((_p, r) => r.category),
+    };
+  }
+
+  function handlePrintReport() {
+    printStockReport(buildReportData(reportSort));
+  }
+  function handleExcelReport() {
+    exportStockReportExcel(buildReportData(reportSort));
+    toast.success("Export Excel généré");
+  }
 
 
   return (
