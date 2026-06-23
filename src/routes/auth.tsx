@@ -38,20 +38,12 @@ function AuthPage() {
   const navigate = useNavigate();
   const login = useServerFn(pinLogin);
 
-  const [phase, setPhase] = useState<Phase>("intro");
+  const [phase, setPhase] = useState<Phase>("profiles");
   const [profile, setProfile] = useState<Profile | null>(null);
   const [pin, setPin] = useState("");
   const [error, setError] = useState(false);
   const [busy, setBusy] = useState(false);
   const submittingRef = useRef(false);
-
-  // Startup animation — data/session checks happen behind it.
-  useEffect(() => {
-    const t = setTimeout(() => setPhase("profiles"), 2600);
-    return () => clearTimeout(t);
-  }, []);
-
-
 
   const selectProfile = (p: Profile) => {
     setProfile(p);
