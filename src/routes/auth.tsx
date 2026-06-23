@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Gem, Shield, ShoppingCart, Delete, Loader2, ArrowLeft, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { pinLogin } from "@/lib/pin-auth.functions";
+import { getActivationStatus } from "@/lib/activation.functions";
 import { useStoreSettings } from "@/lib/store-settings";
 import { fetchUserPreferences } from "@/lib/user-preferences";
 
@@ -12,6 +13,9 @@ export const Route = createFileRoute("/auth")({
   beforeLoad: async () => {
     const { data } = await supabase.auth.getSession();
     if (data.session) throw redirect({ to: "/dashboard" });
+    // App stays locked until activated with a valid access key.
+    const status = await getActivationStatus();
+    if (!status.activated) throw redirect({ to: "/activation" });
   },
   head: () => ({
     meta: [
@@ -343,6 +347,17 @@ function PinEntry({
         <h2 className="mt-4 font-serif text-xl font-semibold">{profile.label}</h2>
         <p className="mt-1 text-sm text-muted-foreground">Saisissez votre code PIN (4 à 8 chiffres)</p>
       </div>
+
+      <div className="mt-4 rounded-2xl border border-primary/30 bg-primary/5 px-4 py-3 text-center">
+        <p className="text-xs font-medium text-foreground">Première connexion ? Code par défaut :</p>
+        <p className="mt-1 font-mono text-lg font-semibold tracking-widest text-primary">
+          {profile.key === "admin" ? "1234" : "0000"}
+        </p>
+        <p className="mt-1 text-[11px] text-muted-foreground">
+          {profile.key === "admin" ? "Gérant / Administrateur" : "Employé"} — pensez à le modifier ensuite.
+        </p>
+      </div>
+
 
       <div className={`mt-7 flex flex-wrap justify-center gap-3 ${error ? "animate-auth-shake" : ""}`}>
         {Array.from({ length: dots }).map((_, i) => {

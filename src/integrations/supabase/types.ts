@@ -1589,6 +1589,9 @@ export type Database = {
       }
       store_settings: {
         Row: {
+          activated: boolean
+          activated_at: string | null
+          activation_key: string | null
           address: string | null
           auto_backup_enabled: boolean
           auto_backup_frequency: string
@@ -1629,6 +1632,9 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          activated?: boolean
+          activated_at?: string | null
+          activation_key?: string | null
           address?: string | null
           auto_backup_enabled?: boolean
           auto_backup_frequency?: string
@@ -1669,6 +1675,9 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          activated?: boolean
+          activated_at?: string | null
+          activation_key?: string | null
           address?: string | null
           auto_backup_enabled?: boolean
           auto_backup_frequency?: string
