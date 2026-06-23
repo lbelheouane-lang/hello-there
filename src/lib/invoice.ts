@@ -232,12 +232,10 @@ export function buildInvoiceHtml(inv: InvoiceRecord): string {
 }
 
 
-/**
- * Print / save-as-PDF without leaving the app.
- * Renders the invoice into a hidden iframe, triggers the print dialog,
- * then cleans up — so the user stays on the current tab.
- */
+/** Print / save-as-PDF without leaving the app or opening a stray tab. */
 export function printInvoice(inv: InvoiceRecord): void {
+  printHtml(buildInvoiceHtml(inv));
+}
   const html = buildInvoiceHtml(inv);
 
   const iframe = document.createElement("iframe");
