@@ -169,6 +169,9 @@ function SuperAdminPanel() {
           <TabsContent value="users">
             <UsersTab />
           </TabsContent>
+          <TabsContent value="sa-access">
+            <SuperAdminAccessTab />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
