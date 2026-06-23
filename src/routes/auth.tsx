@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/auth")({
   beforeLoad: async () => {
     const { data } = await supabase.auth.getSession();
-    if (data.session) throw redirect({ to: "/dashboard" });
+    if (data.session) throw redirect({ to: "/acces" });
     // App stays locked until activated with a valid access key.
     const status = await getActivationStatus();
     if (!status.activated) throw redirect({ to: "/activation" });

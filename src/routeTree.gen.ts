@@ -14,6 +14,7 @@ import { Route as OwnerRouteImport } from './routes/owner'
 import { Route as CreateAccountRouteImport } from './routes/create-account'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ActivationRouteImport } from './routes/activation'
+import { Route as AccesRouteImport } from './routes/acces'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuiviTokenRouteImport } from './routes/suivi.$token'
@@ -62,6 +63,11 @@ const AuthRoute = AuthRouteImport.update({
 const ActivationRoute = ActivationRouteImport.update({
   id: '/activation',
   path: '/activation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccesRoute = AccesRouteImport.update({
+  id: '/acces',
+  path: '/acces',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -193,6 +199,7 @@ const ApiPublicHooksUpdateGoldPricesRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/acces': typeof AccesRoute
   '/activation': typeof ActivationRoute
   '/auth': typeof AuthRoute
   '/create-account': typeof CreateAccountRoute
@@ -223,6 +230,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/acces': typeof AccesRoute
   '/activation': typeof ActivationRoute
   '/auth': typeof AuthRoute
   '/create-account': typeof CreateAccountRoute
@@ -255,6 +263,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/acces': typeof AccesRoute
   '/activation': typeof ActivationRoute
   '/auth': typeof AuthRoute
   '/create-account': typeof CreateAccountRoute
@@ -287,6 +296,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/acces'
     | '/activation'
     | '/auth'
     | '/create-account'
@@ -317,6 +327,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/acces'
     | '/activation'
     | '/auth'
     | '/create-account'
@@ -348,6 +359,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/acces'
     | '/activation'
     | '/auth'
     | '/create-account'
@@ -380,6 +392,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AccesRoute: typeof AccesRoute
   ActivationRoute: typeof ActivationRoute
   AuthRoute: typeof AuthRoute
   CreateAccountRoute: typeof CreateAccountRoute
@@ -425,6 +438,13 @@ declare module '@tanstack/react-router' {
       path: '/activation'
       fullPath: '/activation'
       preLoaderRoute: typeof ActivationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/acces': {
+      id: '/acces'
+      path: '/acces'
+      fullPath: '/acces'
+      preLoaderRoute: typeof AccesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -648,6 +668,7 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AccesRoute: AccesRoute,
   ActivationRoute: ActivationRoute,
   AuthRoute: AuthRoute,
   CreateAccountRoute: CreateAccountRoute,
