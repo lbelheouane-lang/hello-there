@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   Plus, Package, Pencil, Trash2, Tag, Search, Printer, ExternalLink,
-  ChevronRight, LayoutGrid, AlertTriangle, X,
+  ChevronRight, LayoutGrid, AlertTriangle, X, FileSpreadsheet, FileText, FileDown,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
@@ -31,7 +31,11 @@ import {
   KARATS, CATEGORIES, METAL_TYPES, PRODUCT_STATUSES, METAL_ORIGINS, ORIGIN_COUNTRIES,
   formatGrams, statusLabel, metalValue, metalOriginLabel,
 } from "@/lib/format";
-import { formatFromEUR } from "@/lib/currency";
+import { formatFromEUR, dzdFromEur } from "@/lib/currency";
+import { useAuth } from "@/hooks/use-auth";
+import {
+  printStockReport, exportStockReportExcel, type StockReportData, type StockReportRow, type StockGroupTotal,
+} from "@/lib/stock-report";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
 import { LabelDialog, type LabelProduct } from "@/components/LabelDialog";
 import { productImage } from "@/lib/product-image";
@@ -83,6 +87,9 @@ function StockPage() {
   const categoryNames = useCategoryNames();
   const { data: subcategories } = useSubcategories();
   const { data: prices } = useLatestGoldPrices();
+  const { user } = useAuth();
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportSort, setReportSort] = useState<"newest" | "oldest">("newest");
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState(empty);
@@ -383,6 +390,78 @@ function StockPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  // Build the printable / exportable stock inventory report from in-stock products.
+  function buildReportData(sort: "newest" | "oldest"): StockReportData {
+    const metalLabelOf = (p: Product) => {
+      if (p.metal_type === "or") return p.gold_karat ? `Or ${p.gold_karat}K` : "Or";
+      const m = METAL_TYPES.find((x) => x.value === p.metal_type);
+      return m?.label ?? p.metal_type;
+    };
+    const sellingPriceOf = (p: Product) => {
+      const ppg = p.metal_type === "or" ? priceForKarat(prices, p.gold_karat) : null;
+      const metalDzd = dzdFromEur(metalValue(Number(p.weight_grams), ppg));
+      return Math.round(metalDzd + (Number(p.labor_cost) || 0));
+    };
+
+    const inStock = (products ?? []).filter((p) => p.status === "en_stock");
+    const sorted = [...inStock].sort((a, b) => {
+      const da = new Date(a.created_at).getTime();
+      const db = new Date(b.created_at).getTime();
+      return sort === "newest" ? db - da : da - db;
+    });
+
+    const rows: StockReportRow[] = sorted.map((p) => ({
+      entryDate: p.created_at,
+      name: p.name,
+      category: p.category,
+      metalLabel: metalLabelOf(p),
+      originLabel: metalOriginLabel(p.metal_origin),
+      country: p.metal_origin === "imported" ? p.country_of_origin || "Non précisé" : "—",
+      quantity: Number(p.quantity) || 0,
+      weight: Number(p.weight_grams) || 0,
+      sellingPrice: sellingPriceOf(p),
+    }));
+
+    const totals = {
+      products: rows.length,
+      quantity: rows.reduce((s, r) => s + r.quantity, 0),
+      weight: rows.reduce((s, r) => s + r.weight, 0),
+      value: rows.reduce((s, r) => s + r.sellingPrice * r.quantity, 0),
+    };
+
+    const groupBy = (keyOf: (p: Product, r: StockReportRow) => string): StockGroupTotal[] => {
+      const m = new Map<string, StockGroupTotal>();
+      sorted.forEach((p, i) => {
+        const r = rows[i];
+        const key = keyOf(p, r);
+        const e = m.get(key) ?? { label: key, count: 0, quantity: 0, weight: 0, value: 0 };
+        e.count += 1;
+        e.quantity += r.quantity;
+        e.weight += r.weight;
+        e.value += r.sellingPrice * r.quantity;
+        m.set(key, e);
+      });
+      return Array.from(m.values()).sort((a, b) => b.value - a.value);
+    };
+
+    return {
+      rows,
+      generatedBy: user?.email ?? "Administrateur",
+      sortLabel: sort === "newest" ? "Date d'entrée — plus récent d'abord" : "Date d'entrée — plus ancien d'abord",
+      totals,
+      byMetal: groupBy((_p, r) => r.metalLabel),
+      byOrigin: groupBy((_p, r) => r.originLabel),
+      byCategory: groupBy((_p, r) => r.category),
+    };
+  }
+
+  function handlePrintReport() {
+    printStockReport(buildReportData(reportSort));
+  }
+  function handleExcelReport() {
+    exportStockReportExcel(buildReportData(reportSort));
+    toast.success("Export Excel généré");
+  }
 
 
   return (
@@ -544,6 +623,45 @@ function StockPage() {
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input className="pl-9" placeholder="Rechercher un bijou…" value={search} onChange={(e) => setSearch(e.target.value)} />
             </div>
+            <div className="flex flex-wrap items-center gap-2">
+            <Dialog open={reportOpen} onOpenChange={setReportOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <FileText className="mr-2 h-4 w-4" /> Imprimer le rapport de stock
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Rapport d'inventaire du stock</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Rapport professionnel des produits en stock, avec totaux par type de métal, origine et catégorie. Adapté aux audits et à la comptabilité.
+                  </p>
+                  <div className="space-y-2">
+                    <Label>Tri par date d'entrée</Label>
+                    <Select value={reportSort} onValueChange={(v) => setReportSort(v as "newest" | "oldest")}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="newest">Plus récent d'abord</SelectItem>
+                        <SelectItem value="oldest">Plus ancien d'abord</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <DialogFooter className="flex-col gap-2 sm:flex-row">
+                  <Button variant="outline" onClick={handlePrintReport}>
+                    <Printer className="mr-2 h-4 w-4" /> Imprimer
+                  </Button>
+                  <Button variant="outline" onClick={handlePrintReport}>
+                    <FileDown className="mr-2 h-4 w-4" /> Télécharger PDF
+                  </Button>
+                  <Button onClick={handleExcelReport}>
+                    <FileSpreadsheet className="mr-2 h-4 w-4" /> Exporter Excel
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
                 <Button onClick={openNew}>
@@ -703,6 +821,7 @@ function StockPage() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+            </div>
           </div>
 
           {/* Filter bar */}
