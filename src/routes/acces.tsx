@@ -26,6 +26,7 @@ function AccessPage() {
   const { data: storeSettings } = useStoreSettings();
   const storeName = storeSettings?.store_name || "Maison d'Or";
 
+  const [role, setRole] = useState<SelectedRole>("admin");
   const [pin, setPin] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
