@@ -1,4 +1,5 @@
 import { Recycle, Flame, Sparkles, CheckCircle2, ShoppingCart } from "lucide-react";
+import { printHtml } from "@/lib/print";
 import type { LucideIcon } from "lucide-react";
 import { formatDZD, formatGrams, formatDate } from "@/lib/format";
 import { getStoreInfo } from "@/lib/invoice";
@@ -172,12 +173,5 @@ export function buildScrapInvoiceHtml(d: ScrapInvoiceData): string {
 
 /** Open the purchase invoice in a new window and trigger print / save-as-PDF. */
 export function printScrapInvoice(d: ScrapInvoiceData): void {
-  const html = buildScrapInvoiceHtml(d);
-  const w = window.open("", "_blank", "width=900,height=1000");
-  if (!w) return;
-  w.document.open();
-  w.document.write(html);
-  w.document.close();
-  w.focus();
-  setTimeout(() => w.print(), 350);
+  printHtml(buildScrapInvoiceHtml(d));
 }
