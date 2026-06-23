@@ -623,6 +623,45 @@ function StockPage() {
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input className="pl-9" placeholder="Rechercher un bijou…" value={search} onChange={(e) => setSearch(e.target.value)} />
             </div>
+            <div className="flex flex-wrap items-center gap-2">
+            <Dialog open={reportOpen} onOpenChange={setReportOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <FileText className="mr-2 h-4 w-4" /> Imprimer le rapport de stock
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Rapport d'inventaire du stock</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Rapport professionnel des produits en stock, avec totaux par type de métal, origine et catégorie. Adapté aux audits et à la comptabilité.
+                  </p>
+                  <div className="space-y-2">
+                    <Label>Tri par date d'entrée</Label>
+                    <Select value={reportSort} onValueChange={(v) => setReportSort(v as "newest" | "oldest")}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="newest">Plus récent d'abord</SelectItem>
+                        <SelectItem value="oldest">Plus ancien d'abord</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <DialogFooter className="flex-col gap-2 sm:flex-row">
+                  <Button variant="outline" onClick={handlePrintReport}>
+                    <Printer className="mr-2 h-4 w-4" /> Imprimer
+                  </Button>
+                  <Button variant="outline" onClick={handlePrintReport}>
+                    <FileDown className="mr-2 h-4 w-4" /> Télécharger PDF
+                  </Button>
+                  <Button onClick={handleExcelReport}>
+                    <FileSpreadsheet className="mr-2 h-4 w-4" /> Exporter Excel
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
                 <Button onClick={openNew}>
