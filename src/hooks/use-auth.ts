@@ -28,7 +28,7 @@ export function useAuth(): AuthState {
     async function loadProfile(uid: string) {
 
 
-      const [{ data: roleRows }, { data: emp }] = await Promise.all([
+      const [{ data: roleRows }, { data: emp }, { data: prof }] = await Promise.all([
         supabase
           .from("user_roles")
           .select("role")
@@ -39,8 +39,19 @@ export function useAuth(): AuthState {
           .select("permissions, is_active")
           .eq("user_id", uid)
           .maybeSingle(),
+        supabase
+          .from("profiles")
+          .select("disabled")
+          .eq("id", uid)
+          .maybeSingle(),
       ]);
       if (!active) return;
+
+      // Suspended accounts are signed out immediately.
+      if ((prof && prof.disabled === true) || (emp && emp.is_active === false)) {
+        await supabase.auth.signOut();
+        return;
+      }
 
       const roles = (roleRows ?? []).map((r) => String(r.role));
       const dev = roles.includes("developer");
@@ -58,11 +69,6 @@ export function useAuth(): AuthState {
         setPermissions(ALL_PERMISSIONS);
       } else {
         setPermissions((emp?.permissions ?? []) as PermissionKey[]);
-      }
-
-      // Deactivated employees are signed out immediately.
-      if (emp && emp.is_active === false) {
-        await supabase.auth.signOut();
       }
     }
 
