@@ -60,7 +60,9 @@ function AuthPage() {
       setBusy(false);
       return;
     }
-    navigate({ to: "/dashboard" });
+    // Require the PIN step next; clear any stale gate flag from a prior session.
+    sessionStorage.removeItem("md_pin_done");
+    navigate({ to: "/acces" });
   }
 
   return (
