@@ -112,6 +112,13 @@ function AppSidebar() {
     navigate({ to: "/auth", replace: true });
   }
 
+  function switchRole() {
+    // Keep the email/password session, re-show the PIN gate so the operator
+    // can pick a different role (admin / employé) on the same device.
+    sessionStorage.removeItem("md_pin_done");
+    navigate({ to: "/acces", replace: true });
+  }
+
   return (
     <Sidebar>
       <SidebarHeader>
