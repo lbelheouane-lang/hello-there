@@ -22,6 +22,7 @@ import {
 import {
   getPairingState, generatePairing, revokeDevice,
 } from "@/lib/mobile-pairing.functions";
+import { useStoreSettings } from "@/lib/store-settings";
 
 const EXPIRY_OPTIONS = [
   { value: "5", label: "5 minutes" },
@@ -34,7 +35,73 @@ function fmt(d: string | null): string {
   return d ? new Date(d).toLocaleString("fr-FR") : "—";
 }
 
+function MobileAccessQrCard() {
+  const { data: settings } = useStoreSettings();
+  const [qrImage, setQrImage] = useState<string | null>(null);
+  const [version, setVersion] = useState(() => Date.now());
+
+  const origin =
+    typeof window !== "undefined" ? window.location.origin : "https://orusdz.lovable.app";
+  const params = new URLSearchParams();
+  if (settings?.id) params.set("store", settings.id);
+  if (settings?.store_name) params.set("name", settings.store_name);
+  params.set("v", String(version));
+  const mobileUrl = `${origin}/mobile?${params.toString()}`;
+
+  useEffect(() => {
+    QRCode.toDataURL(mobileUrl, { errorCorrectionLevel: "M", margin: 1, width: 320 })
+      .then(setQrImage)
+      .catch(() => setQrImage(null));
+  }, [mobileUrl]);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <QrCode className="h-5 w-5 text-primary" />
+          QR code d'accès mobile
+        </CardTitle>
+        <CardDescription>
+          Scannez ce code avec un téléphone pour ouvrir la version mobile de
+          l'application. Après connexion, l'app peut être ajoutée à l'écran
+          d'accueil pour une expérience plein écran.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex flex-col items-center gap-3 rounded-lg border bg-muted/30 p-6">
+          {qrImage ? (
+            <img
+              src={qrImage}
+              alt="QR code d'accès mobile"
+              className="h-56 w-56 rounded-lg bg-white p-2"
+            />
+          ) : (
+            <div className="h-56 w-56 animate-pulse rounded-lg bg-muted" />
+          )}
+          <p className="max-w-sm break-all text-center text-xs text-muted-foreground">
+            {mobileUrl}
+          </p>
+        </div>
+        <div className="flex justify-center">
+          <Button variant="outline" onClick={() => setVersion(Date.now())}>
+            <RefreshCw className="mr-2 h-4 w-4" /> Régénérer le QR code
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export function MobileAppCard() {
+  return (
+    <div className="space-y-6">
+      <MobileAccessQrCard />
+      <MobilePairingCard />
+    </div>
+  );
+}
+
+function MobilePairingCard() {
   const qc = useQueryClient();
   const fetchState = useServerFn(getPairingState);
   const generate = useServerFn(generatePairing);
@@ -82,6 +149,7 @@ export function MobileAppCard() {
   const devices = data?.devices ?? [];
   const pending = data?.pending ?? null;
   const busy = genMut.isPending || revokeMut.isPending;
+
 
   return (
     <Card>
