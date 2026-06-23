@@ -201,7 +201,11 @@ export function AppShell({
       <SidebarInset>
         <header
           className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur"
-          style={headerStyle}
+          style={{
+            ...headerStyle,
+            paddingTop: "env(safe-area-inset-top)",
+            height: "calc(3.5rem + env(safe-area-inset-top))",
+          }}
         >
           <SidebarTrigger />
           <h1 className="font-serif text-xl font-semibold">{title}</h1>
