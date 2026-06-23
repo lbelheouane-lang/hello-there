@@ -1,19 +1,15 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { zodValidator, fallback } from "@tanstack/zod-adapter";
-import { z } from "zod";
 import { Gem, Share, Plus, ArrowRight, Smartphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useStoreSettings } from "@/lib/store-settings";
 import { Button } from "@/components/ui/button";
 
-const searchSchema = z.object({
-  store: fallback(z.string(), "").default(""),
-  name: fallback(z.string(), "").default(""),
-});
-
 export const Route = createFileRoute("/mobile")({
-  validateSearch: zodValidator(searchSchema),
+  validateSearch: (search: Record<string, unknown>) => ({
+    store: typeof search.store === "string" ? search.store : "",
+    name: typeof search.name === "string" ? search.name : "",
+  }),
   head: () => ({
     meta: [
       { title: "Application mobile — Maison d'Or" },
