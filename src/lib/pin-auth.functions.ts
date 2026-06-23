@@ -18,6 +18,17 @@ export const pinLogin = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<PinLoginResult> => {
     const { ensureBootstrapAccounts, findEmployeeByPin } = await import("./pin-auth.server");
 
+    // The app stays locked until activated with a valid access key.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: settings } = await supabaseAdmin
+      .from("store_settings")
+      .select("activated")
+      .eq("singleton", true)
+      .maybeSingle();
+    if (!settings?.activated) {
+      return { ok: false, error: "Application non activée." };
+    }
+
     // Make sure the two default accounts exist on a fresh install.
     try {
       await ensureBootstrapAccounts();
