@@ -1,7 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-const pinSchema = z.object({ pin: z.string().regex(/^\d{4,8}$/) });
+const pinSchema = z.object({
+  pin: z.string().regex(/^\d{4,8}$/),
+  expectedRole: z.enum(["admin", "employe"]).optional(),
+});
 
 export type PinLoginResult =
   | { ok: true; role: "admin" | "employe"; access_token: string; refresh_token: string }
