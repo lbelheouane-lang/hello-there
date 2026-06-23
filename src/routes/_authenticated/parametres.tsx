@@ -162,6 +162,10 @@ function SettingsPage() {
             <AppearanceCard />
           </TabsContent>
 
+          <TabsContent value="mobile" className="space-y-6">
+            <MobileAppCard />
+          </TabsContent>
+
 
           <TabsContent value="pin" className="space-y-6">
             <ChangeOwnPinCard />
