@@ -806,6 +806,83 @@ export type Database = {
         }
         Relationships: []
       }
+      passkey_events: {
+        Row: {
+          actor: string | null
+          created_at: string
+          detail: string | null
+          event_type: string
+          id: string
+          passkey_id: string | null
+        }
+        Insert: {
+          actor?: string | null
+          created_at?: string
+          detail?: string | null
+          event_type: string
+          id?: string
+          passkey_id?: string | null
+        }
+        Update: {
+          actor?: string | null
+          created_at?: string
+          detail?: string | null
+          event_type?: string
+          id?: string
+          passkey_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "passkey_events_passkey_id_fkey"
+            columns: ["passkey_id"]
+            isOneToOne: false
+            referencedRelation: "passkeys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      passkeys: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          disabled: boolean
+          expires_at: string | null
+          id: string
+          label: string | null
+          updated_at: string
+          used_at: string | null
+          used_by: string | null
+          used_by_email: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          disabled?: boolean
+          expires_at?: string | null
+          id?: string
+          label?: string | null
+          updated_at?: string
+          used_at?: string | null
+          used_by?: string | null
+          used_by_email?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          disabled?: boolean
+          expires_at?: string | null
+          id?: string
+          label?: string | null
+          updated_at?: string
+          used_at?: string | null
+          used_by?: string | null
+          used_by_email?: string | null
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
@@ -1123,26 +1200,40 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          disabled: boolean
           full_name: string | null
           id: string
           phone: string | null
+          signup_passkey_id: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
+          disabled?: boolean
           full_name?: string | null
           id: string
           phone?: string | null
+          signup_passkey_id?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
+          disabled?: boolean
           full_name?: string | null
           id?: string
           phone?: string | null
+          signup_passkey_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_signup_passkey_id_fkey"
+            columns: ["signup_passkey_id"]
+            isOneToOne: false
+            referencedRelation: "passkeys"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       purchases: {
         Row: {
@@ -2053,7 +2144,7 @@ export type Database = {
       seed_demo_data: { Args: never; Returns: undefined }
     }
     Enums: {
-      app_role: "admin" | "employe" | "developer" | "super_admin"
+      app_role: "admin" | "employe" | "developer" | "super_admin" | "client"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2181,7 +2272,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "employe", "developer", "super_admin"],
+      app_role: ["admin", "employe", "developer", "super_admin", "client"],
     },
   },
 } as const

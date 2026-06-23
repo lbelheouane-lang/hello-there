@@ -15,6 +15,9 @@ import {
   Loader2,
   Link as LinkIcon,
   LogOut,
+  Fingerprint,
+  Users,
+  Search,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -39,6 +42,19 @@ import {
   type AccessKeyRow,
   type SuperAdminStats,
 } from "@/lib/super-admin.functions";
+import {
+  listPasskeys,
+  createPasskey,
+  setPasskeyDisabled,
+  deletePasskey,
+  listUsers,
+  setUserDisabled,
+  deleteUser,
+  resetUserPassword,
+  createUserAccount,
+  type PasskeyRow,
+  type ManagedUserRow,
+} from "@/lib/passkey-auth.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -124,6 +140,12 @@ function SuperAdminPanel() {
             <TabsTrigger value="keys" className="gap-2">
               <KeyRound className="h-4 w-4" /> Clés d'accès
             </TabsTrigger>
+            <TabsTrigger value="passkeys" className="gap-2">
+              <Fingerprint className="h-4 w-4" /> Passkeys
+            </TabsTrigger>
+            <TabsTrigger value="users" className="gap-2">
+              <Users className="h-4 w-4" /> Utilisateurs
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard">
@@ -137,6 +159,12 @@ function SuperAdminPanel() {
           </TabsContent>
           <TabsContent value="keys">
             <AccessKeysTab />
+          </TabsContent>
+          <TabsContent value="passkeys">
+            <PasskeysTab />
+          </TabsContent>
+          <TabsContent value="users">
+            <UsersTab />
           </TabsContent>
         </Tabs>
       </div>
@@ -756,6 +784,539 @@ function AccessKeysTab() {
     </Card>
   );
 }
+
+// --------------------------------------------------------------------------
+// Passkeys
+// --------------------------------------------------------------------------
+
+const PASSKEY_STATUS_LABEL: Record<string, string> = {
+  active: "Active",
+  used: "Utilisée",
+  expired: "Expirée",
+  disabled: "Désactivée",
+};
+
+function PasskeyStatusBadge({ status }: { status: string }) {
+  const variant =
+    status === "active"
+      ? "default"
+      : status === "used"
+        ? "secondary"
+        : "outline";
+  return <Badge variant={variant}>{PASSKEY_STATUS_LABEL[status] ?? status}</Badge>;
+}
+
+function PasskeysTab() {
+  const load = useServerFn(listPasskeys);
+  const create = useServerFn(createPasskey);
+  const setDisabled = useServerFn(setPasskeyDisabled);
+  const remove = useServerFn(deletePasskey);
+
+  const [rows, setRows] = useState<PasskeyRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [label, setLabel] = useState("");
+  const [expiresInDays, setExpiresInDays] = useState("0");
+  const [busy, setBusy] = useState(false);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const refresh = useCallback(() => {
+    setLoading(true);
+    load()
+      .then(setRows)
+      .catch((e) => toast.error((e as Error).message))
+      .finally(() => setLoading(false));
+  }, [load]);
+  useEffect(refresh, [refresh]);
+
+  async function submit() {
+    setBusy(true);
+    try {
+      const res = await create({
+        data: { label: label.trim(), expiresInDays: Number(expiresInDays) || 0 },
+      });
+      await navigator.clipboard.writeText(res.code).catch(() => undefined);
+      toast.success("Passkey créée — copiée", { description: res.code });
+      setOpen(false);
+      setLabel("");
+      setExpiresInDays("0");
+      refresh();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const filtered = rows.filter((r) => {
+    const matchesStatus = statusFilter === "all" || r.status === statusFilter;
+    const q = search.trim().toLowerCase();
+    const matchesSearch =
+      !q ||
+      r.code.toLowerCase().includes(q) ||
+      (r.label ?? "").toLowerCase().includes(q) ||
+      (r.used_by_email ?? "").toLowerCase().includes(q);
+    return matchesStatus && matchesSearch;
+  });
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle className="text-base">Passkeys d'inscription</CardTitle>
+        <Button size="sm" onClick={() => setOpen(true)} className="gap-2">
+          <Plus className="h-4 w-4" /> Générer une passkey
+        </Button>
+      </CardHeader>
+      <CardContent>
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row">
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Rechercher (code, libellé, e-mail)…"
+              className="pl-9"
+            />
+          </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="sm:w-48">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tous les statuts</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="used">Utilisée</SelectItem>
+              <SelectItem value="expired">Expirée</SelectItem>
+              <SelectItem value="disabled">Désactivée</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {loading ? (
+          <Loading />
+        ) : filtered.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Aucune passkey.</p>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Passkey</TableHead>
+                <TableHead>Libellé</TableHead>
+                <TableHead>Statut</TableHead>
+                <TableHead>Utilisée par</TableHead>
+                <TableHead>Le</TableHead>
+                <TableHead>Créée le</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((r) => (
+                <TableRow key={r.id}>
+                  <TableCell className="font-mono text-xs">{r.code}</TableCell>
+                  <TableCell>{r.label ?? "—"}</TableCell>
+                  <TableCell>
+                    <PasskeyStatusBadge status={r.status} />
+                  </TableCell>
+                  <TableCell>{r.used_by_email ?? "—"}</TableCell>
+                  <TableCell>{r.used_at ? formatDateTime(r.used_at) : "—"}</TableCell>
+                  <TableCell>{formatDate(r.created_at)}</TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-1">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        title="Copier"
+                        onClick={() => {
+                          navigator.clipboard.writeText(r.code).catch(() => undefined);
+                          toast.success("Copiée");
+                        }}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                      {r.status !== "used" && (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          title={r.disabled ? "Réactiver" : "Désactiver"}
+                          onClick={async () => {
+                            try {
+                              await setDisabled({ data: { id: r.id, disabled: !r.disabled } });
+                              refresh();
+                            } catch (e) {
+                              toast.error((e as Error).message);
+                            }
+                          }}
+                        >
+                          <Power className="h-4 w-4" />
+                        </Button>
+                      )}
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        title="Supprimer"
+                        onClick={async () => {
+                          if (!confirm("Supprimer cette passkey ?")) return;
+                          try {
+                            await remove({ data: { id: r.id } });
+                            refresh();
+                          } catch (e) {
+                            toast.error((e as Error).message);
+                          }
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </CardContent>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Générer une passkey</DialogTitle>
+            <DialogDescription>
+              La passkey permet à une personne de créer un compte (rôle Client).
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="pk-label">Libellé (optionnel)</Label>
+              <Input
+                id="pk-label"
+                value={label}
+                onChange={(e) => setLabel(e.target.value)}
+                placeholder="Ex. Client boutique centre-ville"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="pk-exp">Expiration (jours, 0 = jamais)</Label>
+              <Input
+                id="pk-exp"
+                type="number"
+                min={0}
+                value={expiresInDays}
+                onChange={(e) => setExpiresInDays(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setOpen(false)}>
+              Annuler
+            </Button>
+            <Button onClick={submit} disabled={busy} className="gap-2">
+              {busy && <Loader2 className="h-4 w-4 animate-spin" />} Générer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Card>
+  );
+}
+
+// --------------------------------------------------------------------------
+// Users
+// --------------------------------------------------------------------------
+
+const ROLE_LABEL: Record<string, string> = {
+  super_admin: "Super Admin",
+  admin: "Administrateur",
+  developer: "Développeur",
+  employe: "Employé",
+  client: "Client",
+};
+
+function UsersTab() {
+  const load = useServerFn(listUsers);
+  const setDisabled = useServerFn(setUserDisabled);
+  const remove = useServerFn(deleteUser);
+  const resetPwd = useServerFn(resetUserPassword);
+  const createAcc = useServerFn(createUserAccount);
+
+  const [rows, setRows] = useState<ManagedUserRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+
+  // Reset password dialog
+  const [pwdUser, setPwdUser] = useState<ManagedUserRow | null>(null);
+  const [newPwd, setNewPwd] = useState("");
+
+  // Create account dialog
+  const [createOpen, setCreateOpen] = useState(false);
+  const [cFullName, setCFullName] = useState("");
+  const [cEmail, setCEmail] = useState("");
+  const [cPwd, setCPwd] = useState("");
+  const [cRole, setCRole] = useState("admin");
+  const [busy, setBusy] = useState(false);
+
+  const refresh = useCallback(() => {
+    setLoading(true);
+    load()
+      .then(setRows)
+      .catch((e) => toast.error((e as Error).message))
+      .finally(() => setLoading(false));
+  }, [load]);
+  useEffect(refresh, [refresh]);
+
+  const filtered = rows.filter((r) => {
+    const q = search.trim().toLowerCase();
+    return (
+      !q ||
+      (r.email ?? "").toLowerCase().includes(q) ||
+      (r.full_name ?? "").toLowerCase().includes(q) ||
+      r.role.toLowerCase().includes(q)
+    );
+  });
+
+  async function submitReset() {
+    if (!pwdUser || newPwd.length < 8) {
+      toast.error("Mot de passe : 8 caractères minimum.");
+      return;
+    }
+    setBusy(true);
+    try {
+      await resetPwd({ data: { id: pwdUser.id, password: newPwd } });
+      toast.success("Mot de passe réinitialisé.");
+      setPwdUser(null);
+      setNewPwd("");
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function submitCreate() {
+    if (!cFullName.trim() || !cEmail.trim() || cPwd.length < 8) {
+      toast.error("Renseignez nom, e-mail et mot de passe (8+ caractères).");
+      return;
+    }
+    setBusy(true);
+    try {
+      await createAcc({
+        data: {
+          fullName: cFullName.trim(),
+          email: cEmail.trim(),
+          password: cPwd,
+          role: cRole as "admin" | "employe" | "client",
+        },
+      });
+      toast.success("Compte créé.");
+      setCreateOpen(false);
+      setCFullName("");
+      setCEmail("");
+      setCPwd("");
+      setCRole("admin");
+      refresh();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle className="text-base">Utilisateurs</CardTitle>
+        <Button size="sm" onClick={() => setCreateOpen(true)} className="gap-2">
+          <Plus className="h-4 w-4" /> Créer un compte
+        </Button>
+      </CardHeader>
+      <CardContent>
+        <div className="mb-4 relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Rechercher (nom, e-mail, rôle)…"
+            className="pl-9"
+          />
+        </div>
+
+        {loading ? (
+          <Loading />
+        ) : filtered.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Aucun utilisateur.</p>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nom</TableHead>
+                <TableHead>E-mail</TableHead>
+                <TableHead>Rôle</TableHead>
+                <TableHead>Statut</TableHead>
+                <TableHead>Passkey</TableHead>
+                <TableHead>Créé le</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((r) => (
+                <TableRow key={r.id}>
+                  <TableCell>{r.full_name ?? "—"}</TableCell>
+                  <TableCell>{r.email ?? "—"}</TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">{ROLE_LABEL[r.role] ?? r.role}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    {r.disabled ? (
+                      <Badge variant="outline">Désactivé</Badge>
+                    ) : (
+                      <Badge>Actif</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="font-mono text-xs">{r.signup_passkey ?? "—"}</TableCell>
+                  <TableCell>{formatDate(r.created_at)}</TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-1">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        title="Réinitialiser le mot de passe"
+                        onClick={() => {
+                          setPwdUser(r);
+                          setNewPwd("");
+                        }}
+                      >
+                        <KeyRound className="h-4 w-4" />
+                      </Button>
+                      {r.role !== "super_admin" && (
+                        <>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            title={r.disabled ? "Réactiver" : "Désactiver"}
+                            onClick={async () => {
+                              try {
+                                await setDisabled({ data: { id: r.id, disabled: !r.disabled } });
+                                refresh();
+                              } catch (e) {
+                                toast.error((e as Error).message);
+                              }
+                            }}
+                          >
+                            <Power className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            title="Supprimer"
+                            onClick={async () => {
+                              if (!confirm("Supprimer définitivement ce compte ?")) return;
+                              try {
+                                await remove({ data: { id: r.id } });
+                                refresh();
+                              } catch (e) {
+                                toast.error((e as Error).message);
+                              }
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </CardContent>
+
+      {/* Reset password dialog */}
+      <Dialog open={!!pwdUser} onOpenChange={(o) => !o && setPwdUser(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Réinitialiser le mot de passe</DialogTitle>
+            <DialogDescription>{pwdUser?.email}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-1.5">
+            <Label htmlFor="new-pwd">Nouveau mot de passe</Label>
+            <Input
+              id="new-pwd"
+              type="password"
+              value={newPwd}
+              onChange={(e) => setNewPwd(e.target.value)}
+              placeholder="8 caractères minimum"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setPwdUser(null)}>
+              Annuler
+            </Button>
+            <Button onClick={submitReset} disabled={busy} className="gap-2">
+              {busy && <Loader2 className="h-4 w-4 animate-spin" />} Réinitialiser
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create account dialog */}
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Créer un compte</DialogTitle>
+            <DialogDescription>Crée directement un compte utilisateur.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="c-name">Nom complet</Label>
+              <Input id="c-name" value={cFullName} onChange={(e) => setCFullName(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="c-email">E-mail</Label>
+              <Input
+                id="c-email"
+                type="email"
+                value={cEmail}
+                onChange={(e) => setCEmail(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="c-pwd">Mot de passe</Label>
+              <Input
+                id="c-pwd"
+                type="password"
+                value={cPwd}
+                onChange={(e) => setCPwd(e.target.value)}
+                placeholder="8 caractères minimum"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Rôle</Label>
+              <Select value={cRole} onValueChange={setCRole}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">Administrateur</SelectItem>
+                  <SelectItem value="employe">Employé</SelectItem>
+                  <SelectItem value="client">Client</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setCreateOpen(false)}>
+              Annuler
+            </Button>
+            <Button onClick={submitCreate} disabled={busy} className="gap-2">
+              {busy && <Loader2 className="h-4 w-4 animate-spin" />} Créer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Card>
+  );
+}
+
 
 function Loading() {
   return (

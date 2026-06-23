@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as OwnerRouteImport } from './routes/owner'
+import { Route as CreateAccountRouteImport } from './routes/create-account'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ActivationRouteImport } from './routes/activation'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -40,6 +41,11 @@ import { Route as ApiPublicHooksUpdateGoldPricesRouteImport } from './routes/api
 const OwnerRoute = OwnerRouteImport.update({
   id: '/owner',
   path: '/owner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreateAccountRoute = CreateAccountRouteImport.update({
+  id: '/create-account',
+  path: '/create-account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/activation': typeof ActivationRoute
   '/auth': typeof AuthRoute
+  '/create-account': typeof CreateAccountRoute
   '/owner': typeof OwnerRoute
   '/boutique': typeof AuthenticatedBoutiqueRoute
   '/clients': typeof AuthenticatedClientsRoute
@@ -211,6 +218,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/activation': typeof ActivationRoute
   '/auth': typeof AuthRoute
+  '/create-account': typeof CreateAccountRoute
   '/owner': typeof OwnerRoute
   '/boutique': typeof AuthenticatedBoutiqueRoute
   '/clients': typeof AuthenticatedClientsRoute
@@ -241,6 +249,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/activation': typeof ActivationRoute
   '/auth': typeof AuthRoute
+  '/create-account': typeof CreateAccountRoute
   '/owner': typeof OwnerRoute
   '/_authenticated/boutique': typeof AuthenticatedBoutiqueRoute
   '/_authenticated/clients': typeof AuthenticatedClientsRoute
@@ -271,6 +280,7 @@ export interface FileRouteTypes {
     | '/'
     | '/activation'
     | '/auth'
+    | '/create-account'
     | '/owner'
     | '/boutique'
     | '/clients'
@@ -299,6 +309,7 @@ export interface FileRouteTypes {
     | '/'
     | '/activation'
     | '/auth'
+    | '/create-account'
     | '/owner'
     | '/boutique'
     | '/clients'
@@ -328,6 +339,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/activation'
     | '/auth'
+    | '/create-account'
     | '/owner'
     | '/_authenticated/boutique'
     | '/_authenticated/clients'
@@ -358,6 +370,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   ActivationRoute: typeof ActivationRoute
   AuthRoute: typeof AuthRoute
+  CreateAccountRoute: typeof CreateAccountRoute
   OwnerRoute: typeof OwnerRoute
   InviteCodeRoute: typeof InviteCodeRoute
   SuiviTokenRoute: typeof SuiviTokenRoute
@@ -371,6 +384,13 @@ declare module '@tanstack/react-router' {
       path: '/owner'
       fullPath: '/owner'
       preLoaderRoute: typeof OwnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/create-account': {
+      id: '/create-account'
+      path: '/create-account'
+      fullPath: '/create-account'
+      preLoaderRoute: typeof CreateAccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -610,6 +630,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   ActivationRoute: ActivationRoute,
   AuthRoute: AuthRoute,
+  CreateAccountRoute: CreateAccountRoute,
   OwnerRoute: OwnerRoute,
   InviteCodeRoute: InviteCodeRoute,
   SuiviTokenRoute: SuiviTokenRoute,
