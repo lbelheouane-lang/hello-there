@@ -3,7 +3,7 @@ import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { ALL_PERMISSIONS, type PermissionKey } from "@/lib/permissions";
 
-export type AppRole = "admin" | "employe" | "developer";
+export type AppRole = "admin" | "employe" | "developer" | "client";
 
 export interface AuthState {
   user: User | null;
