@@ -60,9 +60,9 @@ export function useAuth(): AuthState {
       const nonDev = roles.filter(
         (r) => r !== "developer" && r !== "super_admin",
       ) as AppRole[];
-      const resolvedRole = nonDev.includes("admin")
+      const resolvedRole: AppRole | null = nonDev.includes("admin")
         ? "admin"
-        : nonDev[0] ?? (dev ? "developer" : null);
+        : nonDev[0] ?? (roles.includes("super_admin") ? "admin" : dev ? "developer" : null);
       setRole(resolvedRole);
 
       if (resolvedRole === "admin") {
