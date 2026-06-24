@@ -1109,6 +1109,7 @@ export type Database = {
           created_by: string | null
           gold_karat: number | null
           id: string
+          image_url: string | null
           internal_code: string
           is_demo: boolean
           labor_cost: number
@@ -1135,6 +1136,7 @@ export type Database = {
           created_by?: string | null
           gold_karat?: number | null
           id?: string
+          image_url?: string | null
           internal_code: string
           is_demo?: boolean
           labor_cost?: number
@@ -1161,6 +1163,7 @@ export type Database = {
           created_by?: string | null
           gold_karat?: number | null
           id?: string
+          image_url?: string | null
           internal_code?: string
           is_demo?: boolean
           labor_cost?: number
