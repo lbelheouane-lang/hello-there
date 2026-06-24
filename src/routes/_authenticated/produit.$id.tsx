@@ -12,7 +12,7 @@ import {
   METAL_TYPES, formatGrams, formatDZD, statusLabel, metalOriginLabel, formatDateTime,
 } from "@/lib/format";
 import { LabelDialog, type LabelProduct } from "@/components/LabelDialog";
-import { productImage } from "@/lib/product-image";
+import { ProductPhoto } from "@/components/ProductPhoto";
 
 export const Route = createFileRoute("/_authenticated/produit/$id")({
   component: ProductDetailPage,
@@ -36,6 +36,7 @@ interface ProductRow {
   created_at: string;
   supplier_id: string | null;
   is_demo: boolean;
+  image_url: string | null;
   suppliers: { name: string } | null;
 }
 
@@ -149,10 +150,10 @@ function ProductDetailPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <img
-                src={productImage(product.category)}
+              <ProductPhoto
+                imageUrl={product.image_url}
+                category={product.category}
                 alt={product.name}
-                loading="lazy"
                 className="mb-4 aspect-video w-full rounded-lg object-cover"
               />
 

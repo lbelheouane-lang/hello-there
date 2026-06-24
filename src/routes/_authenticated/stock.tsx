@@ -38,7 +38,8 @@ import {
 } from "@/lib/stock-report";
 import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
 import { LabelDialog, type LabelProduct } from "@/components/LabelDialog";
-import { productImage } from "@/lib/product-image";
+import { PhotoCaptureField } from "@/components/PhotoCaptureField";
+import { ProductPhoto } from "@/components/ProductPhoto";
 import { categoryIcon } from "@/lib/category-meta";
 import { useCategories, useCategoryNames, useSubcategories } from "@/hooks/use-categories";
 
@@ -67,6 +68,7 @@ interface Product {
   created_at: string;
   status: string;
   is_demo: boolean;
+  image_url: string | null;
 }
 
 const empty: Record<string, string> = {
@@ -110,6 +112,11 @@ function StockPage() {
   const [qtyFilter, setQtyFilter] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  // Photo capture state for the product form.
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoPath, setPhotoPath] = useState<string | null>(null);
+  const [photoRemoved, setPhotoRemoved] = useState(false);
 
   const { data: products } = useQuery({
     queryKey: ["products"],
@@ -296,12 +303,19 @@ function StockPage() {
 
 
 
+  function resetPhoto() {
+    setPhotoFile(null);
+    setPhotoPreview(null);
+    setPhotoPath(null);
+    setPhotoRemoved(false);
+  }
   function openNew() {
     setEditing(null);
     setForm(empty);
+    resetPhoto();
     setOpen(true);
   }
-  function openEdit(p: Product) {
+  async function openEdit(p: Product) {
     setEditing(p);
     const country = p.country_of_origin ?? "";
     const known = (ORIGIN_COUNTRIES as readonly string[]).includes(country);
@@ -315,7 +329,23 @@ function StockPage() {
       country_select: country ? (known && country !== "Autre" ? country : "Autre") : "",
       country_custom: country && (!known || country === "Autre") ? country : "",
     });
+    resetPhoto();
+    setPhotoPath(p.image_url);
     setOpen(true);
+    if (p.image_url) {
+      const { data } = await supabase.storage.from("product-photos").createSignedUrl(p.image_url, 600);
+      if (data?.signedUrl) setPhotoPreview(data.signedUrl);
+    }
+  }
+  function onPhotoCapture(file: File) {
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
+    setPhotoRemoved(false);
+  }
+  function onPhotoClear() {
+    setPhotoFile(null);
+    setPhotoPreview(null);
+    setPhotoRemoved(true);
   }
 
 
@@ -351,15 +381,35 @@ function StockPage() {
         quantity: qty,
         status,
       };
+
+      const { data: u } = await supabase.auth.getUser();
+
+      // Resolve the new photo path: upload a fresh capture, keep the old one,
+      // or clear it if the user removed the photo.
+      let imagePath: string | null = photoPath;
+      if (photoFile) {
+        const ext = (photoFile.name.split(".").pop() || "jpg").toLowerCase();
+        const path = `${u.user?.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("product-photos")
+          .upload(path, photoFile, { contentType: photoFile.type || "image/jpeg" });
+        if (upErr) throw upErr;
+        imagePath = path;
+        if (photoPath) await supabase.storage.from("product-photos").remove([photoPath]);
+      } else if (photoRemoved) {
+        if (photoPath) await supabase.storage.from("product-photos").remove([photoPath]);
+        imagePath = null;
+      }
+      const fullPayload = { ...payload, image_url: imagePath };
+
       if (editing) {
-        const { error } = await supabase.from("products").update(payload).eq("id", editing.id);
+        const { error } = await supabase.from("products").update(fullPayload).eq("id", editing.id);
         if (error) throw error;
       } else {
-        const { data: u } = await supabase.auth.getUser();
         const code = `BJ-${Date.now().toString(36).toUpperCase().slice(-6)}`;
         const { data: inserted, error } = await supabase
           .from("products")
-          .insert({ ...payload, internal_code: code, created_by: u.user?.id })
+          .insert({ ...fullPayload, internal_code: code, created_by: u.user?.id })
           .select("id")
           .single();
         if (error) throw error;
@@ -673,6 +723,11 @@ function StockPage() {
                   <DialogTitle>{editing ? "Modifier le bijou" : "Nouveau bijou"}</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
+                  <PhotoCaptureField
+                    previewUrl={photoPreview}
+                    onCapture={onPhotoCapture}
+                    onClear={onPhotoClear}
+                  />
                   <div className="space-y-2">
                     <Label>Nom du bijou *</Label>
                     <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
@@ -972,10 +1027,10 @@ function StockPage() {
                         <TableCell className="font-mono text-xs">{p.internal_code}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <img
-                              src={productImage(p.category)}
+                            <ProductPhoto
+                              imageUrl={p.image_url}
+                              category={p.category}
                               alt={p.name}
-                              loading="lazy"
                               className="h-10 w-10 shrink-0 rounded-md object-cover"
                             />
                             <div>
