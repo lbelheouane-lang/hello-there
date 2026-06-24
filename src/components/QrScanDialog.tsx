@@ -122,21 +122,22 @@ export function QrScanDialog({ open, onOpenChange, onScan }: QrScanDialogProps) 
           </DialogDescription>
         </DialogHeader>
 
-        {error ? (
+        {error && (
           <div className="flex flex-col items-center gap-3 py-6 text-center text-sm text-muted-foreground">
             <AlertTriangle className="h-8 w-8 text-destructive" />
             <p>{error}</p>
           </div>
-        ) : (
-          <>
-            <div id={containerId} className="overflow-hidden rounded-xl border" />
-            {starting && (
-              <p className="text-center text-xs text-muted-foreground">
-                Démarrage de la caméra…
-              </p>
-            )}
-          </>
         )}
+        {/* Container stays mounted (hidden on error) so the gallery
+            fallback can always construct a scanner for scanFile(). */}
+        <div className={error ? "hidden" : ""}>
+          <div id={containerId} className="overflow-hidden rounded-xl border" />
+          {!error && starting && (
+            <p className="mt-2 text-center text-xs text-muted-foreground">
+              Démarrage de la caméra…
+            </p>
+          )}
+        </div>
 
         {/* Gallery fallback — always available */}
         <input
