@@ -173,11 +173,11 @@ function InvoicesPage() {
                 <tbody>
                   {filtered.map((inv) => (
                     <tr key={inv.id} className="border-t hover:bg-muted/30">
-                      <td className="px-3 py-2">
+                      <td className="whitespace-nowrap px-3 py-2">
                         <div className="font-mono font-medium">{inv.invoice_number}</div>
                         <div className="text-xs text-muted-foreground">{formatDateTime(inv.issued_at)}</div>
                       </td>
-                      <td className="px-3 py-2">
+                      <td className="whitespace-nowrap px-3 py-2">
                         <span className="inline-flex items-center gap-1 text-xs">
                           {inv.invoice_type === "payment" ? <Receipt className="h-3.5 w-3.5" /> : <FileText className="h-3.5 w-3.5" />}
                           {invoiceTypeLabel(inv.invoice_type)}
@@ -187,8 +187,8 @@ function InvoicesPage() {
                         <div className="font-medium">{inv.customer_name}</div>
                         <div className="text-xs text-muted-foreground">{inv.product_name ?? inv.sale_number}</div>
                       </td>
-                      <td className="px-3 py-2 text-right">{formatDZD(inv.invoice_type === "payment" ? inv.amount_this_tx : inv.total_amount)}</td>
-                      <td className="px-3 py-2 text-right">{formatDZD(inv.balance)}</td>
+                      <td className="whitespace-nowrap px-3 py-2 text-right">{formatDZD(inv.invoice_type === "payment" ? inv.amount_this_tx : inv.total_amount)}</td>
+                      <td className="whitespace-nowrap px-3 py-2 text-right">{formatDZD(inv.balance)}</td>
                       <td className="px-3 py-2">
                         <Badge variant={STATUS_VARIANT[inv.payment_status] ?? "outline"}>{invoiceStatusLabel(inv.payment_status)}</Badge>
                       </td>
