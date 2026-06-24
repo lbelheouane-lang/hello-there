@@ -47,6 +47,34 @@ function isIos(): boolean {
 export function InstallAppCard() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
+  const [qr, setQr] = useState<string | null>(null);
+  const [url, setUrl] = useState(PUBLISHED_URL);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const target = installUrl();
+    setUrl(target);
+    QRCode.toDataURL(target, {
+      errorCorrectionLevel: "M",
+      margin: 1,
+      width: 320,
+      color: { dark: "#000000", light: "#ffffff" },
+    })
+      .then(setQr)
+      .catch(() => setQr(null));
+  }, []);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      toast.success("Lien copié");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Impossible de copier le lien");
+    }
+  };
+
 
   useEffect(() => {
     setInstalled(isStandalone());
