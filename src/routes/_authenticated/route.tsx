@@ -14,7 +14,10 @@ function AuthGate() {
   const [status, setStatus] = useState<"loading" | "authed">("loading");
 
   useEffect(() => {
+    // Authenticated app must never run against the read-only demo client.
+    setDemoActive(false);
     let active = true;
+
     supabase.auth.getUser().then(({ data, error }) => {
       if (!active) return;
       if (error || !data.user) {
