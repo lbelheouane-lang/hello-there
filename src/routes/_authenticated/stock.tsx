@@ -40,6 +40,7 @@ import { useLatestGoldPrices, priceForKarat } from "@/hooks/use-gold-prices";
 import { LabelDialog, type LabelProduct } from "@/components/LabelDialog";
 import { productImage } from "@/lib/product-image";
 import { PhotoCaptureField } from "@/components/PhotoCaptureField";
+import { ProductPhoto } from "@/components/ProductPhoto";
 import { categoryIcon } from "@/lib/category-meta";
 import { useCategories, useCategoryNames, useSubcategories } from "@/hooks/use-categories";
 
