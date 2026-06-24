@@ -386,3 +386,18 @@ a[href*="lovable.app"][aria-label*="Lovable"],
   opacity: 0 !important;
   pointer-events: none !important;
 }
+
+/* ============ Tableaux lisibles sur mobile ============
+   Les tableaux de données ne doivent jamais écraser leurs colonnes
+   jusqu'à wrapper un caractère par ligne. On force les colonnes à
+   prendre la largeur de leur contenu et le conteneur défile latéralement. */
+.overflow-x-auto > table,
+.overflow-auto > table {
+  min-width: max-content;
+}
+.overflow-x-auto > table th,
+.overflow-x-auto > table td,
+.overflow-auto > table th,
+.overflow-auto > table td {
+  white-space: nowrap;
+}
