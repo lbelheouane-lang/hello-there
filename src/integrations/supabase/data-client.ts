@@ -80,10 +80,12 @@ function readOnlyDemoClient() {
   const client = rawDemoClient();
   return new Proxy(client, {
     get(target, prop, receiver) {
+      const anyTarget = target as unknown as Record<string, unknown>;
       if (prop === "from") {
         return (table: string) => {
-          const builder = (target as Record<string, (t: string) => unknown>)
-            .from(table) as Record<string, unknown>;
+          const builder = (anyTarget.from as (t: string) => unknown)(
+            table,
+          ) as Record<string, unknown>;
           return new Proxy(builder, {
             get(b, p) {
               if (typeof p === "string" && WRITE_METHODS.has(p)) {
@@ -96,10 +98,7 @@ function readOnlyDemoClient() {
         };
       }
       if (prop === "storage") {
-        const storage = (target as Record<string, unknown>).storage as Record<
-          string,
-          unknown
-        >;
+        const storage = anyTarget.storage as Record<string, unknown>;
         return new Proxy(storage, {
           get(s, p) {
             if (p === "from") {
