@@ -1,8 +1,8 @@
-import QRCode from "qrcode";
 import { printHtml } from "@/lib/print";
 import { formatDZD, formatDate, formatDateTime } from "@/lib/format";
 import { getStoreInfo } from "@/lib/invoice";
 import { getStoreSettings } from "@/lib/store-settings";
+import { qrToDataUrl } from "@/lib/qrcode-client";
 
 export interface RepairStatusDef {
   value: string;
@@ -58,7 +58,7 @@ export function trackingUrl(token: string): string {
 }
 
 export async function generateQrDataUrl(text: string): Promise<string> {
-  return QRCode.toDataURL(text, { margin: 1, width: 240, errorCorrectionLevel: "M" });
+  return qrToDataUrl(text, { margin: 1, width: 240, errorCorrectionLevel: "M" });
 }
 
 export interface RepairReceiptData {

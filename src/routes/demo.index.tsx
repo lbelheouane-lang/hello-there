@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import QRCode from "qrcode";
 import { Gem, ArrowRight, Eye, Lock, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DemoFooter } from "@/components/demo/DemoFooter";
+import { qrToDataUrl } from "@/lib/qrcode-client";
 
 export const Route = createFileRoute("/demo/")({
   component: DemoLanding,
@@ -35,7 +35,7 @@ function DemoLanding() {
   useEffect(() => {
     const target = demoUrl();
     setUrl(target);
-    QRCode.toDataURL(target, {
+    qrToDataUrl(target, {
       errorCorrectionLevel: "M",
       margin: 1,
       width: 320,

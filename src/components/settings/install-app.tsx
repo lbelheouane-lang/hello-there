@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import QRCode from "qrcode";
 import { Download, Smartphone, Share, Plus, MonitorCheck, CheckCircle2, QrCode, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { qrToDataUrl } from "@/lib/qrcode-client";
 
 /** Public address customers open on their phone to install the app. We always
  *  point the QR at the published site (never the Lovable editor/preview origin,
@@ -54,7 +54,7 @@ export function InstallAppCard() {
   useEffect(() => {
     const target = installUrl();
     setUrl(target);
-    QRCode.toDataURL(target, {
+    qrToDataUrl(target, {
       errorCorrectionLevel: "M",
       margin: 1,
       width: 320,

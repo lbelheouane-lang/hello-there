@@ -1,4 +1,4 @@
-import QRCode from "qrcode";
+import { qrToDataUrl } from "@/lib/qrcode-client";
 
 /** Build the absolute URL that a product QR code points to. Scanning it opens
  *  the product details page directly in the app. */
@@ -11,7 +11,7 @@ export function productUrl(id: string): string {
 
 /** Generate a PNG data-URL QR code that encodes the product details URL. */
 export async function generateProductQr(id: string): Promise<string> {
-  return QRCode.toDataURL(productUrl(id), {
+  return qrToDataUrl(productUrl(id), {
     errorCorrectionLevel: "M",
     margin: 1,
     width: 256,
@@ -51,7 +51,7 @@ export async function generateLabelQr(
   const data = isAdmin
     ? JSON.stringify({ u: productUrl(payload.id), ...payload })
     : productUrl(payload.id);
-  return QRCode.toDataURL(data, {
+  return qrToDataUrl(data, {
     errorCorrectionLevel: isAdmin ? "Q" : "H",
     margin: 0,
     width: 320,
