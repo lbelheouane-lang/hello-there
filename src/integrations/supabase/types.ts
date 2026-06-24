@@ -2219,6 +2219,7 @@ export type Database = {
       next_set_number: { Args: never; Returns: string }
       restore_backup: { Args: { payload: Json }; Returns: Json }
       seed_demo_data: { Args: never; Returns: undefined }
+      seed_demo_extras: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "employe" | "developer" | "super_admin" | "client"
