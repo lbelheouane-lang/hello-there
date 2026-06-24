@@ -274,10 +274,34 @@ export function AppShell({
   children: ReactNode;
   allow?: AppRole[];
 }) {
+  const isDemo = useDemoMode();
   const { data: prefs } = useUserPreferences();
   const headerStyle = prefs?.header_color
     ? { backgroundColor: prefs.header_color }
     : undefined;
+
+  if (isDemo) {
+    return (
+      <SidebarProvider>
+        <DemoSidebar />
+        <SidebarInset>
+          <DemoBanner />
+          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur">
+            <SidebarTrigger />
+            <h1 className="font-serif text-xl font-semibold">{title}</h1>
+          </header>
+          <main
+            className="min-w-0 flex-1 overflow-x-hidden p-4 md:p-6"
+            style={{ animation: "brand-content-in 0.6s ease-out both" }}
+          >
+            {children}
+          </main>
+          <DemoFooter />
+        </SidebarInset>
+      </SidebarProvider>
+    );
+  }
+
 
   const inner = (
     <SidebarProvider defaultOpen={prefs?.sidebar_default !== "collapsed"}>
