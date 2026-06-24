@@ -223,7 +223,7 @@ export function AppShell({
           <h1 className="font-serif text-xl font-semibold">{title}</h1>
         </header>
         <main
-          className="flex-1 p-4 md:p-6"
+          className="min-w-0 flex-1 overflow-x-hidden p-4 md:p-6"
           style={{ animation: "brand-content-in 0.6s ease-out both" }}
         >
           <PermissionGuard>{children}</PermissionGuard>

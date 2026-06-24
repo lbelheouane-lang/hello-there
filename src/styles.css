@@ -236,7 +236,81 @@
   }
 }
 
-/* ============ Mode compact (densité) ============ */
+/* ============ Mobile UI / touch precision ============ */
+@layer base {
+  /* Prevent the whole document from scrolling sideways on small screens. */
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Long words / numbers / emails never blow out their container. */
+  body {
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  /* Remove the 300ms tap delay + grey flash so taps hit the exact element. */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  a,
+  button,
+  label,
+  summary,
+  select,
+  [role="button"],
+  [role="tab"],
+  [role="menuitem"],
+  [role="option"] {
+    touch-action: manipulation;
+  }
+
+  /* Form controls and media must never exceed their container width. */
+  input,
+  textarea,
+  select,
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+  }
+  /* date/number inputs have an intrinsic min width that causes overflow. */
+  input {
+    min-width: 0;
+  }
+}
+
+/* Comfortable, non-overlapping touch zones on touch devices only. */
+@media (hover: none) and (pointer: coarse) {
+  button,
+  a[role="button"],
+  [role="tab"],
+  [role="menuitem"],
+  [role="option"] {
+    min-height: 40px;
+  }
+  /* Icon-only buttons get a square, finger-sized hit area. */
+  button.h-9.w-9,
+  button.size-9 {
+    min-width: 40px;
+  }
+  /* Taller, easier-to-tap table rows with clear separation. */
+  td {
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+  }
+}
+
+/* Smooth momentum scrolling for any horizontally scrollable container. */
+.overflow-x-auto,
+.overflow-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+
 .density-compact {
   --radius: 0.45rem;
 }

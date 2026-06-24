@@ -109,14 +109,15 @@ function InvoicesPage() {
         </div>
 
         <Tabs value={tab} onValueChange={setTab}>
-          <TabsList className="flex flex-wrap">
+          <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1">
             <TabsTrigger value="all">Toutes les ventes</TabsTrigger>
             <TabsTrigger value="full">Payées intégralement</TabsTrigger>
             <TabsTrigger value="installment">Ventes échelonnées</TabsTrigger>
             <TabsTrigger value="pending">Paiements en attente</TabsTrigger>
-            <TabsTrigger value="documents">Documents (factures & reçus)</TabsTrigger>
+            <TabsTrigger value="documents">Documents (factures &amp; reçus)</TabsTrigger>
           </TabsList>
         </Tabs>
+
 
         <Card>
           <CardContent className="space-y-4 p-4">
@@ -145,13 +146,13 @@ function InvoicesPage() {
                 </SelectContent>
               </Select>
               <div className="flex gap-2">
-                <div className="flex-1">
+                <div className="min-w-0 flex-1">
                   <Label className="text-[10px] text-muted-foreground">Du</Label>
-                  <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
+                  <Input type="date" className="w-full" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
                 </div>
-                <div className="flex-1">
+                <div className="min-w-0 flex-1">
                   <Label className="text-[10px] text-muted-foreground">Au</Label>
-                  <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} />
+                  <Input type="date" className="w-full" value={toDate} onChange={(e) => setToDate(e.target.value)} />
                 </div>
               </div>
             </div>
