@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Camera, ImageUp, RefreshCw, Trash2, AlertTriangle, X } from "lucide-react";
+import { Camera, ImageUp, Trash2, AlertTriangle, X } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
