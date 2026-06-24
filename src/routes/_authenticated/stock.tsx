@@ -67,6 +67,7 @@ interface Product {
   created_at: string;
   status: string;
   is_demo: boolean;
+  image_url: string | null;
 }
 
 const empty: Record<string, string> = {
