@@ -158,26 +158,26 @@ function InvoicesPage() {
             </div>
 
             <div className="overflow-x-auto rounded-xl border">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[720px] text-sm">
                 <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
                   <tr>
-                    <th className="px-3 py-2">N° / Date</th>
-                    <th className="px-3 py-2">Type</th>
-                    <th className="px-3 py-2">Client</th>
-                    <th className="px-3 py-2 text-right">Montant</th>
-                    <th className="px-3 py-2 text-right">Reste</th>
-                    <th className="px-3 py-2">Statut</th>
-                    <th className="px-3 py-2 text-right">Actions</th>
+                    <th className="whitespace-nowrap px-3 py-2">N° / Date</th>
+                    <th className="whitespace-nowrap px-3 py-2">Type</th>
+                    <th className="whitespace-nowrap px-3 py-2">Client</th>
+                    <th className="whitespace-nowrap px-3 py-2 text-right">Montant</th>
+                    <th className="whitespace-nowrap px-3 py-2 text-right">Reste</th>
+                    <th className="whitespace-nowrap px-3 py-2">Statut</th>
+                    <th className="whitespace-nowrap px-3 py-2 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.map((inv) => (
                     <tr key={inv.id} className="border-t hover:bg-muted/30">
-                      <td className="px-3 py-2">
+                      <td className="whitespace-nowrap px-3 py-2">
                         <div className="font-mono font-medium">{inv.invoice_number}</div>
                         <div className="text-xs text-muted-foreground">{formatDateTime(inv.issued_at)}</div>
                       </td>
-                      <td className="px-3 py-2">
+                      <td className="whitespace-nowrap px-3 py-2">
                         <span className="inline-flex items-center gap-1 text-xs">
                           {inv.invoice_type === "payment" ? <Receipt className="h-3.5 w-3.5" /> : <FileText className="h-3.5 w-3.5" />}
                           {invoiceTypeLabel(inv.invoice_type)}
@@ -187,8 +187,8 @@ function InvoicesPage() {
                         <div className="font-medium">{inv.customer_name}</div>
                         <div className="text-xs text-muted-foreground">{inv.product_name ?? inv.sale_number}</div>
                       </td>
-                      <td className="px-3 py-2 text-right">{formatDZD(inv.invoice_type === "payment" ? inv.amount_this_tx : inv.total_amount)}</td>
-                      <td className="px-3 py-2 text-right">{formatDZD(inv.balance)}</td>
+                      <td className="whitespace-nowrap px-3 py-2 text-right">{formatDZD(inv.invoice_type === "payment" ? inv.amount_this_tx : inv.total_amount)}</td>
+                      <td className="whitespace-nowrap px-3 py-2 text-right">{formatDZD(inv.balance)}</td>
                       <td className="px-3 py-2">
                         <Badge variant={STATUS_VARIANT[inv.payment_status] ?? "outline"}>{invoiceStatusLabel(inv.payment_status)}</Badge>
                       </td>

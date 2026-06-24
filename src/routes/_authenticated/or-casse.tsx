@@ -335,7 +335,7 @@ function ScrapGoldPage() {
             )}
 
             <div className="overflow-x-auto rounded-xl border">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[680px] text-sm">
                 <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
                   <tr>
                     <th className="px-3 py-2">Réf / Date</th>
