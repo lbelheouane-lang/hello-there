@@ -157,7 +157,49 @@ function InvoicesPage() {
               </div>
             </div>
 
-            <div className="overflow-x-auto rounded-xl border">
+            {/* Mobile: stacked cards */}
+            <div className="space-y-3 sm:hidden">
+              {filtered.map((inv) => (
+                <div key={inv.id} className="rounded-xl border p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="break-all font-mono text-sm font-medium">{inv.invoice_number}</div>
+                      <div className="text-xs text-muted-foreground">{formatDateTime(inv.issued_at)}</div>
+                    </div>
+                    <Badge variant={STATUS_VARIANT[inv.payment_status] ?? "outline"} className="shrink-0">{invoiceStatusLabel(inv.payment_status)}</Badge>
+                  </div>
+                  <div className="mt-2 space-y-1 text-sm">
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      {inv.invoice_type === "payment" ? <Receipt className="h-3.5 w-3.5 shrink-0" /> : <FileText className="h-3.5 w-3.5 shrink-0" />}
+                      <span>{invoiceTypeLabel(inv.invoice_type)}</span>
+                    </div>
+                    <div className="font-medium">{inv.customer_name}</div>
+                    {(inv.product_name ?? inv.sale_number) && (
+                      <div className="text-xs text-muted-foreground">{inv.product_name ?? inv.sale_number}</div>
+                    )}
+                  </div>
+                  <div className="mt-3 flex items-end justify-between gap-2">
+                    <div className="text-sm">
+                      <div><span className="text-xs text-muted-foreground">Montant: </span>{formatDZD(inv.invoice_type === "payment" ? inv.amount_this_tx : inv.total_amount)}</div>
+                      <div><span className="text-xs text-muted-foreground">Reste: </span>{formatDZD(inv.balance)}</div>
+                    </div>
+                    <div className="flex shrink-0 gap-1">
+                      <Button size="icon" variant="ghost" title="Aperçu" onClick={() => setPreview(inv)}><Eye className="h-4 w-4" /></Button>
+                      <Button size="icon" variant="ghost" title="Imprimer / PDF" onClick={() => printInvoice(inv)}><Printer className="h-4 w-4" /></Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {!isLoading && filtered.length === 0 && (
+                <div className="px-3 py-10 text-center text-muted-foreground">Aucune facture trouvée.</div>
+              )}
+              {isLoading && (
+                <div className="px-3 py-10 text-center text-muted-foreground">Chargement…</div>
+              )}
+            </div>
+
+            {/* Desktop: table */}
+            <div className="hidden overflow-x-auto rounded-xl border sm:block">
               <table className="w-full min-w-[720px] text-sm">
                 <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
                   <tr>
