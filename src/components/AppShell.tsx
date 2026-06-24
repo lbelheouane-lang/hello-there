@@ -54,20 +54,28 @@ import type { MouseEvent as ReactMouseEvent } from "react";
 const DEMO_BLOCK_RE =
   /(ajouter|nouveau|nouvelle|enregistrer|modifier|supprimer|imprimer|exporter|importer|sauvegarder|générer|valider|payer|encaisser|créer)/i;
 
-/** Intercepts clicks on Add/Edit/Delete/Save/Print/Export controls in the
- *  showroom and shows a read-only notice instead of letting them run. */
-function demoBlockMutation(e: ReactMouseEvent<HTMLElement>) {
-  const el = (e.target as HTMLElement).closest(
+/** Returns true (and notifies) when the clicked element is a mutating /
+ *  output control that must stay disabled in the showroom. */
+function isBlockedDemoAction(target: EventTarget | null): boolean {
+  const el = (target as HTMLElement | null)?.closest(
     "button, a[role='button'], [type='submit']",
   ) as HTMLElement | null;
-  if (!el) return;
+  if (!el) return false;
   const label = (el.textContent || el.getAttribute("aria-label") || "").trim();
-  if (DEMO_BLOCK_RE.test(label)) {
-    e.preventDefault();
-    e.stopPropagation();
+  return DEMO_BLOCK_RE.test(label);
+}
+
+/** Intercepts clicks (and pointer-downs, used by Radix triggers) on
+ *  Add/Edit/Delete/Save/Print/Export controls in the showroom. */
+function demoBlockMutation(e: ReactMouseEvent<HTMLElement>) {
+  if (!isBlockedDemoAction(e.target)) return;
+  e.preventDefault();
+  e.stopPropagation();
+  if (e.type === "click") {
     toast.info("Indisponible en mode démonstration (lecture seule).");
   }
 }
+
 
 
 
