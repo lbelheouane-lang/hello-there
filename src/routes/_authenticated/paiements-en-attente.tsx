@@ -103,7 +103,7 @@ function formatTime(value: string | Date | null | undefined): string {
   return d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
 }
 
-function PendingPaymentsPage() {
+export function PendingPaymentsPage() {
   const qc = useQueryClient();
   const { user } = useAuth();
 

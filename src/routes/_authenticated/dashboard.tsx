@@ -75,7 +75,7 @@ function StatCard({ icon: Icon, label, value, hint }: { icon: typeof Package; la
   );
 }
 
-function DashboardPage() {
+export function DashboardPage() {
   const { data: prices } = useLatestGoldPrices();
   const { data: stats } = useDashboardStats();
   const { role } = useAuth();

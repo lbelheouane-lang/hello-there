@@ -79,7 +79,7 @@ function SectionCard({ icon: Icon, title, children }: { icon: typeof Package; ti
   );
 }
 
-function JournalPage() {
+export function JournalPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [mode, setMode] = useState<FilterMode>("today");

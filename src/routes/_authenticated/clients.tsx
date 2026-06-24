@@ -35,7 +35,7 @@ interface Customer {
 
 const empty: Record<string, string> = { full_name: "", phone: "", email: "", address: "", notes: "" };
 
-function ClientsPage() {
+export function ClientsPage() {
   const qc = useQueryClient();
   const { role } = useAuth();
   const isAdmin = role === "admin";

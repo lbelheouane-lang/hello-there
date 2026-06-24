@@ -105,7 +105,7 @@ const INVENTORY_TABS = [
   { to: "/or-casse", label: "Or Cassé", icon: Recycle },
 ] as const;
 
-function ScrapGoldPage() {
+export function ScrapGoldPage() {
   const qc = useQueryClient();
   const { user } = useAuth();
 

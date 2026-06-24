@@ -54,7 +54,7 @@ interface SyncLog {
   created_at: string;
 }
 
-function GoldPricePage() {
+export function GoldPricePage() {
   const { role } = useAuth();
   const isAdmin = role === "admin";
   const qc = useQueryClient();

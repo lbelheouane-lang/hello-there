@@ -107,7 +107,7 @@ function isOverdue(r: Repair): boolean {
   return r.estimated_completion < new Date().toISOString().slice(0, 10);
 }
 
-function RepairsPage() {
+export function RepairsPage() {
   const qc = useQueryClient();
   const { user } = useAuth();
 

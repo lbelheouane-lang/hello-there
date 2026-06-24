@@ -103,7 +103,7 @@ function emptyItem(category: string): ItemDraft {
   };
 }
 
-function ParuresPage() {
+export function ParuresPage() {
   const qc = useQueryClient();
   const categoryNames = useCategoryNames();
   const [open, setOpen] = useState(false);

@@ -33,7 +33,7 @@ const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "
   unpaid: "outline",
 };
 
-function InvoicesPage() {
+export function InvoicesPage() {
   const [tab, setTab] = useState("all");
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");

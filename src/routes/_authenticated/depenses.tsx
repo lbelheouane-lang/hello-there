@@ -80,7 +80,7 @@ function startOfToday() { const d = new Date(); d.setHours(0, 0, 0, 0); return d
 function startOfMonth() { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); }
 function startOfYear() { const d = new Date(); return new Date(d.getFullYear(), 0, 1); }
 
-function ExpensesPage() {
+export function ExpensesPage() {
   const qc = useQueryClient();
   const { user } = useAuth();
 

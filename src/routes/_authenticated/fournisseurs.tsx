@@ -32,7 +32,7 @@ interface Supplier {
 
 const empty = { name: "", phone: "", email: "", address: "", notes: "" };
 
-function SuppliersPage() {
+export function SuppliersPage() {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Supplier | null>(null);

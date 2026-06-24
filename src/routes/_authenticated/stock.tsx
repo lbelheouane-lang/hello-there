@@ -84,7 +84,7 @@ function statusVariant(s: string): "default" | "secondary" | "destructive" {
   return "default";
 }
 
-function StockPage() {
+export function StockPage() {
   const qc = useQueryClient();
   const categoryNames = useCategoryNames();
   const { data: subcategories } = useSubcategories();
