@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/data-client";
 import { printHtml } from "@/lib/print";
 import { formatDZD, formatGrams, formatDate, formatDateTime } from "@/lib/format";
 import { getStoreInfo } from "@/lib/invoice";

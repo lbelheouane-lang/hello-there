@@ -6,7 +6,7 @@ import {
   BookOpen, Download, Printer, History, FileText, ShoppingBag, Package,
   Recycle, Wallet2, Truck, Users, Coins, Activity, TrendingUp,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/data-client";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

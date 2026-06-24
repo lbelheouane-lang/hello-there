@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import {
   Coins, RefreshCw, AlertTriangle, CheckCircle2, XCircle, Wifi, WifiOff, Gauge,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/data-client";
 import { useAuth } from "@/hooks/use-auth";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

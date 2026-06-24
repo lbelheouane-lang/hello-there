@@ -6,7 +6,7 @@ import {
   Plus, Package, Pencil, Trash2, Tag, Search, Printer, ExternalLink,
   ChevronRight, LayoutGrid, AlertTriangle, X, FileSpreadsheet, FileText, FileDown,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/data-client";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

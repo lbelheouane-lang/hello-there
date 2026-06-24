@@ -3,7 +3,7 @@
 // default theme from store_settings until they personalize.
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/data-client";
 import { getTheme, type ColorMode, type Density } from "@/lib/themes";
 
 export interface UserPreferences {

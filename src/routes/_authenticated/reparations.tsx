@@ -6,7 +6,7 @@ import {
   Plus, Search, Printer, Pencil, Trash2, Wrench, Clock, PackageCheck,
   CheckCircle2, AlertTriangle, QrCode, Copy, X, Image as ImageIcon,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/data-client";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent } from "@/components/ui/card";

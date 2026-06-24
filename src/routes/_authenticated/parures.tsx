@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import {
   Plus, Layers, Tag, Trash2, ChevronDown, ChevronRight, History, Package, ExternalLink,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/data-client";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
