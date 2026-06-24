@@ -111,6 +111,11 @@ function StockPage() {
   const [qtyFilter, setQtyFilter] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  // Photo capture state for the product form.
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoPath, setPhotoPath] = useState<string | null>(null);
+  const [photoRemoved, setPhotoRemoved] = useState(false);
 
   const { data: products } = useQuery({
     queryKey: ["products"],
