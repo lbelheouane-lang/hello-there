@@ -72,9 +72,7 @@ function rawDemoClient() {
   return _demo;
 }
 
-// `blockedResult` references `proxy` lazily; defined here so the closure binds.
-let proxy: unknown;
-proxy = blockedResult();
+
 
 function readOnlyDemoClient() {
   const client = rawDemoClient();
