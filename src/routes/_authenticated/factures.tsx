@@ -109,14 +109,15 @@ function InvoicesPage() {
         </div>
 
         <Tabs value={tab} onValueChange={setTab}>
-          <TabsList className="flex flex-wrap">
+          <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1">
             <TabsTrigger value="all">Toutes les ventes</TabsTrigger>
             <TabsTrigger value="full">Payées intégralement</TabsTrigger>
             <TabsTrigger value="installment">Ventes échelonnées</TabsTrigger>
             <TabsTrigger value="pending">Paiements en attente</TabsTrigger>
-            <TabsTrigger value="documents">Documents (factures & reçus)</TabsTrigger>
+            <TabsTrigger value="documents">Documents (factures &amp; reçus)</TabsTrigger>
           </TabsList>
         </Tabs>
+
 
         <Card>
           <CardContent className="space-y-4 p-4">
