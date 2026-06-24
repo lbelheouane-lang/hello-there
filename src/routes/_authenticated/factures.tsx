@@ -158,16 +158,16 @@ function InvoicesPage() {
             </div>
 
             <div className="overflow-x-auto rounded-xl border">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[720px] text-sm">
                 <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
                   <tr>
-                    <th className="px-3 py-2">N° / Date</th>
-                    <th className="px-3 py-2">Type</th>
-                    <th className="px-3 py-2">Client</th>
-                    <th className="px-3 py-2 text-right">Montant</th>
-                    <th className="px-3 py-2 text-right">Reste</th>
-                    <th className="px-3 py-2">Statut</th>
-                    <th className="px-3 py-2 text-right">Actions</th>
+                    <th className="whitespace-nowrap px-3 py-2">N° / Date</th>
+                    <th className="whitespace-nowrap px-3 py-2">Type</th>
+                    <th className="whitespace-nowrap px-3 py-2">Client</th>
+                    <th className="whitespace-nowrap px-3 py-2 text-right">Montant</th>
+                    <th className="whitespace-nowrap px-3 py-2 text-right">Reste</th>
+                    <th className="whitespace-nowrap px-3 py-2">Statut</th>
+                    <th className="whitespace-nowrap px-3 py-2 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
