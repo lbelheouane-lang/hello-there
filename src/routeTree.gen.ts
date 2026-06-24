@@ -21,6 +21,18 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoIndexRouteImport } from './routes/demo.index'
 import { Route as SuiviTokenRouteImport } from './routes/suivi.$token'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
+import { Route as DemoStockRouteImport } from './routes/demo.stock'
+import { Route as DemoReparationsRouteImport } from './routes/demo.reparations'
+import { Route as DemoParuresRouteImport } from './routes/demo.parures'
+import { Route as DemoPaiementsEnAttenteRouteImport } from './routes/demo.paiements-en-attente'
+import { Route as DemoOrCasseRouteImport } from './routes/demo.or-casse'
+import { Route as DemoJournalQuotidienRouteImport } from './routes/demo.journal-quotidien'
+import { Route as DemoFournisseursRouteImport } from './routes/demo.fournisseurs'
+import { Route as DemoFacturesRouteImport } from './routes/demo.factures'
+import { Route as DemoDepensesRouteImport } from './routes/demo.depenses'
+import { Route as DemoDashboardRouteImport } from './routes/demo.dashboard'
+import { Route as DemoCoursOrRouteImport } from './routes/demo.cours-or'
+import { Route as DemoClientsRouteImport } from './routes/demo.clients'
 import { Route as AuthenticatedSuperAdminRouteImport } from './routes/_authenticated/super-admin'
 import { Route as AuthenticatedStockRouteImport } from './routes/_authenticated/stock'
 import { Route as AuthenticatedReparationsRouteImport } from './routes/_authenticated/reparations'
@@ -100,6 +112,66 @@ const InviteCodeRoute = InviteCodeRouteImport.update({
   id: '/invite/$code',
   path: '/invite/$code',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DemoStockRoute = DemoStockRouteImport.update({
+  id: '/stock',
+  path: '/stock',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoReparationsRoute = DemoReparationsRouteImport.update({
+  id: '/reparations',
+  path: '/reparations',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoParuresRoute = DemoParuresRouteImport.update({
+  id: '/parures',
+  path: '/parures',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoPaiementsEnAttenteRoute = DemoPaiementsEnAttenteRouteImport.update({
+  id: '/paiements-en-attente',
+  path: '/paiements-en-attente',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoOrCasseRoute = DemoOrCasseRouteImport.update({
+  id: '/or-casse',
+  path: '/or-casse',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoJournalQuotidienRoute = DemoJournalQuotidienRouteImport.update({
+  id: '/journal-quotidien',
+  path: '/journal-quotidien',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoFournisseursRoute = DemoFournisseursRouteImport.update({
+  id: '/fournisseurs',
+  path: '/fournisseurs',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoFacturesRoute = DemoFacturesRouteImport.update({
+  id: '/factures',
+  path: '/factures',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoDepensesRoute = DemoDepensesRouteImport.update({
+  id: '/depenses',
+  path: '/depenses',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoDashboardRoute = DemoDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoCoursOrRoute = DemoCoursOrRouteImport.update({
+  id: '/cours-or',
+  path: '/cours-or',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoClientsRoute = DemoClientsRouteImport.update({
+  id: '/clients',
+  path: '/clients',
+  getParentRoute: () => DemoRoute,
 } as any)
 const AuthenticatedSuperAdminRoute = AuthenticatedSuperAdminRouteImport.update({
   id: '/super-admin',
@@ -234,6 +306,18 @@ export interface FileRoutesByFullPath {
   '/reparations': typeof AuthenticatedReparationsRoute
   '/stock': typeof AuthenticatedStockRoute
   '/super-admin': typeof AuthenticatedSuperAdminRoute
+  '/demo/clients': typeof DemoClientsRoute
+  '/demo/cours-or': typeof DemoCoursOrRoute
+  '/demo/dashboard': typeof DemoDashboardRoute
+  '/demo/depenses': typeof DemoDepensesRoute
+  '/demo/factures': typeof DemoFacturesRoute
+  '/demo/fournisseurs': typeof DemoFournisseursRoute
+  '/demo/journal-quotidien': typeof DemoJournalQuotidienRoute
+  '/demo/or-casse': typeof DemoOrCasseRoute
+  '/demo/paiements-en-attente': typeof DemoPaiementsEnAttenteRoute
+  '/demo/parures': typeof DemoParuresRoute
+  '/demo/reparations': typeof DemoReparationsRoute
+  '/demo/stock': typeof DemoStockRoute
   '/invite/$code': typeof InviteCodeRoute
   '/suivi/$token': typeof SuiviTokenRoute
   '/demo/': typeof DemoIndexRoute
@@ -266,6 +350,18 @@ export interface FileRoutesByTo {
   '/reparations': typeof AuthenticatedReparationsRoute
   '/stock': typeof AuthenticatedStockRoute
   '/super-admin': typeof AuthenticatedSuperAdminRoute
+  '/demo/clients': typeof DemoClientsRoute
+  '/demo/cours-or': typeof DemoCoursOrRoute
+  '/demo/dashboard': typeof DemoDashboardRoute
+  '/demo/depenses': typeof DemoDepensesRoute
+  '/demo/factures': typeof DemoFacturesRoute
+  '/demo/fournisseurs': typeof DemoFournisseursRoute
+  '/demo/journal-quotidien': typeof DemoJournalQuotidienRoute
+  '/demo/or-casse': typeof DemoOrCasseRoute
+  '/demo/paiements-en-attente': typeof DemoPaiementsEnAttenteRoute
+  '/demo/parures': typeof DemoParuresRoute
+  '/demo/reparations': typeof DemoReparationsRoute
+  '/demo/stock': typeof DemoStockRoute
   '/invite/$code': typeof InviteCodeRoute
   '/suivi/$token': typeof SuiviTokenRoute
   '/demo': typeof DemoIndexRoute
@@ -301,6 +397,18 @@ export interface FileRoutesById {
   '/_authenticated/reparations': typeof AuthenticatedReparationsRoute
   '/_authenticated/stock': typeof AuthenticatedStockRoute
   '/_authenticated/super-admin': typeof AuthenticatedSuperAdminRoute
+  '/demo/clients': typeof DemoClientsRoute
+  '/demo/cours-or': typeof DemoCoursOrRoute
+  '/demo/dashboard': typeof DemoDashboardRoute
+  '/demo/depenses': typeof DemoDepensesRoute
+  '/demo/factures': typeof DemoFacturesRoute
+  '/demo/fournisseurs': typeof DemoFournisseursRoute
+  '/demo/journal-quotidien': typeof DemoJournalQuotidienRoute
+  '/demo/or-casse': typeof DemoOrCasseRoute
+  '/demo/paiements-en-attente': typeof DemoPaiementsEnAttenteRoute
+  '/demo/parures': typeof DemoParuresRoute
+  '/demo/reparations': typeof DemoReparationsRoute
+  '/demo/stock': typeof DemoStockRoute
   '/invite/$code': typeof InviteCodeRoute
   '/suivi/$token': typeof SuiviTokenRoute
   '/demo/': typeof DemoIndexRoute
@@ -336,6 +444,18 @@ export interface FileRouteTypes {
     | '/reparations'
     | '/stock'
     | '/super-admin'
+    | '/demo/clients'
+    | '/demo/cours-or'
+    | '/demo/dashboard'
+    | '/demo/depenses'
+    | '/demo/factures'
+    | '/demo/fournisseurs'
+    | '/demo/journal-quotidien'
+    | '/demo/or-casse'
+    | '/demo/paiements-en-attente'
+    | '/demo/parures'
+    | '/demo/reparations'
+    | '/demo/stock'
     | '/invite/$code'
     | '/suivi/$token'
     | '/demo/'
@@ -368,6 +488,18 @@ export interface FileRouteTypes {
     | '/reparations'
     | '/stock'
     | '/super-admin'
+    | '/demo/clients'
+    | '/demo/cours-or'
+    | '/demo/dashboard'
+    | '/demo/depenses'
+    | '/demo/factures'
+    | '/demo/fournisseurs'
+    | '/demo/journal-quotidien'
+    | '/demo/or-casse'
+    | '/demo/paiements-en-attente'
+    | '/demo/parures'
+    | '/demo/reparations'
+    | '/demo/stock'
     | '/invite/$code'
     | '/suivi/$token'
     | '/demo'
@@ -402,6 +534,18 @@ export interface FileRouteTypes {
     | '/_authenticated/reparations'
     | '/_authenticated/stock'
     | '/_authenticated/super-admin'
+    | '/demo/clients'
+    | '/demo/cours-or'
+    | '/demo/dashboard'
+    | '/demo/depenses'
+    | '/demo/factures'
+    | '/demo/fournisseurs'
+    | '/demo/journal-quotidien'
+    | '/demo/or-casse'
+    | '/demo/paiements-en-attente'
+    | '/demo/parures'
+    | '/demo/reparations'
+    | '/demo/stock'
     | '/invite/$code'
     | '/suivi/$token'
     | '/demo/'
@@ -511,6 +655,90 @@ declare module '@tanstack/react-router' {
       fullPath: '/invite/$code'
       preLoaderRoute: typeof InviteCodeRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/demo/stock': {
+      id: '/demo/stock'
+      path: '/stock'
+      fullPath: '/demo/stock'
+      preLoaderRoute: typeof DemoStockRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/reparations': {
+      id: '/demo/reparations'
+      path: '/reparations'
+      fullPath: '/demo/reparations'
+      preLoaderRoute: typeof DemoReparationsRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/parures': {
+      id: '/demo/parures'
+      path: '/parures'
+      fullPath: '/demo/parures'
+      preLoaderRoute: typeof DemoParuresRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/paiements-en-attente': {
+      id: '/demo/paiements-en-attente'
+      path: '/paiements-en-attente'
+      fullPath: '/demo/paiements-en-attente'
+      preLoaderRoute: typeof DemoPaiementsEnAttenteRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/or-casse': {
+      id: '/demo/or-casse'
+      path: '/or-casse'
+      fullPath: '/demo/or-casse'
+      preLoaderRoute: typeof DemoOrCasseRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/journal-quotidien': {
+      id: '/demo/journal-quotidien'
+      path: '/journal-quotidien'
+      fullPath: '/demo/journal-quotidien'
+      preLoaderRoute: typeof DemoJournalQuotidienRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/fournisseurs': {
+      id: '/demo/fournisseurs'
+      path: '/fournisseurs'
+      fullPath: '/demo/fournisseurs'
+      preLoaderRoute: typeof DemoFournisseursRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/factures': {
+      id: '/demo/factures'
+      path: '/factures'
+      fullPath: '/demo/factures'
+      preLoaderRoute: typeof DemoFacturesRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/depenses': {
+      id: '/demo/depenses'
+      path: '/depenses'
+      fullPath: '/demo/depenses'
+      preLoaderRoute: typeof DemoDepensesRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/dashboard': {
+      id: '/demo/dashboard'
+      path: '/dashboard'
+      fullPath: '/demo/dashboard'
+      preLoaderRoute: typeof DemoDashboardRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/cours-or': {
+      id: '/demo/cours-or'
+      path: '/cours-or'
+      fullPath: '/demo/cours-or'
+      preLoaderRoute: typeof DemoCoursOrRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/clients': {
+      id: '/demo/clients'
+      path: '/clients'
+      fullPath: '/demo/clients'
+      preLoaderRoute: typeof DemoClientsRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/_authenticated/super-admin': {
       id: '/_authenticated/super-admin'
@@ -703,10 +931,34 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface DemoRouteChildren {
+  DemoClientsRoute: typeof DemoClientsRoute
+  DemoCoursOrRoute: typeof DemoCoursOrRoute
+  DemoDashboardRoute: typeof DemoDashboardRoute
+  DemoDepensesRoute: typeof DemoDepensesRoute
+  DemoFacturesRoute: typeof DemoFacturesRoute
+  DemoFournisseursRoute: typeof DemoFournisseursRoute
+  DemoJournalQuotidienRoute: typeof DemoJournalQuotidienRoute
+  DemoOrCasseRoute: typeof DemoOrCasseRoute
+  DemoPaiementsEnAttenteRoute: typeof DemoPaiementsEnAttenteRoute
+  DemoParuresRoute: typeof DemoParuresRoute
+  DemoReparationsRoute: typeof DemoReparationsRoute
+  DemoStockRoute: typeof DemoStockRoute
   DemoIndexRoute: typeof DemoIndexRoute
 }
 
 const DemoRouteChildren: DemoRouteChildren = {
+  DemoClientsRoute: DemoClientsRoute,
+  DemoCoursOrRoute: DemoCoursOrRoute,
+  DemoDashboardRoute: DemoDashboardRoute,
+  DemoDepensesRoute: DemoDepensesRoute,
+  DemoFacturesRoute: DemoFacturesRoute,
+  DemoFournisseursRoute: DemoFournisseursRoute,
+  DemoJournalQuotidienRoute: DemoJournalQuotidienRoute,
+  DemoOrCasseRoute: DemoOrCasseRoute,
+  DemoPaiementsEnAttenteRoute: DemoPaiementsEnAttenteRoute,
+  DemoParuresRoute: DemoParuresRoute,
+  DemoReparationsRoute: DemoReparationsRoute,
+  DemoStockRoute: DemoStockRoute,
   DemoIndexRoute: DemoIndexRoute,
 }
 
