@@ -6,7 +6,7 @@ import {
   ArrowLeft, Phone, Mail, MapPin, Wallet, CreditCard, Receipt, Printer,
   Plus, TrendingUp, CalendarClock, Package,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/data-client";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
