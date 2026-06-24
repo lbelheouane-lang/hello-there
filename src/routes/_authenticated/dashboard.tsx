@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Package, Scale, TrendingUp, Coins, ShoppingBag } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/data-client";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLatestGoldPrices } from "@/hooks/use-gold-prices";
@@ -75,7 +75,7 @@ function StatCard({ icon: Icon, label, value, hint }: { icon: typeof Package; la
   );
 }
 
-function DashboardPage() {
+export function DashboardPage() {
   const { data: prices } = useLatestGoldPrices();
   const { data: stats } = useDashboardStats();
   const { role } = useAuth();

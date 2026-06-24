@@ -6,7 +6,7 @@ import {
   Plus, Package, Pencil, Trash2, Tag, Search, Printer, ExternalLink,
   ChevronRight, LayoutGrid, AlertTriangle, X, FileSpreadsheet, FileText, FileDown,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/data-client";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -84,7 +84,7 @@ function statusVariant(s: string): "default" | "secondary" | "destructive" {
   return "default";
 }
 
-function StockPage() {
+export function StockPage() {
   const qc = useQueryClient();
   const categoryNames = useCategoryNames();
   const { data: subcategories } = useSubcategories();

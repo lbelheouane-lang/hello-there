@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { FileText, Search, Printer, Eye, Receipt, Download } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/data-client";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,7 +33,7 @@ const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "
   unpaid: "outline",
 };
 
-function InvoicesPage() {
+export function InvoicesPage() {
   const [tab, setTab] = useState("all");
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");

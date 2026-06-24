@@ -6,7 +6,7 @@ import {
   BookOpen, Download, Printer, History, FileText, ShoppingBag, Package,
   Recycle, Wallet2, Truck, Users, Coins, Activity, TrendingUp,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/data-client";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -79,7 +79,7 @@ function SectionCard({ icon: Icon, title, children }: { icon: typeof Package; ti
   );
 }
 
-function JournalPage() {
+export function JournalPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [mode, setMode] = useState<FilterMode>("today");

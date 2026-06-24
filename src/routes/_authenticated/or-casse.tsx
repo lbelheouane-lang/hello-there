@@ -6,7 +6,7 @@ import {
   Plus, Search, Pencil, Trash2, Recycle, Scale, Coins, Wallet, X, History,
   Package, Layers, FileText,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/data-client";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent } from "@/components/ui/card";
@@ -105,7 +105,7 @@ const INVENTORY_TABS = [
   { to: "/or-casse", label: "Or Cassé", icon: Recycle },
 ] as const;
 
-function ScrapGoldPage() {
+export function ScrapGoldPage() {
   const qc = useQueryClient();
   const { user } = useAuth();
 

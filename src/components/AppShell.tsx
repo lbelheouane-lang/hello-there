@@ -44,6 +44,111 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from "@/components/ui/sidebar";
+import { useDemoMode } from "@/lib/demo/demo-context";
+import { DemoBanner } from "@/components/demo/DemoBanner";
+import { DemoFooter } from "@/components/demo/DemoFooter";
+import { toast } from "sonner";
+import type { MouseEvent as ReactMouseEvent } from "react";
+
+// Verbs that identify a mutating / output action button in the showroom.
+const DEMO_BLOCK_RE =
+  /(ajouter|nouveau|nouvelle|enregistrer|modifier|supprimer|imprimer|exporter|importer|sauvegarder|générer|valider|payer|encaisser|créer)/i;
+
+/** Returns true (and notifies) when the clicked element is a mutating /
+ *  output control that must stay disabled in the showroom. */
+function isBlockedDemoAction(target: EventTarget | null): boolean {
+  const el = (target as HTMLElement | null)?.closest(
+    "button, a[role='button'], [type='submit']",
+  ) as HTMLElement | null;
+  if (!el) return false;
+  const label = (el.textContent || el.getAttribute("aria-label") || "").trim();
+  return DEMO_BLOCK_RE.test(label);
+}
+
+/** Intercepts clicks (and pointer-downs, used by Radix triggers) on
+ *  Add/Edit/Delete/Save/Print/Export controls in the showroom. */
+function demoBlockMutation(e: ReactMouseEvent<HTMLElement>) {
+  if (!isBlockedDemoAction(e.target)) return;
+  e.preventDefault();
+  e.stopPropagation();
+  if (e.type === "click") {
+    toast.info("Indisponible en mode démonstration (lecture seule).");
+  }
+}
+
+
+
+
+/** Navigation shown in the public showroom (read-only modules only). */
+const DEMO_NAV: readonly { to: string; label: string; icon: typeof Gem }[] = [
+  { to: "/demo/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
+  { to: "/demo/stock", label: "Stock", icon: Package },
+  { to: "/demo/parures", label: "Parures", icon: Layers },
+  { to: "/demo/or-casse", label: "Or Cassé", icon: Recycle },
+  { to: "/demo/clients", label: "Clients", icon: Users },
+  { to: "/demo/fournisseurs", label: "Fournisseurs", icon: Truck },
+  { to: "/demo/factures", label: "Ventes & Factures", icon: FileText },
+  { to: "/demo/paiements-en-attente", label: "Paiements en attente", icon: Wallet },
+  { to: "/demo/depenses", label: "Dépenses", icon: Wallet2 },
+  { to: "/demo/reparations", label: "Réparations", icon: Wrench },
+  { to: "/demo/journal-quotidien", label: "Journal Quotidien", icon: BookOpen },
+  { to: "/demo/cours-or", label: "Cours de l'or", icon: Coins },
+];
+
+function DemoSidebar() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  return (
+    <Sidebar>
+      <SidebarHeader>
+        <div className="flex items-center gap-3 px-2 py-3">
+          <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-sidebar-primary text-sidebar-primary-foreground">
+            <Gem className="h-5 w-5" />
+          </div>
+          <div className="leading-tight">
+            <p className="font-serif text-lg font-semibold">ORUS DZ</p>
+            <p className="text-xs text-sidebar-foreground/60">Démonstration</p>
+          </div>
+        </div>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {DEMO_NAV.map((item) => (
+                <SidebarMenuItem key={item.to}>
+                  <SidebarMenuButton asChild isActive={pathname === item.to}>
+                    <Link to={item.to}>
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter>
+        <div className="px-2 py-2">
+          <p className="truncate text-sm font-medium">Visiteur</p>
+          <p className="text-xs text-sidebar-foreground/60">Mode démonstration</p>
+        </div>
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent"
+          asChild
+        >
+          <Link to="/demo">
+            <LogOut className="h-4 w-4" /> Quitter la démo
+          </Link>
+        </Button>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}
+
+
 
 const NAV: readonly {
   to: string;
@@ -200,10 +305,38 @@ export function AppShell({
   children: ReactNode;
   allow?: AppRole[];
 }) {
+  const isDemo = useDemoMode();
   const { data: prefs } = useUserPreferences();
   const headerStyle = prefs?.header_color
     ? { backgroundColor: prefs.header_color }
     : undefined;
+
+  if (isDemo) {
+    return (
+      <SidebarProvider>
+        <DemoSidebar />
+        <SidebarInset>
+          <DemoBanner />
+          <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur">
+            <SidebarTrigger />
+            <h1 className="font-serif text-xl font-semibold">{title}</h1>
+          </header>
+          <main
+            className="min-w-0 flex-1 overflow-x-hidden p-4 md:p-6"
+            style={{ animation: "brand-content-in 0.6s ease-out both" }}
+            onPointerDownCapture={demoBlockMutation}
+            onClickCapture={demoBlockMutation}
+          >
+            {children}
+          </main>
+
+
+          <DemoFooter />
+        </SidebarInset>
+      </SidebarProvider>
+    );
+  }
+
 
   const inner = (
     <SidebarProvider defaultOpen={prefs?.sidebar_default !== "collapsed"}>

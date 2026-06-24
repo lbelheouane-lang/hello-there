@@ -6,7 +6,7 @@ import {
   Plus, Search, Printer, Pencil, Trash2, Paperclip,
   FileDown, X,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/data-client";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -80,7 +80,7 @@ function startOfToday() { const d = new Date(); d.setHours(0, 0, 0, 0); return d
 function startOfMonth() { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); }
 function startOfYear() { const d = new Date(); return new Date(d.getFullYear(), 0, 1); }
 
-function ExpensesPage() {
+export function ExpensesPage() {
   const qc = useQueryClient();
   const { user } = useAuth();
 

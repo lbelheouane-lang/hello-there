@@ -1,6 +1,8 @@
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { setDemoActive } from "@/integrations/supabase/data-client";
+
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -12,7 +14,10 @@ function AuthGate() {
   const [status, setStatus] = useState<"loading" | "authed">("loading");
 
   useEffect(() => {
+    // Authenticated app must never run against the read-only demo client.
+    setDemoActive(false);
     let active = true;
+
     supabase.auth.getUser().then(({ data, error }) => {
       if (!active) return;
       if (error || !data.user) {
