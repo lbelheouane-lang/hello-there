@@ -1,7 +1,29 @@
 import { useEffect, useState } from "react";
-import { Download, Smartphone, Share, Plus, MonitorCheck, CheckCircle2 } from "lucide-react";
+import QRCode from "qrcode";
+import { Download, Smartphone, Share, Plus, MonitorCheck, CheckCircle2, QrCode, Copy, Check } from "lucide-react";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+
+/** Public address customers open on their phone to install the app. We always
+ *  point the QR at the published site (never the Lovable editor/preview origin,
+ *  which is not installable). */
+const PUBLISHED_URL = "https://orusdz.lovable.app";
+
+function installUrl(): string {
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    const isPreview =
+      host.includes("lovableproject.com") ||
+      host.includes("lovable.dev") ||
+      host.startsWith("id-preview--") ||
+      host.startsWith("preview--");
+    if (!isPreview && window.location.origin.startsWith("http")) {
+      return window.location.origin;
+    }
+  }
+  return PUBLISHED_URL;
+}
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
