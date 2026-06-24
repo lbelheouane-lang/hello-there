@@ -372,3 +372,17 @@
     print-color-adjust: exact;
   }
 }
+
+/* ============ Masquer le badge "Made with Lovable" ============ */
+#lovable-badge,
+a#lovable-badge,
+[id^="lovable-badge"],
+a[href*="lovable.dev"][target="_blank"],
+a[href*="lovable.app"][aria-label*="Lovable"],
+[data-lovable-badge],
+.lovable-badge {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
