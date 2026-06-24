@@ -723,6 +723,11 @@ function StockPage() {
                   <DialogTitle>{editing ? "Modifier le bijou" : "Nouveau bijou"}</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
+                  <PhotoCaptureField
+                    previewUrl={photoPreview}
+                    onCapture={onPhotoCapture}
+                    onClear={onPhotoClear}
+                  />
                   <div className="space-y-2">
                     <Label>Nom du bijou *</Label>
                     <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
