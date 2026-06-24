@@ -18,6 +18,7 @@ import { Route as ActivationRouteImport } from './routes/activation'
 import { Route as AccesRouteImport } from './routes/acces'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DemoIndexRouteImport } from './routes/demo.index'
 import { Route as SuiviTokenRouteImport } from './routes/suivi.$token'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
 import { Route as AuthenticatedSuperAdminRouteImport } from './routes/_authenticated/super-admin'
@@ -84,6 +85,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DemoIndexRoute = DemoIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DemoRoute,
 } as any)
 const SuiviTokenRoute = SuiviTokenRouteImport.update({
   id: '/suivi/$token',
@@ -209,7 +215,7 @@ export interface FileRoutesByFullPath {
   '/activation': typeof ActivationRoute
   '/auth': typeof AuthRoute
   '/create-account': typeof CreateAccountRoute
-  '/demo': typeof DemoRoute
+  '/demo': typeof DemoRouteWithChildren
   '/owner': typeof OwnerRoute
   '/super-admin-access': typeof SuperAdminAccessRoute
   '/boutique': typeof AuthenticatedBoutiqueRoute
@@ -230,6 +236,7 @@ export interface FileRoutesByFullPath {
   '/super-admin': typeof AuthenticatedSuperAdminRoute
   '/invite/$code': typeof InviteCodeRoute
   '/suivi/$token': typeof SuiviTokenRoute
+  '/demo/': typeof DemoIndexRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
   '/fournisseurs/$id': typeof AuthenticatedFournisseursIdRoute
   '/produit/$id': typeof AuthenticatedProduitIdRoute
@@ -241,7 +248,6 @@ export interface FileRoutesByTo {
   '/activation': typeof ActivationRoute
   '/auth': typeof AuthRoute
   '/create-account': typeof CreateAccountRoute
-  '/demo': typeof DemoRoute
   '/owner': typeof OwnerRoute
   '/super-admin-access': typeof SuperAdminAccessRoute
   '/boutique': typeof AuthenticatedBoutiqueRoute
@@ -262,6 +268,7 @@ export interface FileRoutesByTo {
   '/super-admin': typeof AuthenticatedSuperAdminRoute
   '/invite/$code': typeof InviteCodeRoute
   '/suivi/$token': typeof SuiviTokenRoute
+  '/demo': typeof DemoIndexRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
   '/fournisseurs/$id': typeof AuthenticatedFournisseursIdRoute
   '/produit/$id': typeof AuthenticatedProduitIdRoute
@@ -275,7 +282,7 @@ export interface FileRoutesById {
   '/activation': typeof ActivationRoute
   '/auth': typeof AuthRoute
   '/create-account': typeof CreateAccountRoute
-  '/demo': typeof DemoRoute
+  '/demo': typeof DemoRouteWithChildren
   '/owner': typeof OwnerRoute
   '/super-admin-access': typeof SuperAdminAccessRoute
   '/_authenticated/boutique': typeof AuthenticatedBoutiqueRoute
@@ -296,6 +303,7 @@ export interface FileRoutesById {
   '/_authenticated/super-admin': typeof AuthenticatedSuperAdminRoute
   '/invite/$code': typeof InviteCodeRoute
   '/suivi/$token': typeof SuiviTokenRoute
+  '/demo/': typeof DemoIndexRoute
   '/_authenticated/clients_/$id': typeof AuthenticatedClientsIdRoute
   '/_authenticated/fournisseurs_/$id': typeof AuthenticatedFournisseursIdRoute
   '/_authenticated/produit/$id': typeof AuthenticatedProduitIdRoute
@@ -330,6 +338,7 @@ export interface FileRouteTypes {
     | '/super-admin'
     | '/invite/$code'
     | '/suivi/$token'
+    | '/demo/'
     | '/clients/$id'
     | '/fournisseurs/$id'
     | '/produit/$id'
@@ -341,7 +350,6 @@ export interface FileRouteTypes {
     | '/activation'
     | '/auth'
     | '/create-account'
-    | '/demo'
     | '/owner'
     | '/super-admin-access'
     | '/boutique'
@@ -362,6 +370,7 @@ export interface FileRouteTypes {
     | '/super-admin'
     | '/invite/$code'
     | '/suivi/$token'
+    | '/demo'
     | '/clients/$id'
     | '/fournisseurs/$id'
     | '/produit/$id'
@@ -395,6 +404,7 @@ export interface FileRouteTypes {
     | '/_authenticated/super-admin'
     | '/invite/$code'
     | '/suivi/$token'
+    | '/demo/'
     | '/_authenticated/clients_/$id'
     | '/_authenticated/fournisseurs_/$id'
     | '/_authenticated/produit/$id'
@@ -408,7 +418,7 @@ export interface RootRouteChildren {
   ActivationRoute: typeof ActivationRoute
   AuthRoute: typeof AuthRoute
   CreateAccountRoute: typeof CreateAccountRoute
-  DemoRoute: typeof DemoRoute
+  DemoRoute: typeof DemoRouteWithChildren
   OwnerRoute: typeof OwnerRoute
   SuperAdminAccessRoute: typeof SuperAdminAccessRoute
   InviteCodeRoute: typeof InviteCodeRoute
@@ -480,6 +490,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/demo/': {
+      id: '/demo/'
+      path: '/'
+      fullPath: '/demo/'
+      preLoaderRoute: typeof DemoIndexRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/suivi/$token': {
       id: '/suivi/$token'
@@ -685,6 +702,16 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface DemoRouteChildren {
+  DemoIndexRoute: typeof DemoIndexRoute
+}
+
+const DemoRouteChildren: DemoRouteChildren = {
+  DemoIndexRoute: DemoIndexRoute,
+}
+
+const DemoRouteWithChildren = DemoRoute._addFileChildren(DemoRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -692,7 +719,7 @@ const rootRouteChildren: RootRouteChildren = {
   ActivationRoute: ActivationRoute,
   AuthRoute: AuthRoute,
   CreateAccountRoute: CreateAccountRoute,
-  DemoRoute: DemoRoute,
+  DemoRoute: DemoRouteWithChildren,
   OwnerRoute: OwnerRoute,
   SuperAdminAccessRoute: SuperAdminAccessRoute,
   InviteCodeRoute: InviteCodeRoute,
