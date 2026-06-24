@@ -380,15 +380,35 @@ function StockPage() {
         quantity: qty,
         status,
       };
+
+      const { data: u } = await supabase.auth.getUser();
+
+      // Resolve the new photo path: upload a fresh capture, keep the old one,
+      // or clear it if the user removed the photo.
+      let imagePath: string | null = photoPath;
+      if (photoFile) {
+        const ext = (photoFile.name.split(".").pop() || "jpg").toLowerCase();
+        const path = `${u.user?.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("product-photos")
+          .upload(path, photoFile, { contentType: photoFile.type || "image/jpeg" });
+        if (upErr) throw upErr;
+        imagePath = path;
+        if (photoPath) await supabase.storage.from("product-photos").remove([photoPath]);
+      } else if (photoRemoved) {
+        if (photoPath) await supabase.storage.from("product-photos").remove([photoPath]);
+        imagePath = null;
+      }
+      const fullPayload = { ...payload, image_url: imagePath };
+
       if (editing) {
-        const { error } = await supabase.from("products").update(payload).eq("id", editing.id);
+        const { error } = await supabase.from("products").update(fullPayload).eq("id", editing.id);
         if (error) throw error;
       } else {
-        const { data: u } = await supabase.auth.getUser();
         const code = `BJ-${Date.now().toString(36).toUpperCase().slice(-6)}`;
         const { data: inserted, error } = await supabase
           .from("products")
-          .insert({ ...payload, internal_code: code, created_by: u.user?.id })
+          .insert({ ...fullPayload, internal_code: code, created_by: u.user?.id })
           .select("id")
           .single();
         if (error) throw error;
