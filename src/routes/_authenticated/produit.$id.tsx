@@ -150,10 +150,10 @@ function ProductDetailPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <img
-                src={productImage(product.category)}
+              <ProductPhoto
+                imageUrl={product.image_url}
+                category={product.category}
                 alt={product.name}
-                loading="lazy"
                 className="mb-4 aspect-video w-full rounded-lg object-cover"
               />
 
