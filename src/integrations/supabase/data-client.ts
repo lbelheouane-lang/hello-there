@@ -41,14 +41,14 @@ function blockedResult(): unknown {
       Promise.resolve(result).catch(onRejected),
     finally: (cb: () => void) => Promise.resolve(result).finally(cb),
   };
-  return new Proxy(base, {
+  const self: unknown = new Proxy(base, {
     get(target, prop) {
       if (prop in target) return target[prop as string];
       // Any chained builder method (.select, .eq, .single, ...) returns self.
-      return () => proxy;
+      return () => self;
     },
   });
-  // eslint-disable-next-line no-unreachable
+  return self;
 }
 
 const WRITE_METHODS = new Set(["insert", "update", "upsert", "delete"]);
