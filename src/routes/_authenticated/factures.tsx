@@ -146,13 +146,13 @@ function InvoicesPage() {
                 </SelectContent>
               </Select>
               <div className="flex gap-2">
-                <div className="flex-1">
+                <div className="min-w-0 flex-1">
                   <Label className="text-[10px] text-muted-foreground">Du</Label>
-                  <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
+                  <Input type="date" className="w-full" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
                 </div>
-                <div className="flex-1">
+                <div className="min-w-0 flex-1">
                   <Label className="text-[10px] text-muted-foreground">Au</Label>
-                  <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} />
+                  <Input type="date" className="w-full" value={toDate} onChange={(e) => setToDate(e.target.value)} />
                 </div>
               </div>
             </div>
