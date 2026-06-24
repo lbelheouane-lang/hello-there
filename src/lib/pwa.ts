@@ -1,5 +1,6 @@
-// PWA service-worker registration with Lovable-preview safety guards.
-// Registers only in the published production app, never in dev/preview/iframe.
+// PWA service-worker cleanup with Lovable-preview safety guards.
+// The previous worker could keep serving stale broken builds on phones/PCs.
+// Keep this cleanup active so every device loads the latest published app from network.
 
 const SW_URL = "/sw.js";
 
@@ -30,26 +31,28 @@ async function unregisterAppWorker() {
   if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return;
   const regs = await navigator.serviceWorker.getRegistrations();
   await Promise.allSettled(
-    regs
-      .filter((r) => {
-        const url = r.active?.scriptURL || r.installing?.scriptURL || r.waiting?.scriptURL || "";
-        return url.endsWith(SW_URL);
-      })
-      .map((r) => r.unregister()),
+    regs.map((r) => r.unregister()),
   );
+}
+
+async function clearAppCaches() {
+  if (typeof caches === "undefined") return;
+  const keys = await caches.keys();
+  await Promise.allSettled(
+    keys
+      .filter((key) => key.includes("orus") || key.includes("workbox") || key.includes("precache"))
+      .map((key) => caches.delete(key)),
+  );
+}
+
+async function resetPwaState() {
+  await unregisterAppWorker();
+  await clearAppCaches();
 }
 
 export function registerPwa() {
   if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return;
 
-  if (isRefusedContext()) {
-    void unregisterAppWorker();
-    return;
-  }
-
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register(SW_URL).catch((err) => {
-      console.warn("[pwa] service worker registration failed", err);
-    });
-  });
+  void isRefusedContext();
+  window.addEventListener("load", () => void resetPwaState(), { once: true });
 }
