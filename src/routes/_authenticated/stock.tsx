@@ -1027,10 +1027,10 @@ function StockPage() {
                         <TableCell className="font-mono text-xs">{p.internal_code}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <img
-                              src={productImage(p.category)}
+                            <ProductPhoto
+                              imageUrl={p.image_url}
+                              category={p.category}
                               alt={p.name}
-                              loading="lazy"
                               className="h-10 w-10 shrink-0 rounded-md object-cover"
                             />
                             <div>
