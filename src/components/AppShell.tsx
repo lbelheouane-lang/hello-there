@@ -47,6 +47,29 @@ import {
 import { useDemoMode } from "@/lib/demo/demo-context";
 import { DemoBanner } from "@/components/demo/DemoBanner";
 import { DemoFooter } from "@/components/demo/DemoFooter";
+import { toast } from "sonner";
+import type { MouseEvent as ReactMouseEvent } from "react";
+
+// Verbs that identify a mutating / output action button in the showroom.
+const DEMO_BLOCK_RE =
+  /(ajouter|nouveau|nouvelle|enregistrer|modifier|supprimer|imprimer|exporter|importer|sauvegarder|générer|valider|payer|encaisser|créer)/i;
+
+/** Intercepts clicks on Add/Edit/Delete/Save/Print/Export controls in the
+ *  showroom and shows a read-only notice instead of letting them run. */
+function demoBlockMutation(e: ReactMouseEvent<HTMLElement>) {
+  const el = (e.target as HTMLElement).closest(
+    "button, a[role='button'], [type='submit']",
+  ) as HTMLElement | null;
+  if (!el) return;
+  const label = (el.textContent || el.getAttribute("aria-label") || "").trim();
+  if (DEMO_BLOCK_RE.test(label)) {
+    e.preventDefault();
+    e.stopPropagation();
+    toast.info("Indisponible en mode démonstration (lecture seule).");
+  }
+}
+
+
 
 /** Navigation shown in the public showroom (read-only modules only). */
 const DEMO_NAV: readonly { to: string; label: string; icon: typeof Gem }[] = [
