@@ -1,7 +1,29 @@
 import { useEffect, useState } from "react";
-import { Download, Smartphone, Share, Plus, MonitorCheck, CheckCircle2 } from "lucide-react";
+import QRCode from "qrcode";
+import { Download, Smartphone, Share, Plus, MonitorCheck, CheckCircle2, QrCode, Copy, Check } from "lucide-react";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+
+/** Public address customers open on their phone to install the app. We always
+ *  point the QR at the published site (never the Lovable editor/preview origin,
+ *  which is not installable). */
+const PUBLISHED_URL = "https://orusdz.lovable.app";
+
+function installUrl(): string {
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    const isPreview =
+      host.includes("lovableproject.com") ||
+      host.includes("lovable.dev") ||
+      host.startsWith("id-preview--") ||
+      host.startsWith("preview--");
+    if (!isPreview && window.location.origin.startsWith("http")) {
+      return window.location.origin;
+    }
+  }
+  return PUBLISHED_URL;
+}
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -25,6 +47,34 @@ function isIos(): boolean {
 export function InstallAppCard() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
+  const [qr, setQr] = useState<string | null>(null);
+  const [url, setUrl] = useState(PUBLISHED_URL);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const target = installUrl();
+    setUrl(target);
+    QRCode.toDataURL(target, {
+      errorCorrectionLevel: "M",
+      margin: 1,
+      width: 320,
+      color: { dark: "#000000", light: "#ffffff" },
+    })
+      .then(setQr)
+      .catch(() => setQr(null));
+  }, []);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      toast.success("Lien copié");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Impossible de copier le lien");
+    }
+  };
+
 
   useEffect(() => {
     setInstalled(isStandalone());
@@ -56,6 +106,52 @@ export function InstallAppCard() {
   const ios = isIos();
 
   return (
+    <>
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <QrCode className="h-5 w-5 text-primary" />
+          Installer sur le téléphone — Scanner le QR code
+        </CardTitle>
+        <CardDescription>
+          Une fois le compte activé, scannez ce QR code avec l'appareil photo du téléphone
+          pour ouvrir Orus et l'installer directement, prête à l'emploi.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
+          <div className="shrink-0 rounded-xl border bg-white p-3">
+            {qr ? (
+              <img src={qr} alt="QR code d'installation Orus" className="h-44 w-44" />
+            ) : (
+              <div className="flex h-44 w-44 items-center justify-center text-sm text-muted-foreground">
+                Génération…
+              </div>
+            )}
+          </div>
+          <div className="min-w-0 flex-1 space-y-3 text-sm">
+            <ol className="list-inside list-decimal space-y-1.5 text-muted-foreground">
+              <li>Ouvrez l'appareil photo (ou un lecteur de QR) sur le téléphone.</li>
+              <li>Visez ce QR code, puis appuyez sur le lien qui apparaît.</li>
+              <li>Suivez « Installer / Ajouter à l'écran d'accueil ».</li>
+            </ol>
+            <div className="flex flex-wrap items-center gap-2">
+              <code className="max-w-full truncate rounded-md border bg-muted/40 px-2 py-1 text-xs">
+                {url}
+              </code>
+              <Button size="sm" variant="outline" className="gap-1.5" onClick={copy}>
+                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {copied ? "Copié" : "Copier le lien"}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Le téléphone et le PC n'ont pas besoin d'être sur le même réseau.
+            </p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
@@ -111,5 +207,6 @@ export function InstallAppCard() {
         )}
       </CardContent>
     </Card>
+    </>
   );
 }
