@@ -302,12 +302,19 @@ function StockPage() {
 
 
 
+  function resetPhoto() {
+    setPhotoFile(null);
+    setPhotoPreview(null);
+    setPhotoPath(null);
+    setPhotoRemoved(false);
+  }
   function openNew() {
     setEditing(null);
     setForm(empty);
+    resetPhoto();
     setOpen(true);
   }
-  function openEdit(p: Product) {
+  async function openEdit(p: Product) {
     setEditing(p);
     const country = p.country_of_origin ?? "";
     const known = (ORIGIN_COUNTRIES as readonly string[]).includes(country);
@@ -321,7 +328,23 @@ function StockPage() {
       country_select: country ? (known && country !== "Autre" ? country : "Autre") : "",
       country_custom: country && (!known || country === "Autre") ? country : "",
     });
+    resetPhoto();
+    setPhotoPath(p.image_url);
     setOpen(true);
+    if (p.image_url) {
+      const { data } = await supabase.storage.from("product-photos").createSignedUrl(p.image_url, 600);
+      if (data?.signedUrl) setPhotoPreview(data.signedUrl);
+    }
+  }
+  function onPhotoCapture(file: File) {
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
+    setPhotoRemoved(false);
+  }
+  function onPhotoClear() {
+    setPhotoFile(null);
+    setPhotoPreview(null);
+    setPhotoRemoved(true);
   }
 
 
