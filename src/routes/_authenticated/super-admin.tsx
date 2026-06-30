@@ -22,6 +22,7 @@ import {
   Eye,
   EyeOff,
   Clock,
+  AlertTriangle,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
