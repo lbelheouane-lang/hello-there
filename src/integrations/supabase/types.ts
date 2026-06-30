@@ -2217,6 +2217,7 @@ export type Database = {
       next_repair_number: { Args: never; Returns: string }
       next_scrap_number: { Args: never; Returns: string }
       next_set_number: { Args: never; Returns: string }
+      reset_instance_for_new_client: { Args: never; Returns: undefined }
       restore_backup: { Args: { payload: Json }; Returns: Json }
       seed_demo_data: { Args: never; Returns: undefined }
       seed_demo_extras: { Args: never; Returns: undefined }

@@ -406,3 +406,25 @@ export const deleteAccessKey = createServerFn({ method: "POST" })
     await supabaseAdmin.from("access_keys").delete().eq("id", data.id);
     return { ok: true };
   });
+
+// ---------------------------------------------------------------------------
+// Clean start — reset an instance for a brand-new client
+// ---------------------------------------------------------------------------
+
+/**
+ * Wipes ALL business + demo + onboarding data so a freshly remixed instance
+ * starts empty for a new jeweller. Super Admin accounts, master passkeys and
+ * store settings are preserved. Requires typing the confirmation phrase.
+ */
+export const resetInstanceForNewClient = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ confirm: z.literal("REINITIALISER") }).parse(d),
+  )
+  .handler(async ({ context }) => {
+    await assertSuperAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.rpc("reset_instance_for_new_client");
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
