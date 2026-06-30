@@ -42,6 +42,7 @@ import {
   setAccessKeyStatus,
   regenerateAccessKey,
   deleteAccessKey,
+  resetInstanceForNewClient,
   type ClientRow,
   type InvitationRow,
   type AccessKeyRow,
