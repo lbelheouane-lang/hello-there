@@ -190,6 +190,9 @@ function SuperAdminPanel() {
           <TabsContent value="sa-access">
             <SuperAdminAccessTab />
           </TabsContent>
+          <TabsContent value="maintenance">
+            <MaintenanceTab />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
