@@ -1601,3 +1601,78 @@ function SuperAdminAccessTab() {
     </div>
   );
 }
+
+// --------------------------------------------------------------------------
+// Maintenance — clean start for a new client instance
+// --------------------------------------------------------------------------
+
+function MaintenanceTab() {
+  const reset = useServerFn(resetInstanceForNewClient);
+  const [confirm, setConfirm] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const onReset = async () => {
+    if (confirm !== "REINITIALISER") return;
+    setBusy(true);
+    try {
+      await reset({ data: { confirm: "REINITIALISER" } });
+      toast.success("Instance réinitialisée. Cette copie est prête pour un nouveau client.");
+      setConfirm("");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Échec de la réinitialisation.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="mx-auto max-w-2xl">
+      <Card className="border-destructive/40">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-destructive">
+            <AlertTriangle className="h-5 w-5" /> Démarrage propre (nouvelle instance)
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4 text-sm">
+          <p className="text-muted-foreground">
+            À lancer <strong>uniquement sur une copie (remix) destinée à un nouveau
+            client</strong>. Cette action efface définitivement toutes les données métier
+            et de démonstration pour repartir de zéro :
+          </p>
+          <ul className="list-disc space-y-1 pl-5 text-muted-foreground">
+            <li>Produits, stock, fournisseurs, clients</li>
+            <li>Ventes, factures, paiements, dépenses</li>
+            <li>Réparations, or cassé, parures, journaux</li>
+            <li>Cours de l'or, sauvegardes, audits</li>
+            <li>Passkeys, invitations et clés d'accès de test</li>
+          </ul>
+          <p className="text-muted-foreground">
+            Vos comptes Super Admin, les passkeys maîtres et les paramètres de la
+            boutique sont <strong>conservés</strong>.
+          </p>
+          <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3">
+            <Label htmlFor="reset-confirm" className="text-destructive">
+              Tapez <span className="font-mono font-semibold">REINITIALISER</span> pour confirmer
+            </Label>
+            <Input
+              id="reset-confirm"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value.toUpperCase())}
+              placeholder="REINITIALISER"
+              className="mt-2"
+            />
+          </div>
+          <Button
+            variant="destructive"
+            disabled={confirm !== "REINITIALISER" || busy}
+            onClick={onReset}
+            className="gap-2"
+          >
+            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+            Effacer toutes les données et démarrer à zéro
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
