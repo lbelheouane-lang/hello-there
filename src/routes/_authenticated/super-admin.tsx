@@ -164,6 +164,9 @@ function SuperAdminPanel() {
             <TabsTrigger value="sa-access" className="gap-2">
               <ShieldCheck className="h-4 w-4" /> Accès Super Admin
             </TabsTrigger>
+            <TabsTrigger value="maintenance" className="gap-2">
+              <AlertTriangle className="h-4 w-4" /> Maintenance
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard">
