@@ -1,64 +1,81 @@
-## ORUS DZ — Public Read-Only Showroom Demo
+# Migration ORUS → SaaS multi-tenant automatique
 
-### Goal
-A public URL (`/demo`) and matching QR code that opens ORUS DZ with no login, showing realistic fictional data across all modules, fully read-only, with zero risk of exposing or mutating production data.
+⚠️ Ce changement contredit la règle actuelle « mono-boutique ». Tu le demandes explicitement : je bascule vers un vrai multi-tenant partagé (une seule appli, une seule URL, bases isolées logiquement par `tenant_id`). Je mettrai à jour la mémoire projet en conséquence.
 
-### Architecture decision (security-first)
-The demo will **never touch production rows**. Two layers guarantee this:
+## Principe retenu
 
-1. **Database isolation** — Demo data already lives in tables flagged `is_demo = true` (the existing `seed_demo_data()` function). We add narrow `TO anon` SELECT policies that return **only** `is_demo = true` rows. Anonymous visitors get zero write policies, so no insert/update/delete is possible at the database level — the demo is structurally non-convertible.
-2. **UI isolation** — A public `/demo/*` route tree (outside `_authenticated`, no PIN gate) renders the existing module screens through a `DemoModeProvider` that forces a synthetic read-only "admin" view, hides forbidden modules, and disables every mutating control.
+Chaque entreprise cliente = **1 tenant**. Toutes les données métier portent un `tenant_id`. Un utilisateur est rattaché à un tenant ; il ne voit **que** les lignes de son tenant. Le Super Admin voit tout. Le rattachement se fait **automatiquement** à la première connexion via une **clé d'accès** unique.
 
 ```text
-/auth, /acces ............ unchanged production login (untouched)
-/_authenticated/* ........ unchanged production app (untouched)
-/demo .................... public landing → redirects into demo shell
-/demo/dashboard, /demo/stock, ... public read-only mirrors
+Super Admin ──crée──> Tenant + Clé d'accès unique
+        │
+        └── remet la clé au client
+                    │
+   Client se connecte (même URL) ─1re fois─> saisit la clé
+                    │
+        Provisionnement AUTO : profile.tenant_id + rôle admin
+        + paramètres boutique + catégories/données initiales
+                    │
+        Toutes ses données isolées par tenant_id (RLS)
 ```
 
-### Data layer
-- A `demoSupabase` client built with the publishable (anon) key, **no session persistence**. Because anon SELECT policies are scoped to `is_demo = true`, every read is automatically demo-only.
-- Extend `seed_demo_data()` so all showroom modules have rich sample rows: products, jewelry sets, scrap gold, customers, suppliers, sales, invoices, payments, expenses, repairs, gold prices. Seed is run once via migration so the demo is populated out of the box.
-- A small `DemoDataContext` exposes the demo client + `readOnly: true` so screens fetch from it instead of the authed `supabase`.
+## Étapes
 
-### Read-only enforcement
-- `DemoModeProvider` sets a global `isDemo` flag.
-- A `useReadOnly()` hook + `<DemoGuard>` wrapper disables/hides: Add, Edit, Delete, Save, Print (real docs), Export, Import, and all destructive dialogs. Buttons render disabled with a tooltip "Indisponible en mode démonstration".
-- Forbidden modules are simply not registered in the demo nav: developer features, licenses/activation, backups, user management, real settings (Boutique/Paramètres show a read-only preview only).
+### 1. Schéma — nouvelle table `tenants`
+- `tenants` : `name`, `slug`, `status` (active/suspended), `created_by`, timestamps.
+- `tenant_access_keys` : `tenant_id`, `key_hash` (clé hashée, jamais en clair), `label`, `status` (active/used/revoked), `max_uses`/`used_count`, `expires_at`. (Réutilise le principe des `access_keys` existants mais lié à un tenant.)
+- Ajout `tenant_id uuid` sur `profiles` (le lien utilisateur→tenant).
 
-### Available demo modules
-Dashboard, Stock (Inventory), Parures (Jewelry Sets), Or Cassé (Scrap Gold), Clients (Customers), Fournisseurs (Suppliers), Ventes/Factures (Sales & Invoices), Paiements en attente (Pending Payments), Dépenses (Expenses), Reports (stock/expense reports view-only), Settings (read-only preview).
+### 2. Fonctions de sécurité (SECURITY DEFINER)
+- `current_tenant_id()` : renvoie `profiles.tenant_id` de `auth.uid()`.
+- `is_super_admin(auth.uid())` : déjà existante, réutilisée pour le bypass.
+- `provision_tenant(name)` : crée tenant + settings + catégories par défaut (Super Admin uniquement).
+- `redeem_tenant_key(key)` : valide la clé, rattache l'utilisateur au tenant, lui donne le rôle `admin` **scopé au tenant**, marque la clé consommée. Appelée à la 1re connexion.
 
-### Banner & footer
-- Permanent top banner on every demo page:
-  `ORUS DZ — VERSION DE DÉMONSTRATION · Mode lecture seule, données fictives.`
-- Footer block:
-  `Intéressé par ORUS DZ ? Contactez-nous pour activer la version complète sous licence.`
+### 3. Ajout de `tenant_id` sur toutes les tables métier
+Tables concernées (remplies puis rendues `NOT NULL`) :
+`products, customers, suppliers, sales, payments, invoices, purchases, expenses, expense_categories, product_categories, product_subcategories, jewelry_sets, jewelry_set_events, scrap_gold, scrap_gold_events, repairs, repair_status_history, daily_journals, stock_movements, gold_prices, store_settings, audit_logs, product_origin_events, product_quantity_events, backups, employees, clients, invitations`.
 
-### Access surfaces
-- **PC:** public link `https://orusdz.lovable.app/demo`.
-- **Mobile:** a QR code (generated with the existing `qrcode` dep) pointing to the published `/demo` URL. Surfaced on the demo landing page and optionally in admin Settings → "Partager la démo".
+Défaut à l'insertion : `tenant_id` rempli automatiquement par trigger `set_tenant_id()` = `current_tenant_id()` — **aucune ligne de code applicatif à modifier pour les inserts**.
 
-### Security guarantees
-- No anon write policies anywhere → modifications impossible.
-- Anon SELECT policies filter `is_demo = true` → production data never returned.
-- No activation/upgrade path inside demo → not convertible.
-- Demo routes never import `supabaseAdmin` or service-role logic.
+### 4. Réécriture des RLS
+Pour chaque table métier, remplacement des policies par :
+```sql
+USING (tenant_id = current_tenant_id() OR is_super_admin(auth.uid()))
+WITH CHECK (tenant_id = current_tenant_id() OR is_super_admin(auth.uid()))
+```
+`user_roles` gagne aussi un `tenant_id` pour scoper le rôle admin/employé par tenant. `super_admin`/`developer` restent globaux. Les tables système (super_admin_*, owner_access, gold_sync_logs) restent inchangées.
 
----
+### 5. Migration des données existantes
+- Création d'un **tenant « Boutique principale »** rattaché aux clients actuels.
+- Toutes les données existantes reçoivent ce `tenant_id` (les 2-3 clients actuels ne sont pas cassés, ils partagent ce tenant historique — comme aujourd'hui).
+- Les profils existants sont rattachés à ce tenant.
 
-### Technical steps
-1. **Migration**: add `GRANT SELECT ... TO anon` + `CREATE POLICY ... TO anon USING (is_demo = true)` on the demo-read tables; extend & run `seed_demo_data()` to cover expenses/repairs/payments/jewelry_sets/scrap_gold.
-2. **`src/lib/demo/demo-client.ts`**: anon, session-less Supabase client.
-3. **`src/lib/demo/demo-context.tsx`**: `DemoModeProvider`, `useDemoMode()`, `useReadOnly()`.
-4. **`src/components/demo/DemoBanner.tsx`** + **`DemoFooter.tsx`** + **`DemoShell.tsx`** (sidebar/nav mirror of `AppShell`, demo nav list, no auth).
-5. **`src/routes/demo.tsx`** (landing + QR) and `src/routes/demo.$module.tsx` mirrors that reuse existing module bodies refactored to accept a client/read-only prop, or thin demo wrappers.
-6. **Read-only control wrapper** to neutralize mutating buttons across reused screens.
-7. Wire QR/share entry point and verify with a headless browser pass (no console/auth errors, data renders, buttons disabled).
+### 6. Provisionnement automatique — flux 1re connexion
+- Après login (email/mot de passe existant), si `profile.tenant_id` est `NULL` → redirection vers un nouvel écran **`/rejoindre`** (saisie de la clé d'accès).
+- `redeem_tenant_key` rattache et provisionne, puis redirige vers le dashboard.
+- Si `tenant.status = suspended` → accès bloqué avec message.
 
-### Open question
-Reusing the existing 11 module screens read-only is the bulk of the work. Two ways to do it:
-- **(A) Refactor each module** to accept an injected data client + `readOnly` flag, so demo and production share one component (most maintainable, larger diff).
-- **(B) Build dedicated lightweight demo pages** that re-present the same data with a simpler read-only layout (faster, but some duplication and slightly different look).
+### 7. Interface Super Admin (`/super-admin`)
+Nouvel onglet **« Tenants »** :
+- Liste des tenants (nom, statut, nb utilisateurs, date).
+- Bouton **« Créer un tenant »** → génère le tenant + **une clé d'accès unique affichée une seule fois**.
+- Actions : révoquer/regénérer une clé, suspendre/réactiver un tenant.
+- Serveur : fonctions dans `src/lib/super-admin.functions.ts` (déjà existant), protégées par `assertSuperAdmin`.
 
-I recommend **(A)** for visual fidelity ("experience the complete interface"). Confirm A or B before I start.
+### 8. Serveur / code applicatif
+- Les lectures/écritures front actuelles restent quasi inchangées grâce aux triggers + RLS (le `tenant_id` est injecté et filtré côté base).
+- `useAuth` expose `tenantId` + état « sans tenant » pour piloter la redirection `/rejoindre`.
+- `reset_instance_for_new_client` devient obsolète (remplacé par l'isolation par tenant) — conservé mais non nécessaire.
+
+## Détails techniques / risques
+- Migration exécutée en plusieurs migrations SQL ordonnées (ajout colonnes nullable → backfill → NOT NULL → triggers → RLS) pour éviter toute coupure.
+- Les clés d'accès sont **hashées** (scrypt) comme les passkeys existantes ; jamais stockées ni loggées en clair.
+- Le rôle par défaut d'un nouveau tenant = `admin` (le patron de la boutique) ; il gère ensuite ses employés via le module existant.
+- Aucune donnée existante supprimée ; rollback possible tant que `tenant_id` reste nullable jusqu'à validation.
+
+## Ce que je ne fais PAS (sauf demande)
+- Pas de facturation/abonnements Stripe par tenant (peut venir après).
+- Pas de sous-domaine par tenant : une seule URL comme demandé.
+
+Confirme et je démarre par les migrations de schéma, tenant historique inclus, sans casser tes clients actuels.
