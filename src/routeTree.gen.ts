@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SuperAdminAccessRouteImport } from './routes/super-admin-access'
+import { Route as RejoindreRouteImport } from './routes/rejoindre'
 import { Route as OwnerRouteImport } from './routes/owner'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as CreateAccountRouteImport } from './routes/create-account'
@@ -57,6 +58,11 @@ import { Route as ApiPublicHooksUpdateGoldPricesRouteImport } from './routes/api
 const SuperAdminAccessRoute = SuperAdminAccessRouteImport.update({
   id: '/super-admin-access',
   path: '/super-admin-access',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RejoindreRoute = RejoindreRouteImport.update({
+  id: '/rejoindre',
+  path: '/rejoindre',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OwnerRoute = OwnerRouteImport.update({
@@ -289,6 +295,7 @@ export interface FileRoutesByFullPath {
   '/create-account': typeof CreateAccountRoute
   '/demo': typeof DemoRouteWithChildren
   '/owner': typeof OwnerRoute
+  '/rejoindre': typeof RejoindreRoute
   '/super-admin-access': typeof SuperAdminAccessRoute
   '/boutique': typeof AuthenticatedBoutiqueRoute
   '/clients': typeof AuthenticatedClientsRoute
@@ -333,6 +340,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/create-account': typeof CreateAccountRoute
   '/owner': typeof OwnerRoute
+  '/rejoindre': typeof RejoindreRoute
   '/super-admin-access': typeof SuperAdminAccessRoute
   '/boutique': typeof AuthenticatedBoutiqueRoute
   '/clients': typeof AuthenticatedClientsRoute
@@ -380,6 +388,7 @@ export interface FileRoutesById {
   '/create-account': typeof CreateAccountRoute
   '/demo': typeof DemoRouteWithChildren
   '/owner': typeof OwnerRoute
+  '/rejoindre': typeof RejoindreRoute
   '/super-admin-access': typeof SuperAdminAccessRoute
   '/_authenticated/boutique': typeof AuthenticatedBoutiqueRoute
   '/_authenticated/clients': typeof AuthenticatedClientsRoute
@@ -427,6 +436,7 @@ export interface FileRouteTypes {
     | '/create-account'
     | '/demo'
     | '/owner'
+    | '/rejoindre'
     | '/super-admin-access'
     | '/boutique'
     | '/clients'
@@ -471,6 +481,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/create-account'
     | '/owner'
+    | '/rejoindre'
     | '/super-admin-access'
     | '/boutique'
     | '/clients'
@@ -517,6 +528,7 @@ export interface FileRouteTypes {
     | '/create-account'
     | '/demo'
     | '/owner'
+    | '/rejoindre'
     | '/super-admin-access'
     | '/_authenticated/boutique'
     | '/_authenticated/clients'
@@ -564,6 +576,7 @@ export interface RootRouteChildren {
   CreateAccountRoute: typeof CreateAccountRoute
   DemoRoute: typeof DemoRouteWithChildren
   OwnerRoute: typeof OwnerRoute
+  RejoindreRoute: typeof RejoindreRoute
   SuperAdminAccessRoute: typeof SuperAdminAccessRoute
   InviteCodeRoute: typeof InviteCodeRoute
   SuiviTokenRoute: typeof SuiviTokenRoute
@@ -577,6 +590,13 @@ declare module '@tanstack/react-router' {
       path: '/super-admin-access'
       fullPath: '/super-admin-access'
       preLoaderRoute: typeof SuperAdminAccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rejoindre': {
+      id: '/rejoindre'
+      path: '/rejoindre'
+      fullPath: '/rejoindre'
+      preLoaderRoute: typeof RejoindreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/owner': {
@@ -973,6 +993,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreateAccountRoute: CreateAccountRoute,
   DemoRoute: DemoRouteWithChildren,
   OwnerRoute: OwnerRoute,
+  RejoindreRoute: RejoindreRoute,
   SuperAdminAccessRoute: SuperAdminAccessRoute,
   InviteCodeRoute: InviteCodeRoute,
   SuiviTokenRoute: SuiviTokenRoute,
