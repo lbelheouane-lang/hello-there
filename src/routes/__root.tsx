@@ -23,6 +23,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeManager } from "@/components/ThemeManager";
 import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
 import { registerPwa } from "@/lib/pwa";
+import { I18nProvider } from "@/lib/i18n";
 
 function NotFoundComponent() {
   return (
