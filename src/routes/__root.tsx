@@ -23,6 +23,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeManager } from "@/components/ThemeManager";
 import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
 import { registerPwa } from "@/lib/pwa";
+import { I18nProvider } from "@/lib/i18n";
 
 function NotFoundComponent() {
   return (
@@ -156,11 +157,13 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeManager />
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-      <PwaInstallPrompt />
-      <Toaster richColors position="top-right" />
+      <I18nProvider>
+        <ThemeManager />
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+        <PwaInstallPrompt />
+        <Toaster richColors position="top-right" />
+      </I18nProvider>
     </QueryClientProvider>
   );
 }
