@@ -47,6 +47,8 @@ import {
 import { useDemoMode } from "@/lib/demo/demo-context";
 import { DemoBanner } from "@/components/demo/DemoBanner";
 import { DemoFooter } from "@/components/demo/DemoFooter";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useI18n } from "@/lib/i18n";
 import { toast } from "sonner";
 import type { MouseEvent as ReactMouseEvent } from "react";
 
