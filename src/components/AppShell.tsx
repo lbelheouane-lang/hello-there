@@ -155,27 +155,27 @@ function DemoSidebar() {
 
 const NAV: readonly {
   to: string;
-  label: string;
+  tKey: string;
   icon: typeof Gem;
   roles: readonly AppRole[];
   perm?: PermissionKey;
   developerOnly?: boolean;
 }[] = [
-  { to: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard, roles: ["admin"], perm: "dashboard" },
-  { to: "/nouvelle-vente", label: "Nouvelle vente", icon: ShoppingCart, roles: ["admin", "employe"], perm: "sales" },
-  { to: "/clients", label: "Clients", icon: Users, roles: ["admin", "employe"], perm: "customers" },
-  { to: "/paiements-en-attente", label: "Paiements en attente", icon: Wallet, roles: ["admin", "employe"], perm: "sales" },
-  { to: "/factures", label: "Ventes", icon: FileText, roles: ["admin", "employe"], perm: "invoices" },
-  { to: "/reparations", label: "Réparations", icon: Wrench, roles: ["admin", "employe"] },
-  { to: "/stock", label: "Stock", icon: Package, roles: ["admin"], perm: "inventory" },
-  { to: "/parures", label: "Parures", icon: Layers, roles: ["admin"], perm: "jewelry_sets" },
-  { to: "/or-casse", label: "Or Cassé", icon: Recycle, roles: ["admin"], perm: "scrap_gold" },
-  { to: "/fournisseurs", label: "Fournisseurs", icon: Truck, roles: ["admin"], perm: "suppliers" },
-  { to: "/depenses", label: "Dépenses", icon: Wallet2, roles: ["admin"], perm: "reports" },
-  { to: "/journal-quotidien", label: "Journal Quotidien", icon: BookOpen, roles: ["admin", "employe"], perm: "reports" },
-  { to: "/cours-or", label: "Cours de l'or", icon: Coins, roles: ["admin"] },
-  { to: "/boutique", label: "Boutique", icon: Store, roles: ["admin"], perm: "settings" },
-  { to: "/parametres", label: "Paramètres", icon: Settings, roles: ["admin"], perm: "settings" },
+  { to: "/dashboard", tKey: "nav.dashboard", icon: LayoutDashboard, roles: ["admin"], perm: "dashboard" },
+  { to: "/nouvelle-vente", tKey: "nav.new_sale", icon: ShoppingCart, roles: ["admin", "employe"], perm: "sales" },
+  { to: "/clients", tKey: "nav.customers", icon: Users, roles: ["admin", "employe"], perm: "customers" },
+  { to: "/paiements-en-attente", tKey: "nav.pending_payments", icon: Wallet, roles: ["admin", "employe"], perm: "sales" },
+  { to: "/factures", tKey: "nav.sales", icon: FileText, roles: ["admin", "employe"], perm: "invoices" },
+  { to: "/reparations", tKey: "nav.repairs", icon: Wrench, roles: ["admin", "employe"] },
+  { to: "/stock", tKey: "nav.stock", icon: Package, roles: ["admin"], perm: "inventory" },
+  { to: "/parures", tKey: "nav.sets", icon: Layers, roles: ["admin"], perm: "jewelry_sets" },
+  { to: "/or-casse", tKey: "nav.scrap_gold", icon: Recycle, roles: ["admin"], perm: "scrap_gold" },
+  { to: "/fournisseurs", tKey: "nav.suppliers", icon: Truck, roles: ["admin"], perm: "suppliers" },
+  { to: "/depenses", tKey: "nav.expenses", icon: Wallet2, roles: ["admin"], perm: "reports" },
+  { to: "/journal-quotidien", tKey: "nav.daily_journal", icon: BookOpen, roles: ["admin", "employe"], perm: "reports" },
+  { to: "/cours-or", tKey: "nav.gold_price", icon: Coins, roles: ["admin"] },
+  { to: "/boutique", tKey: "nav.store", icon: Store, roles: ["admin"], perm: "settings" },
+  { to: "/parametres", tKey: "nav.settings", icon: Settings, roles: ["admin"], perm: "settings" },
 ];
 
 /** A nav item is visible when the role allows it and (admin, no permission gate,
