@@ -198,6 +198,7 @@ function AppSidebar() {
   const { user, role, permissions, isDeveloper } = useAuth();
   const { data: settings } = useStoreSettings();
   const { data: prefs } = useUserPreferences();
+  const { t } = useI18n();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const storeName = settings?.store_name || "Maison d'Or";
