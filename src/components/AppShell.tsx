@@ -99,6 +99,7 @@ const DEMO_NAV: readonly { to: string; tKey: string; icon: typeof Gem }[] = [
 
 function DemoSidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { t } = useI18n();
   return (
     <Sidebar>
       <SidebarHeader>
@@ -108,13 +109,13 @@ function DemoSidebar() {
           </div>
           <div className="leading-tight">
             <p className="font-serif text-lg font-semibold">ORUS DZ</p>
-            <p className="text-xs text-sidebar-foreground/60">Démonstration</p>
+            <p className="text-xs text-sidebar-foreground/60">{t("shell.demo")}</p>
           </div>
         </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("nav.navigation")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {DEMO_NAV.map((item) => (
@@ -122,7 +123,7 @@ function DemoSidebar() {
                   <SidebarMenuButton asChild isActive={pathname === item.to}>
                     <Link to={item.to}>
                       <item.icon />
-                      <span>{item.label}</span>
+                      <span>{t(item.tKey)}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -133,8 +134,8 @@ function DemoSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <div className="px-2 py-2">
-          <p className="truncate text-sm font-medium">Visiteur</p>
-          <p className="text-xs text-sidebar-foreground/60">Mode démonstration</p>
+          <p className="truncate text-sm font-medium">{t("shell.visitor")}</p>
+          <p className="text-xs text-sidebar-foreground/60">{t("shell.demo_mode")}</p>
         </div>
         <Button
           variant="ghost"
@@ -142,7 +143,7 @@ function DemoSidebar() {
           asChild
         >
           <Link to="/demo">
-            <LogOut className="h-4 w-4" /> Quitter la démo
+            <LogOut className="h-4 w-4" /> {t("shell.exit_demo")}
           </Link>
         </Button>
       </SidebarFooter>
