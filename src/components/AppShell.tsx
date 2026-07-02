@@ -268,15 +268,15 @@ function AppSidebar() {
         <div className="px-2 py-2">
           <p className="truncate text-sm font-medium">{user?.email}</p>
           <p className="text-xs capitalize text-sidebar-foreground/60">
-            {role === "admin" ? "Administrateur" : role === "developer" ? "Développeur" : "Employé"}
-            {isDeveloper && role === "admin" ? " · Développeur" : ""}
+            {role === "admin" ? t("role.admin") : role === "developer" ? t("role.developer") : t("role.employee")}
+            {isDeveloper && role === "admin" ? ` · ${t("role.developer")}` : ""}
           </p>
         </div>
         <Button variant="ghost" className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent" onClick={switchRole}>
-          <Repeat className="h-4 w-4" /> Changer de rôle
+          <Repeat className="h-4 w-4" /> {t("shell.switch_role")}
         </Button>
         <Button variant="ghost" className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent" onClick={signOut}>
-          <LogOut className="h-4 w-4" /> Déconnexion
+          <LogOut className="h-4 w-4" /> {t("shell.sign_out")}
         </Button>
       </SidebarFooter>
     </Sidebar>
