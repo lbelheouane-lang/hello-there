@@ -324,6 +324,7 @@ export function AppShell({
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
             <h1 className="font-serif text-xl font-semibold">{title}</h1>
+            <div className="ml-auto"><LanguageSwitcher /></div>
           </header>
           <main
             className="min-w-0 flex-1 overflow-x-hidden p-4 md:p-6"
