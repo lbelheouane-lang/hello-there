@@ -247,7 +247,7 @@ function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("nav.navigation")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {orderedNav.map((item) => (
@@ -255,7 +255,7 @@ function AppSidebar() {
                   <SidebarMenuButton asChild isActive={pathname === item.to}>
                     <Link to={item.to}>
                       <item.icon />
-                      <span>{item.label}</span>
+                      <span>{t(item.tKey)}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
