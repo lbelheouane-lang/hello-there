@@ -82,19 +82,19 @@ function demoBlockMutation(e: ReactMouseEvent<HTMLElement>) {
 
 
 /** Navigation shown in the public showroom (read-only modules only). */
-const DEMO_NAV: readonly { to: string; label: string; icon: typeof Gem }[] = [
-  { to: "/demo/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
-  { to: "/demo/stock", label: "Stock", icon: Package },
-  { to: "/demo/parures", label: "Parures", icon: Layers },
-  { to: "/demo/or-casse", label: "Or Cassé", icon: Recycle },
-  { to: "/demo/clients", label: "Clients", icon: Users },
-  { to: "/demo/fournisseurs", label: "Fournisseurs", icon: Truck },
-  { to: "/demo/factures", label: "Ventes & Factures", icon: FileText },
-  { to: "/demo/paiements-en-attente", label: "Paiements en attente", icon: Wallet },
-  { to: "/demo/depenses", label: "Dépenses", icon: Wallet2 },
-  { to: "/demo/reparations", label: "Réparations", icon: Wrench },
-  { to: "/demo/journal-quotidien", label: "Journal Quotidien", icon: BookOpen },
-  { to: "/demo/cours-or", label: "Cours de l'or", icon: Coins },
+const DEMO_NAV: readonly { to: string; tKey: string; icon: typeof Gem }[] = [
+  { to: "/demo/dashboard", tKey: "nav.dashboard", icon: LayoutDashboard },
+  { to: "/demo/stock", tKey: "nav.stock", icon: Package },
+  { to: "/demo/parures", tKey: "nav.sets", icon: Layers },
+  { to: "/demo/or-casse", tKey: "nav.scrap_gold", icon: Recycle },
+  { to: "/demo/clients", tKey: "nav.customers", icon: Users },
+  { to: "/demo/fournisseurs", tKey: "nav.suppliers", icon: Truck },
+  { to: "/demo/factures", tKey: "nav.sales_invoices", icon: FileText },
+  { to: "/demo/paiements-en-attente", tKey: "nav.pending_payments", icon: Wallet },
+  { to: "/demo/depenses", tKey: "nav.expenses", icon: Wallet2 },
+  { to: "/demo/reparations", tKey: "nav.repairs", icon: Wrench },
+  { to: "/demo/journal-quotidien", tKey: "nav.daily_journal", icon: BookOpen },
+  { to: "/demo/cours-or", tKey: "nav.gold_price", icon: Coins },
 ];
 
 function DemoSidebar() {
