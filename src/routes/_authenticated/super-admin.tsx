@@ -70,6 +70,13 @@ import {
   type SuperAdminPasskeyRow,
   type SuperAdminAccessLogRow,
 } from "@/lib/super-admin-passkey.functions";
+import {
+  listTenants,
+  listTenantKeys,
+  createTenantWithKey,
+  type TenantRow,
+  type TenantKeyRow,
+} from "@/lib/tenant.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -146,6 +153,9 @@ function SuperAdminPanel() {
             <TabsTrigger value="dashboard" className="gap-2">
               <LayoutDashboard className="h-4 w-4" /> Tableau de bord
             </TabsTrigger>
+            <TabsTrigger value="tenants" className="gap-2">
+              <Building2 className="h-4 w-4" /> Boutiques (SaaS)
+            </TabsTrigger>
             <TabsTrigger value="clients" className="gap-2">
               <Building2 className="h-4 w-4" /> Clients
             </TabsTrigger>
@@ -171,6 +181,9 @@ function SuperAdminPanel() {
 
           <TabsContent value="dashboard">
             <DashboardTab />
+          </TabsContent>
+          <TabsContent value="tenants">
+            <TenantsTab />
           </TabsContent>
           <TabsContent value="clients">
             <ClientsTab />
