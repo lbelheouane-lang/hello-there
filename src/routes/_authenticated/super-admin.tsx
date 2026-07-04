@@ -70,6 +70,13 @@ import {
   type SuperAdminPasskeyRow,
   type SuperAdminAccessLogRow,
 } from "@/lib/super-admin-passkey.functions";
+import {
+  listTenants,
+  listTenantKeys,
+  createTenantWithKey,
+  type TenantRow,
+  type TenantKeyRow,
+} from "@/lib/tenant.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -146,6 +153,9 @@ function SuperAdminPanel() {
             <TabsTrigger value="dashboard" className="gap-2">
               <LayoutDashboard className="h-4 w-4" /> Tableau de bord
             </TabsTrigger>
+            <TabsTrigger value="tenants" className="gap-2">
+              <Building2 className="h-4 w-4" /> Boutiques (SaaS)
+            </TabsTrigger>
             <TabsTrigger value="clients" className="gap-2">
               <Building2 className="h-4 w-4" /> Clients
             </TabsTrigger>
@@ -171,6 +181,9 @@ function SuperAdminPanel() {
 
           <TabsContent value="dashboard">
             <DashboardTab />
+          </TabsContent>
+          <TabsContent value="tenants">
+            <TenantsTab />
           </TabsContent>
           <TabsContent value="clients">
             <ClientsTab />
@@ -1671,6 +1684,183 @@ function MaintenanceTab() {
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             Effacer toutes les données et démarrer à zéro
           </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Boutiques (multi-tenant SaaS) — création de tenants + clés d'accès
+// ---------------------------------------------------------------------------
+
+function TenantsTab() {
+  const loadTenants = useServerFn(listTenants);
+  const loadKeys = useServerFn(listTenantKeys);
+  const create = useServerFn(createTenantWithKey);
+
+  const [tenants, setTenants] = useState<TenantRow[]>([]);
+  const [keys, setKeys] = useState<TenantKeyRow[]>([]);
+  const [name, setName] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [newKey, setNewKey] = useState<string | null>(null);
+
+  const refresh = useCallback(() => {
+    loadTenants().then(setTenants).catch(() => {});
+    loadKeys().then(setKeys).catch(() => {});
+  }, [loadTenants, loadKeys]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  async function onCreate(e: React.FormEvent) {
+    e.preventDefault();
+    if (busy || name.trim().length < 2) return;
+    setBusy(true);
+    setNewKey(null);
+    try {
+      const res = await create({ data: { tenantName: name.trim() } });
+      setNewKey(res.key);
+      setName("");
+      toast.success("Boutique et clé d'accès créées.");
+      refresh();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Créer une nouvelle boutique</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Chaque boutique est un espace totalement isolé. Créez-la, transmettez la clé
+            au client : il l'active sur la page <span className="font-mono">/rejoindre</span>{" "}
+            après avoir créé son compte, et obtient sa boutique vide automatiquement.
+          </p>
+          <form onSubmit={onCreate} className="flex flex-col gap-3 sm:flex-row">
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Nom de la boutique (ex. Bijouterie El Feth)"
+              className="flex-1"
+            />
+            <Button type="submit" disabled={busy || name.trim().length < 2} className="gap-2">
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+              Créer + générer la clé
+            </Button>
+          </form>
+
+          {newKey && (
+            <div className="rounded-lg border border-primary/40 bg-primary/5 p-4">
+              <p className="mb-2 text-sm font-medium">
+                Clé d'accès (copiez-la maintenant, elle ne sera plus affichée) :
+              </p>
+              <div className="flex items-center gap-2">
+                <code className="flex-1 break-all rounded bg-background px-3 py-2 font-mono text-sm">
+                  {newKey}
+                </code>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    navigator.clipboard.writeText(newKey);
+                    toast.success("Clé copiée.");
+                  }}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Boutiques existantes</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Boutique</TableHead>
+                <TableHead>Statut</TableHead>
+                <TableHead>Utilisateurs</TableHead>
+                <TableHead>Créée le</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {tenants.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center text-muted-foreground">
+                    Aucune boutique.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                tenants.map((t) => (
+                  <TableRow key={t.id}>
+                    <TableCell className="font-medium">{t.name}</TableCell>
+                    <TableCell>
+                      <Badge variant={t.status === "active" ? "default" : "secondary"}>
+                        {t.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{t.user_count}</TableCell>
+                    <TableCell>{formatDate(t.created_at)}</TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Clés d'accès des boutiques</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Boutique</TableHead>
+                <TableHead>Libellé</TableHead>
+                <TableHead>Statut</TableHead>
+                <TableHead>Utilisations</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {keys.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center text-muted-foreground">
+                    Aucune clé.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                keys.map((k) => (
+                  <TableRow key={k.id}>
+                    <TableCell className="font-medium">{k.tenant_name ?? "—"}</TableCell>
+                    <TableCell>{k.label ?? "—"}</TableCell>
+                    <TableCell>
+                      <Badge variant={k.status === "active" ? "default" : "secondary"}>
+                        {k.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {k.used_count}/{k.max_uses}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>
