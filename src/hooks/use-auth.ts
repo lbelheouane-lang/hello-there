@@ -31,7 +31,7 @@ export function useAuth(): AuthState {
       const [{ data: roleRows }, { data: emp }, { data: prof }] = await Promise.all([
         supabase
           .from("user_roles")
-          .select("role")
+          .select("role, tenant_id")
           .eq("user_id", uid)
           .order("role", { ascending: true }),
         supabase
@@ -53,7 +53,17 @@ export function useAuth(): AuthState {
         return;
       }
 
-      const roles = (roleRows ?? []).map((r) => String(r.role));
+      const activeTenantId = prof?.tenant_id ?? null;
+      const scopedRoleRows = (roleRows ?? []).filter((r) => {
+        const role = String(r.role);
+        return (
+          role === "super_admin" ||
+          role === "developer" ||
+          !activeTenantId ||
+          r.tenant_id === activeTenantId
+        );
+      });
+      const roles = scopedRoleRows.map((r) => String(r.role));
       const dev = roles.includes("developer");
       setIsDeveloper(dev);
       setIsSuperAdmin(roles.includes("super_admin"));
