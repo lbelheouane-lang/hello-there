@@ -2590,6 +2590,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_role_in_tenant: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _tenant_id: string
+          _user_id: string
+        }
+        Returns: boolean
+      }
       invoice_status: {
         Args: { _due: string; _paid: number; _total: number }
         Returns: string
