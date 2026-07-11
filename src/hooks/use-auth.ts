@@ -41,7 +41,7 @@ export function useAuth(): AuthState {
           .maybeSingle(),
         supabase
           .from("profiles")
-          .select("disabled")
+          .select("disabled, tenant_id")
           .eq("id", uid)
           .maybeSingle(),
       ]);
